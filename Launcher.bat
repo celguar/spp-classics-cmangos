@@ -317,7 +317,7 @@ if "%choose_exp%"=="4" goto install_module_vanilla
 :install_module_vanilla
 mode con: cols=80 lines=30
 echo.
-echo  Downloading Vanilla module...(~460 MB)
+echo  Downloading Vanilla module...(~520 MB)
 echo.
 "%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://161.97.113.128:9876/spp_classics_data/cmangos/vanilla.7z -P "%mainfolder%\Modules"
 echo.
@@ -328,7 +328,7 @@ goto check_modules
 :install_module_tbc
 mode con: cols=80 lines=30
 echo.
-echo  Downloading TBC module...(~650 MB)
+echo  Downloading TBC module...(~740 MB)
 echo.
 "%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://161.97.113.128:9876/spp_classics_data/cmangos/tbc.7z -P "%mainfolder%\Modules"
 echo.
@@ -339,7 +339,7 @@ goto check_modules
 :install_module_wotlk
 mode con: cols=80 lines=30
 echo.
-echo  Downloading WotLK module...(~900 MB)
+echo  Downloading WotLK module...(~1100 MB)
 echo.
 "%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://161.97.113.128:9876/spp_classics_data/cmangos/wotlk.7z -P "%mainfolder%\Modules"
 echo.
