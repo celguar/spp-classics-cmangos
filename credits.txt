@@ -1,0 +1,15 @@
+ Teams:
+ ------
+ "MaNGOS"           "(C)ontinued MaNGOS"
+ "AzerothCore"      "TrinityCore"
+ "WoWruRU Project"
+
+ Persons:
+ --------
+ "Ike3"             "Lidocain"
+ "LordPsyan"        "jokerlfm"
+ "Ovahlord"         "Talamortis"
+ "Traesh"           "StygianTheBest"
+ "5man999"          "Wowx"
+ "ainslievaux"      "apock69"
+ "Lillecarl"        "Mostlikely"
