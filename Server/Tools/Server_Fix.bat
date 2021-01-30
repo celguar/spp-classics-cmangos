@@ -33,7 +33,7 @@ cls
 if not exist "%mainfolder%\%installpath%\launcher.bat" goto not_installed_error
 cd "%mainfolder%\%installpath%"
 robocopy Settings Settings_Old /E
-..\git\cmd\git.exe reset --hard 5da671e275a5c4b8f432cd55d2d590bed946cdea
+..\git\cmd\git.exe reset --hard 4132ae0c46dca07d6b57622427e6bcf4cf67627a
 ping -n 5 127.0.0.1>nul
 cls
 echo.
