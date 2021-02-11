@@ -143,10 +143,7 @@ if exist "%mainfolder%\Modules\tbc\dbc" set module_check_tbc=Installed
 if exist "%mainfolder%\Modules\wotlk\dbc" set module_check_wotlk=Installed
 if exist "%mainfolder%\Modules\cata\dbc" set module_check_cata=Installed
 cls
-echo ########################################
-echo # SPP - Classics Collection            #
-echo # https://spp-forum.de                 #
-echo ########################################
+more < "%mainfolder%\header_spp.txt"
 echo.
 echo   Choose expansion:
 echo.
@@ -201,7 +198,7 @@ set world_update=vanilla_world_up1
 goto settings
 
 :setup_tbc
-SET NAME=SPP - The Burning Crusade
+SET NAME=SPP - Burning Crusade
 TITLE %NAME%
 COLOR 0A
 set expansion=tbc
@@ -220,7 +217,7 @@ set world_update=tbc_world_up1
 goto settings
 
 :setup_wotlk
-SET NAME=SPP - Wrath of the Lich King
+SET NAME=SPP - WotLK
 TITLE %NAME%
 COLOR 0B
 set expansion=wotlk
@@ -304,6 +301,7 @@ goto menu
 
 :module_not_found
 cls
+more < "%mainfolder%\header_spp.txt"
 echo.
 echo  The %expansion% module not found
 ping -n 2 127.0.0.1>nul
@@ -318,33 +316,33 @@ if "%choose_exp%"=="4" goto install_module_vanilla
 :install_module_vanilla
 mode con: cols=80 lines=30
 echo.
-echo  Downloading Vanilla module...(~520 MB)
+echo    Downloading Vanilla module...(~520 MB)
 echo.
 "%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://161.97.113.128:9876/spp_classics_data/cmangos/vanilla.7z -P "%mainfolder%\Modules"
 echo.
-echo  Download complete. Checking file...
+echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
 goto check_modules
 
 :install_module_tbc
 mode con: cols=80 lines=30
 echo.
-echo  Downloading TBC module...(~740 MB)
+echo    Downloading TBC module...(~740 MB)
 echo.
 "%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://161.97.113.128:9876/spp_classics_data/cmangos/tbc.7z -P "%mainfolder%\Modules"
 echo.
-echo  Download complete. Checking file...
+echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
 goto check_modules
 
 :install_module_wotlk
 mode con: cols=80 lines=30
 echo.
-echo  Downloading WotLK module...(~1100 MB)
+echo    Downloading WotLK module...(~1100 MB)
 echo.
 "%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://161.97.113.128:9876/spp_classics_data/cmangos/wotlk.7z -P "%mainfolder%\Modules"
 echo.
-echo  Download complete. Checking file...
+echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
 goto check_modules
 
@@ -355,25 +353,26 @@ cd "%mainfolder%\Modules"
 mkdir %expansion%
 cd %expansion%
 echo.
-echo  Extracting %expansion% module...
+echo    Extracting %expansion% module...
 echo.
 ping -n 2 127.0.0.1>nul
-echo  Please, wait...
+echo    Please, wait...
 echo.
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Modules\%expansion%.7z" > nul
-echo  Done!
+echo    Done!
 ping -n 3 127.0.0.1>nul
 del "%mainfolder%\Modules\%expansion%.7z"
 cd "%mainfolder%"
 goto update_install
 
 :extract_worlddb
+more < "%mainfolder%\header_spp.txt"
 echo.
-echo  Extracting world database...
+echo    Extracting world database...
 echo.
 cd "%mainfolder%\sql\%expansion%"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
-echo  Done!
+echo    Done!
 cd "%mainfolder%"
 ping -n 2 127.0.0.1>nul
 goto update_install
@@ -383,15 +382,16 @@ mode con: cols=40 lines=30
 cls
 if not exist "%mainfolder%\Modules\%expansion%\vmaps" goto check_modules
 if not exist "%mainfolder%\sql\%expansion%\world.sql" goto extract_worlddb
+more < "%mainfolder%\header_spp.txt"
 echo.
-echo  Installing database, please wait...
+echo    Installing database, please wait...
 echo.
 ping -n 10 127.0.0.1>nul
-echo  Installing world database...
+echo    Installing world database...
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_world.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world.sql"
 echo.
-echo  Installing characters database...
+echo    Installing characters database...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_characters.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_realmd.sql"
@@ -399,21 +399,21 @@ ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmd.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
 echo.
-echo  Applying characters updates...
+echo    Applying characters updates...
 ping -n 2 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 echo.
-echo  Applying playerbot updates...
+echo    Applying playerbot updates...
 ping -n 2 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 echo.
-echo  Applying world updates...
+echo    Applying world updates...
 ping -n 2 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 for %%i in ("%mainfolder%\sql\%expansion%\world\Instances\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\Instances\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\Instances\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\Instances\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 ping -n 3 127.0.0.1>nul
 echo %spp_update% > "%mainfolder%\%spp_update%.spp"
 goto start_database
@@ -438,32 +438,33 @@ del "%mainfolder%\%expansion%_ru_re.spp"
 del "%mainfolder%\%expansion%_tw_re.spp"
 del "%mainfolder%\%expansion%_es_re.spp"
 cls
+more < "%mainfolder%\header_spp.txt"
 echo.
-echo  Extracting world update...
+echo    Extracting world update...
 cd "%mainfolder%\sql\%expansion%"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
 ping -n 2 127.0.0.1>nul
 cd "%mainfolder%"
 echo.
-echo  Updating database, please wait...
+echo    Updating database, please wait...
 echo.
 ping -n 10 127.0.0.1>nul
-echo  Installing updated world database...
+echo    Installing updated world database...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_world.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world.sql"
 echo.
-echo  Applying characters database updates...
+echo    Applying characters updates...
 ping -n 2 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 for %%i in ("%mainfolder%\sql\%expansion%\characters_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 echo.
-echo  Applying world updates...
+echo    Applying world updates...
 ping -n 2 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 for %%i in ("%mainfolder%\sql\%expansion%\world\Instances\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\Instances\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\Instances\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\Instances\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 ping -n 3 127.0.0.1>nul
 echo %spp_update% > "%mainfolder%\%world_update%.spp"
 goto start_database
@@ -671,14 +672,14 @@ if exist "%mainfolder%\%expansion%_tw.spp" set lo_tw=Installed
 if exist "%mainfolder%\%expansion%_ru.spp" set lo_ru=Installed
 if exist "%mainfolder%\%expansion%_mx.spp" set lo_mx=Installed
 
-if exist "%mainfolder%\%expansion%_fr_re.spp" set lo_fr=Eng replaced
-if exist "%mainfolder%\%expansion%_es_re.spp" set lo_es=Eng replaced
-if exist "%mainfolder%\%expansion%_de_re.spp" set lo_de=Eng replaced
-if exist "%mainfolder%\%expansion%_ko_re.spp" set lo_ko=Eng replaced
-if exist "%mainfolder%\%expansion%_ch_re.spp" set lo_ch=Eng replaced
-if exist "%mainfolder%\%expansion%_tw_re.spp" set lo_tw=Eng replaced
-if exist "%mainfolder%\%expansion%_ru_re.spp" set lo_ru=Eng replaced
-if exist "%mainfolder%\%expansion%_mx_re.spp" set lo_mx=Eng replaced
+if exist "%mainfolder%\%expansion%_fr_re.spp" set lo_fr=ENG replaced
+if exist "%mainfolder%\%expansion%_es_re.spp" set lo_es=ENG replaced
+if exist "%mainfolder%\%expansion%_de_re.spp" set lo_de=ENG replaced
+if exist "%mainfolder%\%expansion%_ko_re.spp" set lo_ko=ENG replaced
+if exist "%mainfolder%\%expansion%_ch_re.spp" set lo_ch=ENG replaced
+if exist "%mainfolder%\%expansion%_tw_re.spp" set lo_tw=ENG replaced
+if exist "%mainfolder%\%expansion%_ru_re.spp" set lo_ru=ENG replaced
+if exist "%mainfolder%\%expansion%_mx_re.spp" set lo_mx=ENG replaced
 
 set loc_already_replaced=NO
 if exist "%mainfolder%\%expansion%_fr_re.spp" set loc_already_replaced=YES
@@ -1083,7 +1084,7 @@ del "%mainfolder%\%expansion%_mx_re.spp"
 del "%mainfolder%\%expansion%_ru_re.spp"
 del "%mainfolder%\%expansion%_tw_re.spp"
 del "%mainfolder%\%expansion%_es_re.spp"
-goto install_locales
+goto locales_end
 
 :quick_start_servers_x86
 taskkill /f /im cmdmp3win.exe
@@ -1470,14 +1471,17 @@ goto menu
 
 :account_tool
 cls
+more < "%mainfolder%\header_spp.txt"
 echo.
 echo   - Start the server
 echo   - Open "mangosd.exe" window
 echo   - Use the following command:
 echo.
-echo    account create NAME PASSWORD
+if "%choose_exp%"=="1" echo    account create NAME PASSWORD
+if "%choose_exp%"=="2" echo    account create NAME PASSWORD 1
+if "%choose_exp%"=="3" echo    account create NAME PASSWORD 2
 echo.
-echo  To create an administrator account:
+echo  To give GM rights use:
 echo.
 echo    account set gm NAME 3
 echo.
@@ -1617,11 +1621,14 @@ echo.
 echo    Shutting down the database...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown
-ping -n 3 127.0.0.1>nul
 cls
 more < "%mainfolder%\header_spp.txt"
 echo.
-echo    DB check complete!
+echo    Check complete
+echo.
+echo    Shutting down the database...
+echo.
+echo    Done!
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Press any key to go back
