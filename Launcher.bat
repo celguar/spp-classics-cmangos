@@ -429,6 +429,14 @@ del "%mainfolder%\%expansion%_mx.spp"
 del "%mainfolder%\%expansion%_ru.spp"
 del "%mainfolder%\%expansion%_tw.spp"
 del "%mainfolder%\%expansion%_es.spp"
+del "%mainfolder%\%expansion%_fr_re.spp"
+del "%mainfolder%\%expansion%_de_re.spp"
+del "%mainfolder%\%expansion%_ko_re.spp"
+del "%mainfolder%\%expansion%_ch_re.spp"
+del "%mainfolder%\%expansion%_mx_re.spp"
+del "%mainfolder%\%expansion%_ru_re.spp"
+del "%mainfolder%\%expansion%_tw_re.spp"
+del "%mainfolder%\%expansion%_es_re.spp"
 cls
 echo.
 echo  Extracting world update...
@@ -638,9 +646,11 @@ set locCH=X
 set locTW=X
 set locRU=X
 set locMX=X
+set loc_replace=NO
 
 :install_locales
 cls
+set lo_fields=NO
 set lo_fr=Not Installed
 set lo_es=Not Installed
 set lo_de=Not Installed
@@ -650,6 +660,8 @@ set lo_tw=Not Installed
 set lo_ru=Not Installed
 set lo_mx=Not Installed
 
+if exist "%mainfolder%\%expansion%_locale_fields.spp" set lo_fields=YES
+
 if exist "%mainfolder%\%expansion%_fr.spp" set lo_fr=Installed
 if exist "%mainfolder%\%expansion%_es.spp" set lo_es=Installed
 if exist "%mainfolder%\%expansion%_de.spp" set lo_de=Installed
@@ -658,6 +670,25 @@ if exist "%mainfolder%\%expansion%_ch.spp" set lo_ch=Installed
 if exist "%mainfolder%\%expansion%_tw.spp" set lo_tw=Installed
 if exist "%mainfolder%\%expansion%_ru.spp" set lo_ru=Installed
 if exist "%mainfolder%\%expansion%_mx.spp" set lo_mx=Installed
+
+if exist "%mainfolder%\%expansion%_fr_re.spp" set lo_fr=Eng replaced
+if exist "%mainfolder%\%expansion%_es_re.spp" set lo_es=Eng replaced
+if exist "%mainfolder%\%expansion%_de_re.spp" set lo_de=Eng replaced
+if exist "%mainfolder%\%expansion%_ko_re.spp" set lo_ko=Eng replaced
+if exist "%mainfolder%\%expansion%_ch_re.spp" set lo_ch=Eng replaced
+if exist "%mainfolder%\%expansion%_tw_re.spp" set lo_tw=Eng replaced
+if exist "%mainfolder%\%expansion%_ru_re.spp" set lo_ru=Eng replaced
+if exist "%mainfolder%\%expansion%_mx_re.spp" set lo_mx=Eng replaced
+
+set loc_already_replaced=NO
+if exist "%mainfolder%\%expansion%_fr_re.spp" set loc_already_replaced=YES
+if exist "%mainfolder%\%expansion%_es_re.spp" set loc_already_replaced=YES
+if exist "%mainfolder%\%expansion%_de_re.spp" set loc_already_replaced=YES
+if exist "%mainfolder%\%expansion%_ko_re.spp" set loc_already_replaced=YES
+if exist "%mainfolder%\%expansion%_ch_re.spp" set loc_already_replaced=YES
+if exist "%mainfolder%\%expansion%_tw_re.spp" set loc_already_replaced=YES
+if exist "%mainfolder%\%expansion%_ru_re.spp" set loc_already_replaced=YES
+if exist "%mainfolder%\%expansion%_mx_re.spp" set loc_already_replaced=YES
 
 more < "%mainfolder%\header_locale.txt"
 echo.
@@ -672,6 +703,11 @@ echo    S - Spanish      (%locES%) [%lo_es%]
 echo    M - Spanish (SA) (%locMX%) [%lo_mx%]
 echo    K - Korean       (%locKO%) [%lo_ko%]
 echo.
+echo    P - Replace English        [%loc_replace%]
+echo    Note: Only one can replace english!
+echo.
+if %loc_already_replaced% == YES echo    O - Restore English
+if %loc_already_replaced% == YES echo.
 echo        N - Install selected
 echo        X - Go back
 echo.
@@ -692,6 +728,10 @@ if %activity% == S goto ToggleLocES:
 if %activity% == s goto ToggleLocES:
 if %activity% == K goto ToggleLocKO:
 if %activity% == k goto ToggleLocKO:
+if %activity% == P goto ToggleRe:
+if %activity% == p goto ToggleRe:
+if %activity% == o goto restore_locale:
+if %activity% == O goto restore_locale:
 
 if %activity% == N goto install_locales_go
 if %activity% == n goto install_locales_go
@@ -701,6 +741,19 @@ if %activity% == x goto menu
 if %activity%. == . goto menu
 pause
 goto menu
+
+:ToggleRe
+if %loc_replace% == NO goto ToggleReNo:
+if %loc_replace% == YES goto ToggleReYes:
+goto install_locales
+
+:ToggleReNo
+set loc_replace=YES
+goto install_locales
+
+:ToggleReYes
+set loc_replace=NO
+goto install_locales
 
 :ToggleLocFR
 if %locFR% == X goto ToggleLocFRNo:
@@ -809,19 +862,22 @@ goto install_locales
 cls
 more < "%mainfolder%\header_locale.txt"
 echo.
-echo  Extracting locales...
+echo    Extracting locales...
 ping -n 3 127.0.0.1>nul
 echo.
-echo  Please wait...
+echo    Please wait...
 cd "%mainfolder%\sql\%expansion%"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\locales.7z" > nul
 echo.
 cd "%mainfolder%"
 ping -n 3 127.0.0.1>nul
-echo  Preparing %expansion% DB...
+echo    Preparing %expansion% DB...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\prepare.sql"
 ping -n 3 127.0.0.1>nul
+if %loc_replace% == YES goto locales_replace_1
+
+:locales_continue
 
 :WorldDB
 if %locFR% == V goto LoadFR:
@@ -851,98 +907,183 @@ if %locRU% == V goto LoadRU:
 cls
 more < "%mainfolder%\header_locale.txt"
 echo.
-echo  Locales installed!
+echo    Locales installed!
 ping -n 3 127.0.0.1>nul
 echo.
-echo  Removing temp files...
+echo    Removing temp files...
 rd /s /q "%mainfolder%\sql\%expansion%\locales"
 ping -n 3 127.0.0.1>nul
 echo.
-echo  Done!
+echo    Done!
 ping -n 3 127.0.0.1>nul
 echo.
 
 goto install_locales_pre
 
 :LoadFR
+set cur_loc=fr
 echo.
-echo  Loading French Locale...
+echo    Loading French Locale...
 for %%i in ("%mainfolder%\sql\%expansion%\locales\French\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\French\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\French\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\French\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 echo %expansion% > "%mainfolder%\%expansion%_fr.spp"
 ping -n 2 127.0.0.1>nul
+if %loc_replace% == YES goto locales_replace_2
 goto WorldDB1:
 
 :LoadDE
+set cur_loc=de
 echo.
-echo  Loading German Locale...
+echo    Loading German Locale...
 for %%i in ("%mainfolder%\sql\%expansion%\locales\German\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\German\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\German\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\German\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 echo %expansion% > "%mainfolder%\%expansion%_de.spp"
 ping -n 2 127.0.0.1>nul
+if %loc_replace% == YES goto locales_replace_2
 goto WorldDB2:
 
 :LoadKO
+set cur_loc=ko
 echo.
-echo  Loading Korean Locale...
+echo    Loading Korean Locale...
 for %%i in ("%mainfolder%\sql\%expansion%\locales\Korean\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Korean\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Korean\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Korean\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 echo %expansion% > "%mainfolder%\%expansion%_ko.spp"
 ping -n 2 127.0.0.1>nul
+if %loc_replace% == YES goto locales_replace_2
 goto WorldDB3:
 
 :LoadCH
+set cur_loc=ch
 echo.
-echo  Loading Chinese Locale...
+echo    Loading Chinese Locale...
 for %%i in ("%mainfolder%\sql\%expansion%\locales\Chinese\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Chinese\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Chinese\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Chinese\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 echo %expansion% > "%mainfolder%\%expansion%_ch.spp"
 ping -n 2 127.0.0.1>nul
+if %loc_replace% == YES goto locales_replace_2
 goto WorldDB4:
 
 :LoadTW
+set cur_loc=tw
 echo.
-echo  Loading Taiwanese Locale...
+echo    Loading Taiwanese Locale...
 for %%i in ("%mainfolder%\sql\%expansion%\locales\Taiwanese\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Taiwanese\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Taiwanese\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Taiwanese\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 echo %expansion% > "%mainfolder%\%expansion%_tw.spp"
 ping -n 2 127.0.0.1>nul
+if %loc_replace% == YES goto locales_replace_2
 goto WorldDB5:
 
 :LoadES
+set cur_loc=es
 echo.
-echo  Loading Spanish Locale...
+echo    Loading Spanish Locale...
 for %%i in ("%mainfolder%\sql\%expansion%\locales\Spanish\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 echo %expansion% > "%mainfolder%\%expansion%_es.spp"
 ping -n 2 127.0.0.1>nul
+if %loc_replace% == YES goto locales_replace_2
 goto WorldDB6:
 
 :LoadMX
+set cur_loc=mx
 echo.
-echo  Loading Spanish (SA) Locale...
+echo    Loading Spanish (SA) Locale...
 for %%i in ("%mainfolder%\sql\%expansion%\locales\Spanish_South_American\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish_South_American\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish_South_American\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish_South_American\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 echo %expansion% > "%mainfolder%\%expansion%_mx.spp"
 ping -n 2 127.0.0.1>nul
+if %loc_replace% == YES goto locales_replace_2
 goto WorldDB7:
 
 :LoadRU
+set cur_loc=ru
 echo.
-echo  Loading Russian Locale...
+echo    Loading Russian Locale...
 for %%i in ("%mainfolder%\sql\%expansion%\locales\Russian\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Russian\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Russian\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Russian\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
-echo  Done!
+echo    Done!
 echo %expansion% > "%mainfolder%\%expansion%_ru.spp"
 ping -n 2 127.0.0.1>nul
+if %loc_replace% == YES goto locales_replace_2
 goto locales_end
+
+:locales_replace_1
+echo.
+if %loc_already_replaced% == NO echo    Backing up English locale...
+if %loc_already_replaced% == NO ping -n 3 127.0.0.1>nul
+if %lo_fields% == NO ("%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\add_fields.sql")
+if %lo_fields% == NO (echo %expansion% > "%mainfolder%\%expansion%_locale_fields.spp")
+set lo_fields = YES
+if %loc_already_replaced% == NO ping -n 3 127.0.0.1>nul
+if %loc_already_replaced% == NO "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\save_english.sql"
+del "%mainfolder%\%expansion%_fr_re.spp"
+del "%mainfolder%\%expansion%_de_re.spp"
+del "%mainfolder%\%expansion%_ko_re.spp"
+del "%mainfolder%\%expansion%_ch_re.spp"
+del "%mainfolder%\%expansion%_mx_re.spp"
+del "%mainfolder%\%expansion%_ru_re.spp"
+del "%mainfolder%\%expansion%_tw_re.spp"
+del "%mainfolder%\%expansion%_es_re.spp"
+cls
+more < "%mainfolder%\header_locale.txt"
+goto locales_continue
+
+:locales_replace_2
+echo.
+echo    Replacing English locale...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\replace_%cur_loc%.sql"
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+echo %expansion% > "%mainfolder%\%expansion%_%cur_loc%_re.spp"
+if %cur_loc% == fr goto WorldDB1:
+if %cur_loc% == de goto WorldDB2:
+if %cur_loc% == ko goto WorldDB3:
+if %cur_loc% == ch goto WorldDB4:
+if %cur_loc% == tw goto WorldDB5:
+if %cur_loc% == es goto WorldDB6:
+if %cur_loc% == mx goto WorldDB7:
+if %cur_loc% == ru goto locales_end
+goto install_locales
+
+:restore_locale
+cls
+more < "%mainfolder%\header_locale.txt"
+echo.
+echo    Extracting locales...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
+cd "%mainfolder%\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\locales.7z" > nul
+cd "%mainfolder%"
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Restoring English locale...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\load_english.sql"
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+del "%mainfolder%\%expansion%_fr_re.spp"
+del "%mainfolder%\%expansion%_de_re.spp"
+del "%mainfolder%\%expansion%_ko_re.spp"
+del "%mainfolder%\%expansion%_ch_re.spp"
+del "%mainfolder%\%expansion%_mx_re.spp"
+del "%mainfolder%\%expansion%_ru_re.spp"
+del "%mainfolder%\%expansion%_tw_re.spp"
+del "%mainfolder%\%expansion%_es_re.spp"
+goto install_locales
 
 :quick_start_servers_x86
 taskkill /f /im cmdmp3win.exe
