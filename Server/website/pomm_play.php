@@ -57,7 +57,7 @@ for ($i = 0; $i < $maps_count; $i++) {
 }
 $arr = array();
 $i=$maps_count;
-$query = $characters_db->query("SELECT `account`,`name`,`class`,`race`, `level`, `gender`, `position_x`,`position_y`,`map`,`zone`,`extra_flags` FROM `characters` WHERE `online`='1' ORDER BY `name`");
+$query = $characters_db->query("SELECT `account`,`name`,`class`,`race`, `level`, `gender`, `playerFlags`, `position_x`,`position_y`,`map`,`zone`,`extra_flags` FROM `characters` WHERE `online`='1' ORDER BY `name`");
 while ($result = $characters_db->fetch_assoc($query)) {
     if ($result['map'] == 530 && $result['position_y'] > -1000 || in_array($result['map'], $outland_inst)) {
         $Extention = 1;
@@ -103,7 +103,7 @@ while ($result = $characters_db->fetch_assoc($query)) {
 
     $char_data = 0;
     $char_flags = $char_data;
-    $char_dead = ($char_flags & 0x11)?1:0;
+    $char_dead = ($result['playerFlags'] & 0x11)?1:0;
     $arr[$i]['x'] = $result['position_x'];
     $arr[$i]['y'] = $result['position_y'];
     $arr[$i]['dead'] = $char_dead;
