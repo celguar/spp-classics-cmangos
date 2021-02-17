@@ -556,12 +556,13 @@ if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
 cls
+more < "%mainfolder%\header_spp.txt"
 echo.
-echo  Reseting random bots...
+echo    Reseting random bots...
 echo.
-ping -n 2 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
-echo  Done! Going back...
+echo    Done! Going back...
 ping -n 3 127.0.0.1>nul
 goto menu
 
@@ -572,7 +573,7 @@ cls
 echo ########################################
 echo # WARNING!                             #
 echo # All characters and bots              #
-echi # will be removed !!!                  #
+echo # will be removed !!!                  #
 echo ########################################
 echo.
 setlocal
@@ -584,39 +585,41 @@ if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
 cls
+more < "%mainfolder%\header_spp.txt"
 echo.
-echo  Wiping accounts...
-ping -n 2 127.0.0.1>nul
+echo    Wiping accounts...
+ping -n 3 127.0.0.1>nul
 echo.
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_characters.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_realmd.sql"
-echo  Wiping characters...
-ping -n 2 127.0.0.1>nul
+echo    Wiping characters...
+ping -n 3 127.0.0.1>nul
 echo.
-echo  Reinstalling character database...
+echo    Reinstalling characters database...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\characters.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmd.sql"
 echo.
-echo  Applying characters database updates...
-ping -n 2 127.0.0.1>nul
+echo    Applying characters updates...
+ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 for %%i in ("%mainfolder%\sql\%expansion%\characters_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 echo.
-echo  Installing bots database...
-ping -n 2 127.0.0.1>nul
+echo    Installing bots database...
+ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 echo.
-echo  Done! Going back...
+echo    Done! Going back...
 ping -n 3 127.0.0.1>nul
 goto menu
 
 :ip_changer
 set /p current_ip=<"%mainfolder%\Settings\%expansion%\address.txt"
 cls
+more < "%mainfolder%\header_spp.txt"
 echo.
-echo  Current address: %current_ip%
+echo    Current address: %current_ip%
 echo.
 set /P setip=Enter the new address:
 echo %setip%>"%mainfolder%\Settings\%expansion%\address.txt"
@@ -625,15 +628,15 @@ if "%choose_exp%"=="2" set realmlist_address=REPLACE INTO `realmlist` VALUES ('1
 if "%choose_exp%"=="3" set realmlist_address=REPLACE INTO `realmlist` VALUES ('1', 'Wrath of the Lich King Realm', '%setip%', 8085, 1, 0, 1, 0, 0, '');
 if "%choose_exp%"=="4" set realmlist_address=REPLACE INTO `realmlist` VALUES ('1', 'Single Player Project', '%setip%', '127.0.0.1', '255.255.255.0', 8085, 1, 0, 1, 0, 0, 15595, 2, 1);
 echo.
-echo  Saving the new address...
+echo    Saving the new address...
 ping -n 2 127.0.0.1>nul
 echo %realmlist_address%>"%mainfolder%\sql\%expansion%\realmlist.sql"
 echo.
-echo  Importing new address...
+echo    Importing new address...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
 echo.
-echo  Address changed to: %setip%
+echo    Address changed to: %setip%
 pause
 goto menu
 
