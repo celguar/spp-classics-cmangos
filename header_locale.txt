@@ -1,0 +1,9 @@
+########################################
+#            LOCALES MANAGER           #
+#  Translations of quests, items, etc  #
+#                                      #
+#  Authors: MaNGOS Project             #
+#                                      #
+#  Website / Forum / Wiki:             #
+#  https://getmangos.eu                #
+########################################
