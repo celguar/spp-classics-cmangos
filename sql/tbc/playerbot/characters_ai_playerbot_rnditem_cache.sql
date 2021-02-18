@@ -12,6 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Дамп структуры для таблица tbcplayerbots.ai_playerbot_rnditem_cache
+DROP TABLE IF EXISTS `ai_playerbot_rnditem_cache`;
 CREATE TABLE IF NOT EXISTS `ai_playerbot_rnditem_cache` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `lvl` mediumint(8) NOT NULL,

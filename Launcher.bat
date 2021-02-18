@@ -30,15 +30,15 @@ goto beginning
 
 :install_website
 echo.
-echo  Extracting Webserver...
+echo    Extracting Webserver...
 echo.
 ping -n 2 127.0.0.1>nul
-echo  Please, wait...
+echo    Please, wait...
 echo.
 cd "%mainfolder%\Server\Tools"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf Apache.7z > nul
 cd "%mainfolder%"
-echo  Done!
+echo    Done!
 ping -n 3 127.0.0.1>nul
 goto beginning
 
@@ -352,6 +352,8 @@ if not exist "%mainfolder%\Modules\%expansion%.7z" goto module_not_found
 cd "%mainfolder%\Modules"
 mkdir %expansion%
 cd %expansion%
+cls
+more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Extracting %expansion% module...
 echo.
@@ -510,6 +512,8 @@ echo  2 - Start servers (Win64)
 echo.
 echo  3 - Create game account
 echo  4 - Change default server address
+echo  R - Change Realm name
+echo.
 echo  5 - Save Manager
 echo.
 echo  6 - Reset randombots
@@ -534,6 +538,8 @@ if "%menu%"=="7" (goto clear_characters)
 if "%menu%"=="8" (goto install_locales_pre)
 if "%menu%"=="9" (goto select_expansion)
 if "%menu%"=="0" (goto shutdown_servers)
+if "%menu%"=="r" (goto rename_realm)
+if "%menu%"=="R" (goto rename_realm)
 if "%menu%"=="" (goto menu)
 
 goto menu
@@ -616,17 +622,20 @@ goto menu
 
 :ip_changer
 set /p current_ip=<"%mainfolder%\Settings\%expansion%\address.txt"
+set /p current_name=<"%mainfolder%\Settings\%expansion%\name.txt"
 cls
+if "%current_ip%"=="" set current_ip=127.0.0.1
 more < "%mainfolder%\header_spp.txt"
 echo.
-echo    Current address: %current_ip%
+echo    Current address:
+echo    %current_ip%
 echo.
-set /P setip=Enter the new address:
+set /P setip=Enter the new address (X to cancel):
+if "%setip%"=="" goto menu
+if "%setip%"=="x" goto menu
+if "%setip%"=="X" goto menu
 echo %setip%>"%mainfolder%\Settings\%expansion%\address.txt"
-if "%choose_exp%"=="1" set realmlist_address=REPLACE INTO `realmlist` VALUES ('1', 'Vanilla Realm', '%setip%', 8085, 1, 0, 1, 0, 0, '');
-if "%choose_exp%"=="2" set realmlist_address=REPLACE INTO `realmlist` VALUES ('1', 'The Burning Crusade Realm', '%setip%', 8085, 1, 0, 1, 0, 0, '');
-if "%choose_exp%"=="3" set realmlist_address=REPLACE INTO `realmlist` VALUES ('1', 'Wrath of the Lich King Realm', '%setip%', 8085, 1, 0, 1, 0, 0, '');
-if "%choose_exp%"=="4" set realmlist_address=REPLACE INTO `realmlist` VALUES ('1', 'Single Player Project', '%setip%', '127.0.0.1', '255.255.255.0', 8085, 1, 0, 1, 0, 0, 15595, 2, 1);
+set realmlist_address=UPDATE `realmlist` SET `address`='%setip%' WHERE  `id`=1;UPDATE `realmlist` SET `name`='%current_name%' WHERE  `id`=1;
 echo.
 echo    Saving the new address...
 ping -n 2 127.0.0.1>nul
@@ -636,7 +645,40 @@ echo    Importing new address...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
 echo.
-echo    Address changed to: %setip%
+echo    Address changed to:
+echo    %setip%
+echo.
+pause
+goto menu
+
+:rename_realm
+set /p current_ip=<"%mainfolder%\Settings\%expansion%\address.txt"
+set /p current_name=<"%mainfolder%\Settings\%expansion%\name.txt"
+if "%current_ip%"=="" set current_ip=127.0.0.1
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Current name:
+echo    %current_name%
+echo.
+set /P setname=Enter new realm name (X to cancel):
+if "%setname%"=="" goto menu
+if "%setname%"=="x" goto menu
+if "%setname%"=="X" goto menu
+echo %setname%>"%mainfolder%\Settings\%expansion%\name.txt"
+set realmlist_address=UPDATE `realmlist` SET `address`='%current_ip%' WHERE  `id`=1;UPDATE `realmlist` SET `name`='%setname%' WHERE  `id`=1;
+echo.
+echo    Saving new realm name...
+ping -n 2 127.0.0.1>nul
+echo %realmlist_address%>"%mainfolder%\sql\%expansion%\realmlist.sql"
+echo.
+echo    Applying new realm name...
+ping -n 2 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+echo.
+echo    Realm name changed to:
+echo    %setname%
+echo.
 pause
 goto menu
 
@@ -1094,7 +1136,10 @@ taskkill /f /im cmdmp3win.exe
 cls
 set serverstartoption=1
 set /p realmname1=<"%mainfolder%\Settings\%expansion%\name.txt
-
+echo ########################################
+echo # %NAME%
+echo # https://spp-forum.de
+echo ########################################
 echo.
 echo  Starting the first realm...
 echo.
@@ -1108,11 +1153,11 @@ taskkill /f /im cmdmp3win.exe
 cls
 set serverstartoption=2
 set /p realmname1=<"%mainfolder%\Settings\%expansion%\name.txt
-
+more < "%mainfolder%\header_spp.txt"
 echo.
-echo  Starting the first realm...
+echo    Starting %expansion% realm...
 echo.
-echo  %realmname1%
+echo    %realmname1%
 echo.
 ping -n 5 127.0.0.1>nul
 goto check_autosave_start
@@ -1126,32 +1171,29 @@ goto menu
 :autosave_start
 cls
 set saveslot=autosave
+more < "%mainfolder%\header_spp.txt"
 echo.
-echo ########################################
-echo           # Autosave is on! #
-echo ########################################
+echo           Autosave is on!
 echo.
-echo  Exporting accounts...please wait...
+echo    Exporting accounts...please wait...
 ping -n 1 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %login% > "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
 echo.
-echo  Done!
+echo    Done!
 echo.
 ping -n 1 127.0.0.1>nul
-echo  Exporting characters...please wait...
+echo    Exporting characters...please wait...
 ping -n 1 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %characters% > "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
 echo.
-echo  Done!
+echo    Done!
 echo.
 ping -n 1 127.0.0.1>nul
-if "%choose_exp%"=="1" echo  Exporting playerbots...please wait...
-if "%choose_exp%"=="2" echo  Exporting playerbots...please wait...
-if "%choose_exp%"=="3" echo  Exporting playerbots...please wait...
+echo    Exporting playerbots...please wait...
 ping -n 1 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %playerbot% > "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
 echo.
-echo  Done!
+echo    Done!
 echo.
 ping -n 1 127.0.0.1>nul
 if "%serverstartoption%"=="1" (goto server_x86)
@@ -1190,7 +1232,6 @@ goto menu
 
 :save_menu
 cls
-echo.
 set customname1=Empty slot
 set customname2=Empty slot
 set customname3=Empty slot
@@ -1215,14 +1256,8 @@ if exist "%mainfolder%\Saves\%expansion%\9\name.txt" set /p customname9=<"%mainf
 if exist "%mainfolder%\Saves\%expansion%\old\name.txt" set /p customnameold=<"%mainfolder%\Saves\%expansion%\old\name.txt"
 REM if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" set /p customnametrans=<"%mainfolder%\Saves\%expansion%\transfer\name.txt"
 
+more < "%mainfolder%\header_save.txt"
 echo.
-echo  SPP Save Manager.
-echo.
-echo  This is the list of saves.
-echo.
-echo  Select an action below.
-echo.
-echo  -----------------------
 echo  Save 1  -  [%customname1%]
 echo  Save 2  -  [%customname2%]
 echo  Save 3  -  [%customname3%]
@@ -1241,12 +1276,9 @@ REM if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo  ------CMan
 REM if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo  Save 12 -  [%customnametrans%]
 echo  -----------------------
 echo.
-echo  1 - Save
-echo  2 - Load
-echo  3 - Delete
+echo  1 - Save      2 - Load      3 - Delete
 echo.
 echo  4 - Turn autosave on/off [%autosave%]
-echo.
 echo  5 - Open the Saves folder
 echo.
 echo  0 - Back to main menu
@@ -1256,7 +1288,7 @@ if "%savemenu%"=="1" (goto saveslot_choose)
 if "%savemenu%"=="2" (goto saveslot_choose)
 if "%savemenu%"=="3" (goto saveslot_choose)
 if "%savemenu%"=="4" (goto autosave_switch)
-if "%savemenu%"=="5" (explorer.exe Saves)
+if "%savemenu%"=="5" (explorer.exe Saves\%expansion%)
 if "%savemenu%"=="0" (goto menu)
 if "%savemenu%"=="" (goto save_menu)
 goto save_menu
@@ -1284,39 +1316,43 @@ if "%savemenu%"=="3" (goto delete_saveslot_check)
 :delete_saveslot_check
 cls
 if exist "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql" goto delete_saveslot
+more < "%mainfolder%\header_save.txt"
 echo.
-echo  You can not delete an empty slot...
+echo    You can not delete an empty slot...
 echo.
 ping -n 3 127.0.0.1>nul
 goto save_menu
 
 :delete_saveslot
 cls
+more < "%mainfolder%\header_save.txt"
 echo.
-set /P menu=Are you sure want to clear #%saveslot% save? (Y/n)
-if "%menu%"=="n" (goto menu)
-if "%menu%"=="y" (goto delete_saveslot_1)
+SET /P AREYOUSURE=Delete #%saveslot% save? (Y/[N])?
+IF /I "%AREYOUSURE%" NEQ "Y" GOTO save_menu
+goto delete_saveslot_1
 
 :delete_saveslot_1
 cls
+more < "%mainfolder%\header_save.txt"
 echo.
-echo  Removing slot %saveslot% save files...
+echo    Removing slot %saveslot% save files...
 del "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
 del "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
 del "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
 del "%mainfolder%\Saves\%expansion%\%saveslot%\name.txt"
-ping -n 2 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo.
-echo  Save %saveslot% is empty now.
+echo    Save %saveslot% is empty now.
 echo.
 ping -n 3 127.0.0.1>nul
 goto save_menu
 
 :export_notransfer
 cls
+more < "%mainfolder%\header_save.txt"
 echo.
-if "%saveslot%"=="transfer" echo  Transfer slot is for import only...
-if "%saveslot%"=="old" echo  Old SPP slot is for import only...
+if "%saveslot%"=="transfer" echo    Transfer slot is for import only...
+if "%saveslot%"=="old" echo    Old SPP slot is for import only...
 echo.
 ping -n 3 127.0.0.1>nul
 goto save_menu
@@ -1330,81 +1366,91 @@ goto export_char_1
 
 :export_char
 cls
+more < "%mainfolder%\header_save.txt"
 echo.
-echo  This will overwrite your previous save!
+echo    This will overwrite previous save!
 echo.
-set /P menu=Are you sure want save into this slot? (Y/n)
-if "%menu%"=="n" (goto menu)
-if "%menu%"=="y" (goto export_char_1)
+SET /P AREYOUSURE=Overwrite save in this slot? (Y/[N])?
+IF /I "%AREYOUSURE%" NEQ "Y" GOTO save_menu
+goto export_char_1
 
 :export_char_1
 cls
+more < "%mainfolder%\header_save.txt"
 echo.
 set /P slotname=Enter a name for the save slot:
 echo %slotname%>"%mainfolder%\Saves\%expansion%\%saveslot%\name.txt"
+cls
+more < "%mainfolder%\header_save.txt"
+ping -n 2 127.0.0.1>nul
 echo.
-echo  Exporting accounts...please wait...
+echo    Save #%saveslot% "%slotname%"
+echo.
+echo    Exporting accounts...please wait...
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %login% > "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
 ping -n 2 127.0.0.1>nul
 echo.
-echo  Done!
+echo    Done!
 echo.
 ping -n 2 127.0.0.1>nul
-echo  Exporting characters...please wait...
+echo    Exporting characters...please wait...
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %characters% > "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
 ping -n 2 127.0.0.1>nul
 echo.
-echo  Done!
+echo    Done!
 echo.
 ping -n 2 127.0.0.1>nul
-if "%choose_exp%"=="1" echo  Exporting playerbots...please wait...
-if "%choose_exp%"=="2" echo  Exporting playerbots...please wait...
-if "%choose_exp%"=="3" echo  Exporting playerbots...please wait...
+echo    Exporting playerbots...please wait...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %playerbot% > "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
 ping -n 2 127.0.0.1>nul
 echo.
-echo  Done!
+echo    Done!
 echo.
 ping -n 2 127.0.0.1>nul
-echo  Save slot %saveslot% created.
-ping -n 2 127.0.0.1>nul
-echo  Saves are stored in the Saves folder.
+echo    Save slot %saveslot% created.
+ping -n 3 127.0.0.1>nul
 echo.
+echo    Saves are stored here:
+ping -n 2 127.0.0.1>nul
+echo    SPP_Server/Saves/%expansion%/
 ping -n 3 127.0.0.1>nul
 goto menu
 
 :import_char_check
 cls
 if exist "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql" goto import_char
+more < "%mainfolder%\header_save.txt"
 echo.
-echo  This slot is empty
-echo  Please select another one
+echo    This slot is empty
+ping -n 2 127.0.0.1>nul
+echo    Please select another one
 echo.
 ping -n 3 127.0.0.1>nul
 goto save_menu
 
 :import_char
 cls
+more < "%mainfolder%\header_save.txt"
 echo.
-echo  Please stop all your servers
-echo  before continuing!
+echo    Please stop all your servers
+echo    before continuing!
 echo.
-echo  This will overwrite your current DB!
+echo    This will overwrite your current DB!
 echo.
-set /P menu=Are you sure want to do this? (Y/n)
-if "%menu%"=="n" (goto menu)
-if "%menu%"=="y" (goto import_char_1)
+SET /P AREYOUSURE=Are you sure want to do this? (Y/[N])?
+IF /I "%AREYOUSURE%" NEQ "Y" GOTO save_menu
+goto import_char_1
 
 :convert_old_data
-echo  Converting accounts...
+echo    Converting accounts...
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\convert_realmd.sql"
 ping -n 2 127.0.0.1>nul
 REM echo.
 REM echo  Done!
 ping -n 2 127.0.0.1>nul
 echo.
-echo  Converting characters...
+echo    Converting characters...
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\convert_characters.sql"
 ping -n 2 127.0.0.1>nul
 REM echo.
@@ -1412,7 +1458,7 @@ REM echo  Done!
 ping -n 2 127.0.0.1>nul
 echo.
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
-echo  Updating realmlist...
+echo    Updating realmlist...
 ping -n 2 127.0.0.1>nul
 echo.
 if "%saveslot%"=="old" goto import_playerbots
@@ -1420,15 +1466,16 @@ if "%saveslot%"=="transfer" goto import_continue
 
 :import_char_1
 cls
+more < "%mainfolder%\header_save.txt"
 echo.
-echo  Importing accounts...
+echo    Importing accounts...
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
 ping -n 2 127.0.0.1>nul
 REM echo.
 REM echo  Done!
 echo.
 ping -n 2 127.0.0.1>nul
-echo  Importing characters...
+echo    Importing characters...
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
 ping -n 2 127.0.0.1>nul
 REM echo.
@@ -1438,13 +1485,11 @@ echo.
 if "%saveslot%"=="old" goto convert_old_data
 if "%saveslot%"=="transfer" goto convert_old_data
 :import_playerbots
-if "%choose_exp%"=="1" echo  Importing playerbots...
-if "%choose_exp%"=="2" echo  Importing playerbots...
-if "%choose_exp%"=="3" echo  Importing playerbots...
+echo    Importing playerbots...
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
 if "%saveslot%"=="old" ping -n 2 127.0.0.1>nul
 if "%saveslot%"=="old" echo.
-if "%saveslot%"=="old" echo. Converting playerbots...
+if "%saveslot%"=="old" echo    Converting playerbots...
 if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
 if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
 if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
@@ -1456,19 +1501,19 @@ REM if "%choose_exp%"=="2" echo  Done!
 REM if "%choose_exp%"=="3" echo  Done!
 ping -n 2 127.0.0.1>nul
 :import_continue
-echo  Importing characters updates...
-echo.
+echo    Importing characters updates...
 for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 for %%i in ("%mainfolder%\sql\%expansion%\characters_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 ping -n 2 127.0.0.1>nul
-echo  Done!
+echo.
+echo    Done!
 ping -n 3 127.0.0.1>nul
 echo.
 cls
+more < "%mainfolder%\header_save.txt"
 echo.
-echo  Save slot %saveslot% import completed.
-echo.
+echo    Save slot %saveslot% import completed.
 ping -n 3 127.0.0.1>nul
 goto menu
 
@@ -1513,35 +1558,33 @@ goto exit
 
 :autosave_shutdown
 set saveslot=autosave
+more < "%mainfolder%\header_spp.txt"
 echo.
-echo ########################################
-echo           # Autosave is on! #
-echo ########################################
+echo           Autosave is on!
+ping -n 1 127.0.0.1>nul
 echo.
-echo  Exporting accounts...please wait...
+echo    Exporting accounts...please wait...
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %login% > "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
 ping -n 1 127.0.0.1>nul
 echo.
-echo  Done!
+echo    Done!
 ping -n 1 127.0.0.1>nul
 echo.
-echo  Exporting characters...please wait...
+echo    Exporting characters...please wait...
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %characters% > "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
 ping -n 1 127.0.0.1>nul
 echo.
-echo  Done!
+echo    Done!
 ping -n 1 127.0.0.1>nul
 echo.
-if "%choose_exp%"=="1" echo  Exporting playerbots...please wait...
-if "%choose_exp%"=="2" echo  Exporting playerbots...please wait...
-if "%choose_exp%"=="3" echo  Exporting playerbots...please wait...
+echo    Exporting playerbots...please wait...
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %playerbot% > "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
 ping -n 1 127.0.0.1>nul
 echo.
-echo  Done!
+echo    Done!
 echo.
 ping -n 1 127.0.0.1>nul
-echo  Shutting down...
+echo    Shutting down...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown
 
@@ -1642,10 +1685,7 @@ goto service_menu
 
 :vcredist_install_x86
 cls
-echo ########################################
-echo # SPP - Classics Collection            #
-echo # https://spp-forum.de                 #
-echo ########################################
+more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Complete VCredist installation
 "%mainfolder%\Addons\vcredist\2005 Updated\vcredist_x86.exe" /Q
@@ -1659,10 +1699,7 @@ goto service_menu
 
 :vcredist_install_x64
 cls
-echo ########################################
-echo # SPP - Classics Collection            #
-echo # https://spp-forum.de                 #
-echo ########################################
+more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Complete VCredist installation
 "%mainfolder%\Addons\vcredist\2005 Updated\vcredist_x64.exe" /Q
