@@ -1,5 +1,5 @@
 ########################################
-#            LOCALES MANAGER           #
+#           LOCALES MANAGER            #
 #  Translations of quests, items, etc  #
 #                                      #
 #  Authors: MaNGOS Project             #
