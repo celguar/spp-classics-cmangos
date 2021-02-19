@@ -20,7 +20,7 @@ if not exist "%mainfolder%\Server\Tools\Apache24" goto install_website
 if exist "%mainfolder%\Server\Database" goto beginning_part2
 cls
 echo.
-echo  Preparing for the first launch...
+echo    Preparing for the first launch...
 ping -n 2 127.0.0.1>nul
 cd "%mainfolder%\Server"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf Database.7z > nul
@@ -303,9 +303,9 @@ goto menu
 cls
 more < "%mainfolder%\header_spp.txt"
 echo.
-echo  The %expansion% module not found
+echo    The %expansion% module not found
 ping -n 2 127.0.0.1>nul
-echo  Starting download in 10 seconds...
+echo    Starting download in 10 seconds...
 ping -n 10 127.0.0.1>nul
 echo.
 if "%choose_exp%"=="1" goto install_module_vanilla
@@ -356,14 +356,14 @@ cls
 more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Extracting %expansion% module...
-echo.
 ping -n 2 127.0.0.1>nul
-echo    Please, wait...
 echo.
+echo    Please, wait...
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Modules\%expansion%.7z" > nul
+echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\Modules\%expansion%.7z"
+rem del "%mainfolder%\Modules\%expansion%.7z"
 cd "%mainfolder%"
 goto update_install
 
