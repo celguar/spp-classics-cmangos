@@ -914,9 +914,9 @@ echo.
 echo    Please wait...
 cd "%mainfolder%\sql\%expansion%"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\locales.7z" > nul
-echo.
 cd "%mainfolder%"
 ping -n 3 127.0.0.1>nul
+echo.
 echo    Preparing %expansion% DB...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\prepare.sql"
