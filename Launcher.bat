@@ -464,7 +464,7 @@ echo.
 echo    Applying world updates...
 ping -n 2 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-for %%i in ("%mainfolder%\sql\%expansion%\world\Instances\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\Instances\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\Instances\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\Instances\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+for %%i in ("%mainfolder%\sql\%expansion%\world\world_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\world_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\world_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\world_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -491,7 +491,7 @@ if not exist "%mainfolder%\Saves\%expansion%\7" mkdir "%mainfolder%\Saves\%expan
 if not exist "%mainfolder%\Saves\%expansion%\8" mkdir "%mainfolder%\Saves\%expansion%\8"
 if not exist "%mainfolder%\Saves\%expansion%\9" mkdir "%mainfolder%\Saves\%expansion%\9"
 if not exist "%mainfolder%\Saves\%expansion%\old" mkdir "%mainfolder%\Saves\%expansion%\old"
-REM if not exist "%mainfolder%\Saves\%expansion%\transfer" mkdir "%mainfolder%\Saves\%expansion%\transfer"
+if not "%choose_exp%"=="1" (if not exist "%mainfolder%\Saves\%expansion%\transfer" mkdir "%mainfolder%\Saves\%expansion%\transfer")
 cls
 echo ########################################
 echo # %NAME%
@@ -684,14 +684,14 @@ goto menu
 
 :install_locales_pre
 cls
-set locFR=X
-set locES=X
-set locDE=X
-set locKO=X
-set locCH=X
-set locTW=X
-set locRU=X
-set locMX=X
+set locFR= 
+set locES= 
+set locDE= 
+set locKO= 
+set locCH= 
+set locTW= 
+set locRU= 
+set locMX= 
 set loc_replace=NO
 
 :install_locales
@@ -802,106 +802,106 @@ set loc_replace=NO
 goto install_locales
 
 :ToggleLocFR
-if %locFR% == X goto ToggleLocFRNo:
-if %locFR% == V goto ToggleLocFRYes:
+if not "%locFR%" == "%locFR: =%" goto ToggleLocFRNo:
+if %locFR% == X goto ToggleLocFRYes:
 goto install_locales
 
 :ToggleLocFRNo
-set locFR=V
-goto install_locales
-
-:ToggleLocFRYes
 set locFR=X
 goto install_locales
 
+:ToggleLocFRYes
+set locFR= 
+goto install_locales
+
 :ToggleLocCH
-if %locCH% == X goto ToggleLocCHNo:
-if %locCH% == V goto ToggleLocCHYes:
+if not "%locCH%" == "%locCH: =%" goto ToggleLocCHNo:
+if %locCH% == X goto ToggleLocCHYes:
 goto install_locales
 
 :ToggleLocCHNo
-set locCH=V
-goto install_locales
-
-:ToggleLocCHYes
 set locCH=X
 goto install_locales
 
+:ToggleLocCHYes
+set locCH= 
+goto install_locales
+
 :ToggleLocTW
-if %locTW% == X goto ToggleLocTWNo:
-if %locTW% == V goto ToggleLocTWYes:
+if not "%locTW%" == "%locTW: =%" goto ToggleLocTWNo:
+if %locTW% == X goto ToggleLocTWYes:
 goto install_locales
 
 :ToggleLocTWNo
-set locTW=V
-goto install_locales
-
-:ToggleLocTWYes
 set locTW=X
 goto install_locales
 
+:ToggleLocTWYes
+set locTW= 
+goto install_locales
+
 :ToggleLocDE
-if %locDE% == X goto ToggleLocDENo:
+if not "%locDE%" == "%locDE: =%" goto ToggleLocDENo:
 goto install_locales
 
 :ToggleLocDENo
-set locDE=V
-goto install_locales
-
-:ToggleLocDEYes
 set locDE=X
 goto install_locales
 
+:ToggleLocDEYes
+set locDE= 
+goto install_locales
+
 :ToggleLocES
-if %locES% == X goto ToggleLocESNo:
-if %locES% == V goto ToggleLocESYes:
+if not "%locES%" == "%locES: =%" goto ToggleLocESNo:
+if %locES% == X goto ToggleLocESYes:
 goto install_locales
 
 :ToggleLocESNo
-set locES=V
-goto install_locales
-
-:ToggleLocESYes
 set locES=X
 goto install_locales
 
+:ToggleLocESYes
+set locES= 
+goto install_locales
+
 :ToggleLocMX
-if %locMX% == X goto ToggleLocMXNo:
-if %locMX% == V goto ToggleLocMXYes:
+if not "%locMX%" == "%locMX: =%" goto ToggleLocMXNo:
+if %locMX% == X goto ToggleLocMXYes:
 goto install_locales
 
 :ToggleLocMXNo
-set locMX=V
-goto install_locales
-
-:ToggleLocMXYes
 set locMX=X
 goto install_locales
 
+:ToggleLocMXYes
+set locMX= 
+goto install_locales
+
 :ToggleLocRU
-if %locRU% == X goto ToggleLocRUNo:
-if %locRU% == V goto ToggleLocRUYes:
+if not "%locRU%" == "%locRU: =%" goto ToggleLocRUNo:
+if %locRU% == X goto ToggleLocRUYes:
 goto install_locales
 
 :ToggleLocRUNo
-set locRU=V
-goto install_locales
-
-:ToggleLocRUYes
 set locRU=X
 goto install_locales
 
+:ToggleLocRUYes
+set locRU= 
+goto install_locales
+
 :ToggleLocKO
-if %locKO% == X goto ToggleLocKONo:
-if %locKO% == V goto ToggleLocKOYes:
+if not "%locKO%" == "%locKO: =%" goto ToggleLocKONo:
+if %locKO% == X goto ToggleLocKOYes:
 goto install_locales
 
 :ToggleLocKONo
-set locKO=V
+set locKO=X
 goto install_locales
 
 :ToggleLocKOYes
-set locKO=X
+set locKO= 
 goto install_locales
 
 :install_locales_go
@@ -926,28 +926,28 @@ if %loc_replace% == YES goto locales_replace_1
 :locales_continue
 
 :WorldDB
-if %locFR% == V goto LoadFR:
+if "%locFR%" == "X" goto LoadFR:
 
 :WorldDB1
-if %locDE% == V goto LoadDE:
+if "%locDE%" == "X" goto LoadDE:
 
 :WorldDB2
-if %locKO% == V goto LoadKO:
+if "%locKO%" == "X" goto LoadKO:
 
 :WorldDB3
-if %locCH% == V goto LoadCH:
+if "%locCH%" == "X" goto LoadCH:
 
 :WorldDB4
-if %locTW% == V goto LoadTW:
+if "%locTW%" == "X" goto LoadTW:
 
 :WorldDB5
-if %locES% == V goto LoadES:
+if "%locES%" == "X" goto LoadES:
 
 :WorldDB6
-if %locMX% == V goto LoadMX:
+if "%locMX%" == "X" goto LoadMX:
 
 :WorldDB7
-if %locRU% == V goto LoadRU:
+if "%locRU%"== "X" goto LoadRU:
 
 :locales_end
 cls
@@ -1071,16 +1071,16 @@ if %lo_fields% == NO (echo %expansion% > "%mainfolder%\%expansion%_locale_fields
 set lo_fields = YES
 if %loc_already_replaced% == NO ping -n 3 127.0.0.1>nul
 if %loc_already_replaced% == NO "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\save_english.sql"
-del "%mainfolder%\%expansion%_fr_re.spp"
-del "%mainfolder%\%expansion%_de_re.spp"
-del "%mainfolder%\%expansion%_ko_re.spp"
-del "%mainfolder%\%expansion%_ch_re.spp"
-del "%mainfolder%\%expansion%_mx_re.spp"
-del "%mainfolder%\%expansion%_ru_re.spp"
-del "%mainfolder%\%expansion%_tw_re.spp"
-del "%mainfolder%\%expansion%_es_re.spp"
-cls
-more < "%mainfolder%\header_locale.txt"
+if exist "%mainfolder%\%expansion%_fr_re.spp" del "%mainfolder%\%expansion%_fr_re.spp"
+if exist "%mainfolder%\%expansion%_de_re.spp" del "%mainfolder%\%expansion%_de_re.spp"
+if exist "%mainfolder%\%expansion%_ko_re.spp" del "%mainfolder%\%expansion%_ko_re.spp"
+if exist "%mainfolder%\%expansion%_ch_re.spp" del "%mainfolder%\%expansion%_ch_re.spp"
+if exist "%mainfolder%\%expansion%_mx_re.spp" del "%mainfolder%\%expansion%_mx_re.spp"
+if exist "%mainfolder%\%expansion%_ru_re.spp" del "%mainfolder%\%expansion%_ru_re.spp"
+if exist "%mainfolder%\%expansion%_tw_re.spp" del "%mainfolder%\%expansion%_tw_re.spp"
+if exist "%mainfolder%\%expansion%_es_re.spp" del "%mainfolder%\%expansion%_es_re.spp"
+REM cls
+REM more < "%mainfolder%\header_locale.txt"
 goto locales_continue
 
 :locales_replace_2
@@ -1242,7 +1242,7 @@ set customname7=Empty slot
 set customname8=Empty slot
 set customname9=Empty slot
 set customnameold=Old Save
-REM set customnametransfer=Cmangos Save
+set customnametransfer=Transfer Save
 
 if exist "%mainfolder%\Saves\%expansion%\1\name.txt" set /p customname1=<"%mainfolder%\Saves\%expansion%\1\name.txt"
 if exist "%mainfolder%\Saves\%expansion%\2\name.txt" set /p customname2=<"%mainfolder%\Saves\%expansion%\2\name.txt"
@@ -1254,7 +1254,7 @@ if exist "%mainfolder%\Saves\%expansion%\7\name.txt" set /p customname7=<"%mainf
 if exist "%mainfolder%\Saves\%expansion%\8\name.txt" set /p customname8=<"%mainfolder%\Saves\%expansion%\8\name.txt"
 if exist "%mainfolder%\Saves\%expansion%\9\name.txt" set /p customname9=<"%mainfolder%\Saves\%expansion%\9\name.txt"
 if exist "%mainfolder%\Saves\%expansion%\old\name.txt" set /p customnameold=<"%mainfolder%\Saves\%expansion%\old\name.txt"
-REM if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" set /p customnametrans=<"%mainfolder%\Saves\%expansion%\transfer\name.txt"
+if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" set /p customnametransfer=<"%mainfolder%\Saves\%expansion%\transfer\name.txt"
 
 more < "%mainfolder%\header_save.txt"
 echo.
@@ -1269,11 +1269,12 @@ echo  Save 8  -  [%customname8%]
 echo  Save 9  -  [%customname9%]
 echo  Save 10 -  [Autosave]
 if exist "%mainfolder%\Saves\%expansion%\old\name.txt" echo.
-if exist "%mainfolder%\Saves\%expansion%\old\name.txt" echo  --------Old Save-------
+if exist "%mainfolder%\Saves\%expansion%\old\name.txt" echo  -------Old Save-------
 if exist "%mainfolder%\Saves\%expansion%\old\name.txt" echo  Save 11 -  [%customnameold%]
-REM if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo.
-REM if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo  ------CMangos Save-----
-REM if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo  Save 12 -  [%customnametrans%]
+if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo.
+if "%choose_exp%"=="2" if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo  -------Vanilla Save-------
+if "%choose_exp%"=="3" if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo  ---------TBC Save---------
+if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo  Save 12 -  [%customnametransfer%]
 echo  -----------------------
 echo.
 echo  1 - Save      2 - Load      3 - Delete
@@ -1306,7 +1307,7 @@ if "%saveslot%"=="8" (set saveslot=8)
 if "%saveslot%"=="9" (set saveslot=9)
 if "%saveslot%"=="10" (set saveslot=autosave)
 if "%saveslot%"=="11" (set saveslot=old)
-REM if "%saveslot%"=="12" (set saveslot=transfer)
+if "%saveslot%"=="12" (set saveslot=transfer)
 if "%saveslot%"=="" (goto save_menu)
 
 if "%savemenu%"=="1" (goto export_char_check)
@@ -1462,7 +1463,27 @@ echo    Updating realmlist...
 ping -n 2 127.0.0.1>nul
 echo.
 if "%saveslot%"=="old" goto import_playerbots
-if "%saveslot%"=="transfer" goto import_continue
+
+:convert_transfer_data
+echo    Upgrading accounts...
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\transfer_realmd.sql"
+ping -n 2 127.0.0.1>nul
+REM echo.
+REM echo  Done!
+ping -n 2 127.0.0.1>nul
+echo.
+echo    Upgrading characters...
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\transfer_characters.sql"
+ping -n 2 127.0.0.1>nul
+REM echo.
+REM echo  Done!
+ping -n 2 127.0.0.1>nul
+echo.
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+echo    Updating realmlist...
+ping -n 2 127.0.0.1>nul
+echo.
+if "%saveslot%"=="transfer" goto import_playerbots
 
 :import_char_1
 cls
@@ -1483,7 +1504,7 @@ REM echo  Done!
 ping -n 2 127.0.0.1>nul
 echo.
 if "%saveslot%"=="old" goto convert_old_data
-if "%saveslot%"=="transfer" goto convert_old_data
+if "%saveslot%"=="transfer" goto convert_transfer_data
 :import_playerbots
 echo    Importing playerbots...
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
@@ -1494,6 +1515,15 @@ if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-e
 if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
 if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
 if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
+if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
+if "%saveslot%"=="transfer" ping -n 2 127.0.0.1>nul
+if "%saveslot%"=="transfer" echo.
+if "%saveslot%"=="transfer" echo    Upgrading playerbots...
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
 ping -n 2 127.0.0.1>nul
 echo.
 REM if "%choose_exp%"=="1" echo  Done!
