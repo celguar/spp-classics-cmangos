@@ -121,10 +121,19 @@ goto beginning
 
 :website_on
 del "%mainfolder%\website.off"
-echo music > "%mainfolder%\website.on"
+echo website > "%mainfolder%\website.on"
+tasklist /FI "IMAGENAME eq spp-httpd.exe" 2>NUL | find /I /N "spp-httpd.exe">NUL
+if "%ERRORLEVEL%"=="0" goto beginning
+REM cd "%mainfolder%\Server\Tools\Apache24"
+REM start "" /min "apache_start.bat"
+REM cd "%mainfolder%"
 goto beginning
 
 :select_expansion
+tasklist /FI "IMAGENAME eq mysqld.exe" 2>NUL | find /I /N "mysqld.exe">NUL
+if "%ERRORLEVEL%"=="0" ("%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown)
+tasklist /FI "IMAGENAME eq spp-httpd.exe" 2>NUL | find /I /N "spp-httpd.exe">NUL
+if "%ERRORLEVEL%"=="0" (taskkill /f /im spp-httpd.exe)
 mode con: cols=40 lines=30
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
@@ -513,10 +522,12 @@ echo.
 echo  3 - Create game account
 echo  4 - Change default server address
 echo  R - Change Realm name
+if "%website%"=="ON" echo  M - Open players map
 echo.
 echo  5 - Save Manager
 echo.
-echo  6 - Reset randombots
+echo  6 - Bots menu
+echo.
 echo  7 - Wipe characters, accounts, bots
 echo.
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
@@ -533,18 +544,64 @@ if "%menu%"=="2" (goto quick_start_servers_x64)
 if "%menu%"=="3" (goto account_tool)
 if "%menu%"=="4" (goto ip_changer)
 if "%menu%"=="5" (goto save_menu)
-if "%menu%"=="6" (goto clear_bots)
+if "%menu%"=="6" (goto bots_menu)
 if "%menu%"=="7" (goto clear_characters)
 if "%menu%"=="8" (goto install_locales_pre)
 if "%menu%"=="9" (goto select_expansion)
 if "%menu%"=="0" (goto shutdown_servers)
 if "%menu%"=="r" (goto rename_realm)
 if "%menu%"=="R" (goto rename_realm)
+if "%menu%"=="m" (goto open_map)
+if "%menu%"=="M" (goto open_map)
 if "%menu%"=="" (goto menu)
 
 goto menu
 
-:clear_bots
+:open_map
+cls
+if "%website%"=="OFF" (goto menu)
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Opening players map
+echo    in default browser...
+ping -n 3 127.0.0.1>nul
+start http://localhost
+goto menu
+
+:bots_menu
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo   1 - Reset Random Bots
+echo.
+echo       - saved talent build
+echo       - time till next randomise
+echo       - saved strategies
+echo       - saved online bot number
+echo       Note: alts saved strategies
+echo             are also removed
+echo.
+echo   2 - Delete Random Bots
+echo.
+echo       Delete all random bots on start
+echo       except for bots who are:
+echo       - in someone's friend list
+echo       - in real player's guild
+echo.
+echo   3 - Delete ALL Random Bots
+echo       Delete all random bots on start
+echo       with no exceptions
+echo.
+echo   0 - Go back
+echo.
+set /P choose_service=Enter your choice: 
+if "%choose_service%"=="1" (goto reset_bots)
+if "%choose_service%"=="2" (goto delete_bots)
+if "%choose_service%"=="3" (goto delete_all_bots)
+if "%choose_service%"=="0" (goto menu)
+goto menu
+
+:reset_bots
 mode con: cols=40 lines=30
 COLOR 0C
 cls
@@ -570,6 +627,76 @@ ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
 echo    Done! Going back...
 ping -n 3 127.0.0.1>nul
+goto menu
+
+:delete_bots
+mode con: cols=40 lines=30
+COLOR 0C
+cls
+echo ########################################
+echo # WARNING!                             #
+echo # All random bots will be removed!     #
+echo #                                      #
+echo # Bots in friend/guild will stay!      #
+echo ########################################
+echo.
+setlocal
+:PROMPT
+SET /P AREYOUSURE=Are you sure (Y/[N])?
+IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
+tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
+if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Scheduling deleting random bots...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\delete_randombots.sql"
+echo.
+echo    Done!
+ping -n 2 127.0.0.1>nul
+echo.
+echo    On next restart bots will be removed
+echo    and new bots will be created
+ping -n 5 127.0.0.1>nul
+goto menu
+
+:delete_all_bots
+mode con: cols=40 lines=30
+COLOR 0C
+cls
+echo ########################################
+echo # WARNING!                             #
+echo # All random bots will be removed!     #
+echo #                                      #
+echo # Including those in guilds/friends!   #
+echo ########################################
+echo.
+setlocal
+:PROMPT
+SET /P AREYOUSURE=Are you sure (Y/[N])?
+IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
+tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
+if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Scheduling deleting random bots...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\delete_all_randombots.sql"
+echo.
+echo    Done!
+ping -n 2 127.0.0.1>nul
+echo.
+echo    On next restart bots will be removed
+echo    and new bots will be created
+ping -n 5 127.0.0.1>nul
 goto menu
 
 :clear_characters
@@ -1439,6 +1566,13 @@ echo    before continuing!
 echo.
 echo    This will overwrite your current DB!
 echo.
+if "%saveslot%"=="transfer" echo    IMPORTANT!
+if "%saveslot%"=="transfer" echo    After vanilla - tbc transfer
+if "%saveslot%"=="transfer" echo    all random bots are deleted
+if "%saveslot%"=="transfer" echo    Except for bots who are:
+if "%saveslot%"=="transfer" echo    - in someone's Friends list
+if "%saveslot%"=="transfer" echo    - in real player's guild
+if "%saveslot%"=="transfer" echo.
 SET /P AREYOUSURE=Are you sure want to do this? (Y/[N])?
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO save_menu
 goto import_char_1
@@ -1524,6 +1658,7 @@ if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defau
 if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
 if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
 if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\delete_randombots.sql"
 ping -n 2 127.0.0.1>nul
 echo.
 REM if "%choose_exp%"=="1" echo  Done!

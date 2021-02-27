@@ -6,3 +6,4 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES ('2724', '-100');
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES ('2725', '-100');
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES ('9000405', '-100');
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES ('9000406', '100');
+UPDATE `creature_template` SET `Faction`='1767' WHERE  `Entry`=19322;
