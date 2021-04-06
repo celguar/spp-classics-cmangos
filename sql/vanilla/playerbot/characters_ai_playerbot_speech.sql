@@ -239,3 +239,12 @@ INSERT INTO `ai_playerbot_speech` VALUES
 (NULL, 'loot', 'The gold is mine. I''l leave everyting, I promise', 'say'),
 (NULL, 'loot', 'No, I can''t resist', 'say'),
 (NULL, 'loot', 'I want more!', 'say');
+
+INSERT INTO `ai_playerbot_speech` VALUES
+(NULL, 'low ammo', 'I have few <ammo> left!', 'say'),
+(NULL, 'low ammo', 'I need more <ammo>!', 'say'),
+(NULL, 'low ammo', '100 <ammo> left!', 'say'),
+(NULL, 'no ammo', 'That\'s it! No <ammo>!', 'say'),
+(NULL, 'no ammo', 'And you have my bow... Oops, no <ammo>!', 'say'),
+(NULL, 'no ammo', 'Need ammo!', 'yell');
+

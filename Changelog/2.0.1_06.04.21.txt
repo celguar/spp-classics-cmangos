@@ -1,0 +1,23 @@
+
+                      Update 06.04.2021
+
+ - Performance tweaks
+ - Cmangos AhBot added
+ - Update locales
+ - Fix bot stand while drinking
+ - Fix reset strategies on login
+ - Use healthstone instead of potion of available
+ - Random bots appear in different zones faster
+ - Temporary increase bot speed by 10% until fix
+ - Fix bots following while dead
+ - Disable Druid bots auto Prowl until fix
+ - Druid bots should now remove form to buff
+ - Fix auto/trainer learning of spells in tbc/wotlk
+ - Option to sync bots max level players level
+ - Hunter bots use melee if enemy is close or no ammo
+ - Hunter bots say if they are low on ammo
+ - "ammo" command to check ammunition
+ - [Vanilla] LFG using Meeting Stones
+ - [Vanilla] Random bots use LFG
+ - [Wotlk] Fix bots not confirming in LFG
+ - Other fixes

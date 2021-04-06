@@ -371,8 +371,8 @@ INSERT INTO `ai_playerbot_rpg_races` VALUES
 --
 --       TAUREN
 --
--- Innkeeper Pala, Mulgore
-(NULL, 6746, 6, 1, 10),
+-- Innkeeper Kauth, Mulgore
+(NULL, 6747, 6, 1, 10),
 --
 --       UNDEAD
 --

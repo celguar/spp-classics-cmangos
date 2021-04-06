@@ -237,3 +237,6 @@ DROP FUNCTION IF EXISTS `uint32toint32`;
  ALTER TABLE `item_instance` DROP `data`;
 
 ALTER TABLE item_instance ALTER duration SET DEFAULT 0;
+
+TRUNCATE `character_honor_cp`;
+

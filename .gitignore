@@ -1,7 +1,11 @@
 
 Server/Database
 Server/Database_Playerbot
+Server/Tools/Apache24
+Server/Tools/php7
+Server/Tools/Notepad
 Modules
+Settings_Old
 *.spp
 *.on
 *.off
@@ -13,3 +17,4 @@ sql/tbc/world.sql
 sql/wotlk/world.sql
 sql/cata/world.sql
 Saves
+!Changelog/*.txt
