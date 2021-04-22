@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.0.1
+set repack_version=2.0.2
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -2111,18 +2111,21 @@ echo # https://spp-forum.de                                     #
 echo ############################################################
 echo.
 set /a count=0
+set /a newcount=0
+for %%f in ("%mainfolder%\Changelog\*.txt") do (
+set /a newcount+=1
+)
 if "%selected_log%"=="" (set selected_log=0)
 set logname[0]=1
 set manylogs=0
 set choose_log=0
 rem echo Selected Log:%selected_log%
-rem echo Selected log name: !logname[%selected_log%]!
 if %selected_log% GTR 0 (
-echo              -------- Changelog v%selected_log% --------
+echo          -------- Changelog v%selected_log% --------
 more < "%mainfolder%\Changelog\%selected_log%.txt"
 echo.
 )
-for %%f in ("%mainfolder%\Changelog\*txt") do (
+for /f "tokens=*" %%f in ('dir /b /o-n "%mainfolder%\Changelog\*.txt"') do (
 set /a count+=1
 set logname[!count!]=%%~nf
 rem echo Log Name: !logname[%count%]!
@@ -2132,14 +2135,14 @@ rem set /p val=<%%f
 rem echo "fullname: %%f"
 rem echo "name: %%~nf"
 rem echo "contents: !val!"
-if !count! EQU 1 (if %selected_log% LSS 1 (
-echo           -------- Changelog v%%~nf --------
+if !count! EQU 1 (if %selected_log% EQU 0 (
+echo          -------- Changelog v%%~nf --------
 more < "%mainfolder%\Changelog\%%~nf.txt"
 )
-if %selected_log% GTR %%~nf (
-echo    !count! - %%~nf
+if %selected_log% EQU 0 echo.
+if %selected_log% GTR 0 (
+if %selected_log% NEQ %%~nf (echo    !count! - %%~nf)
 )
-if %selected_log% LSS 1 echo.
 )
 if !count! GTR 1 (
 if !count! LSS 6 ( if %selected_log% NEQ %%~nf (echo    !count! - %%~nf))
