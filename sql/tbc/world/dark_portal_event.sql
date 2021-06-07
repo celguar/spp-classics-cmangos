@@ -7,6 +7,6 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES ('42457', '-100');
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES ('2723', '-100');
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES ('2724', '-100');
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES ('2725', '-100');
-INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (@PROUD2, '-100');
-INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (@PROUD1, '100');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (@PROUD1, '-100');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (@PROUD2, '100');
 UPDATE `creature_template` SET `Faction`='1767' WHERE  `Entry`=19322;
