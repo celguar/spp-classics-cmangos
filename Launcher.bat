@@ -237,7 +237,7 @@ set /a maps_version=1
 set /a world_version=2
 set /a chars_version=1
 set /a bots_version=1
-set core_version=1.1
+set core_version=1.2
 
 goto settings
 
@@ -260,7 +260,7 @@ set /a maps_version=1
 set /a world_version=2
 set /a chars_version=1
 set /a bots_version=1
-set core_version=1.1
+set core_version=1.2
 
 goto settings
 
@@ -283,7 +283,7 @@ set /a maps_version=1
 set /a world_version=2
 set /a chars_version=1
 set /a bots_version=1
-set core_version=1.1
+set core_version=1.2
 
 goto settings
 
