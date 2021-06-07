@@ -1,0 +1,14 @@
+
+                      Update 22.04.2021
+
+ - [Core] Latest CMaNGOS update
+ - [Core] Many fixes from CMaNGOS (quests, scripts, etc)
+ - [Bots] BG tactics for 3 vanilla BGs (Thanks to vmangos)
+ - [Bots] Tweaks fot bots auto questing
+ - [Bots] Fix several crashes
+ - [Bots] Tweak bots responsiveness in combat
+ - [Bots] Fix bots not attacking back in pvp
+ - [Bots] Fix shaman bots not having totems
+ - [Bots] Fix random bots missing bags
+ - [Bots] Fix random bot number not going more than 1.5k
+ - Other fixes

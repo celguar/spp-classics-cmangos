@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.0.2
+set repack_version=2.0.3
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -233,7 +233,8 @@ set realmserver=realmd.exe
 set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
-set /a world_version=1
+set /a maps_version=1
+set /a world_version=2
 set /a chars_version=1
 set /a bots_version=1
 set core_version=1.1
@@ -255,7 +256,8 @@ set realmserver=realmd.exe
 set worldserver=mangosd.exe
 
 set spp_update=tbc_base
-set /a world_version=1
+set /a maps_version=1
+set /a world_version=2
 set /a chars_version=1
 set /a bots_version=1
 set core_version=1.1
@@ -277,10 +279,13 @@ set realmserver=realmd.exe
 set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
-set /a world_version=1
+set /a maps_version=1
+set /a world_version=2
 set /a chars_version=1
 set /a bots_version=1
 set core_version=1.1
+
+goto settings
 
 cls
 REM echo.
@@ -339,25 +344,32 @@ IF NOT EXIST "%mainfolder%\website.on" (
 )
 
 start "" /min "%mainfolder%\Server\Database\start.bat"
- 
+
+if not exist "%mainfolder%\Modules\%expansion%\dbc" del "%mainfolder%\%expansion%_maps_version.spp"
+
 if not exist "%mainfolder%\%spp_update%.spp" goto update_install
+if not exist "%mainfolder%\%expansion%_maps_version.spp" goto update_maps
 if not exist "%mainfolder%\%expansion%_world_version.spp" goto update_world
 if not exist "%mainfolder%\%expansion%_chars_version.spp" goto update_chars
 if not exist "%mainfolder%\%expansion%_bots_version.spp" goto update_bots
 
+set /p current_maps_version=<"%mainfolder%\%expansion%_maps_version.spp"
 set /p current_world_version=<"%mainfolder%\%expansion%_world_version.spp"
 set /p current_chars_version=<"%mainfolder%\%expansion%_chars_version.spp"
 set /p current_bots_version=<"%mainfolder%\%expansion%_bots_version.spp"
 
+if %current_maps_version% LSS 1 (set current_maps_version=1)
 if %current_world_version% LSS 1 (set current_world_version=1)
 if %current_chars_version% LSS 1 (set current_chars_version=1)
 if %current_bots_version% LSS 1 (set current_bots_version=1)
 
+rem echo %current_maps_version% - maps
 rem echo %current_world_version% - world
 rem echo %current_chars_version% - chars
 rem echo %current_bots_version% - bots
 rem pause
 
+if %current_maps_version% LSS %maps_version% goto update_maps
 if %current_world_version% LSS %world_version% goto update_world
 if %current_chars_version% LSS %chars_version% goto update_chars
 if %current_bots_version% LSS %bots_version% goto update_bots
@@ -388,7 +400,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading Vanilla module...(~520 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics/vanilla.7z -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics_v2/vanilla.7z -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -399,7 +411,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading TBC module...(~740 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics/tbc.7z -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics_v2/tbc.7z -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -410,7 +422,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading WotLK module...(~1100 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics/wotlk.7z -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics_v2/wotlk.7z -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -435,12 +447,13 @@ echo    Done!
 ping -n 3 127.0.0.1>nul
 del "%mainfolder%\Modules\%expansion%.7z"
 cd "%mainfolder%"
+>"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
 goto update_install
 
 :extract_worlddb
 more < "%mainfolder%\header_spp.txt"
 echo.
-echo    Extracting world database...
+echo    Extracting world db...
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\sql\%expansion%"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
@@ -480,13 +493,13 @@ ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
 for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 echo.
-echo    Applying world db updates...
-ping -n 3 127.0.0.1>nul
-set /a next_world_version=%current_world_version%+1
-for /l %%x in (%next_world_version%, 1, %world_version%) do (
-   ping -n 2 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-)
+rem echo    Applying world db updates...
+rem ping -n 3 127.0.0.1>nul
+rem set /a next_world_version=%current_world_version%+1
+rem for /l %%x in (%next_world_version%, 1, %world_version%) do (
+rem   ping -n 2 127.0.0.1>nul
+rem   for %%i in ("%mainfolder%\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+rem )
 echo    Applying world db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
@@ -504,7 +517,7 @@ for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%main
 echo.
 echo    Applying accounts db updates...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\realmd_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+for %%i in ("%mainfolder%\sql\%expansion%\updates\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 echo    Applying accounts db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
@@ -526,10 +539,76 @@ echo %spp_update% > "%mainfolder%\%spp_update%.spp"
 >"%mainfolder%\%expansion%_bots_version.spp" echo %bots_version%
 goto start_database
 
+:update_maps
+mode con: cols=40 lines=30
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Maps update required!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    %current_maps_version% ---^> %maps_version%
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Downloading %expansion% files (~520 MB)
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics_v2/%expansion%.7z -P "%mainfolder%\Modules"
+echo.
+echo    Download complete. Checking file...
+ping -n 3 127.0.0.1>nul
+if not exist "%mainfolder%\Modules\%expansion%.7z" (
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Module download error
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please try again...
+ping -n 3 127.0.0.1>nul
+goto select_expansion
+)
+rd /s /q "%mainfolder%\Modules\%expansion%"
+cd "%mainfolder%\Modules"
+mkdir %expansion%
+cd %expansion%
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Extracting %expansion% module...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please, wait...
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Modules\%expansion%.7z" > nul
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+del "%mainfolder%\Modules\%expansion%.7z"
+cd "%mainfolder%"
+>"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+goto start_database
+
 :update_world
 rem setlocal enableDelayedExpansion
 mode con: cols=40 lines=30
 REM if "%choose_exp%"=="4" goto menu
+del "%mainfolder%\%expansion%_fr.spp"
+del "%mainfolder%\%expansion%_de.spp"
+del "%mainfolder%\%expansion%_ko.spp"
+del "%mainfolder%\%expansion%_ch.spp"
+del "%mainfolder%\%expansion%_mx.spp"
+del "%mainfolder%\%expansion%_ru.spp"
+del "%mainfolder%\%expansion%_tw.spp"
+del "%mainfolder%\%expansion%_es.spp"
+del "%mainfolder%\%expansion%_fr_re.spp"
+del "%mainfolder%\%expansion%_de_re.spp"
+del "%mainfolder%\%expansion%_ko_re.spp"
+del "%mainfolder%\%expansion%_ch_re.spp"
+del "%mainfolder%\%expansion%_mx_re.spp"
+del "%mainfolder%\%expansion%_ru_re.spp"
+del "%mainfolder%\%expansion%_tw_re.spp"
+del "%mainfolder%\%expansion%_es_re.spp"
 cls
 more < "%mainfolder%\header_spp.txt"
 echo.
@@ -542,19 +621,40 @@ echo.
 echo    Please wait...
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Applying world db updates...
+echo    Extracting world db...
 ping -n 3 127.0.0.1>nul
-set /a next_world_version=%current_world_version%+1
-for /l %%x in (%next_world_version%, 1, %world_version%) do (
-   ping -n 2 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-)
-for %%i in ("%mainfolder%\sql\%expansion%\updates\world\common\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-rem endlocal
+cd "%mainfolder%\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
+cd "%mainfolder%"
+echo.
+echo    Wiping world db...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_world.sql"
+echo.
+echo    Installing world db...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world.sql"
+rem echo    Applying world db updates...
+rem ping -n 3 127.0.0.1>nul
+rem set /a next_world_version=%current_world_version%+1
+rem for /l %%x in (%next_world_version%, 1, %world_version%) do (
+rem    ping -n 2 127.0.0.1>nul
+rem    for %%i in ("%mainfolder%\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+rem )
+rem for %%i in ("%mainfolder%\sql\%expansion%\updates\world\common\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+echo.
+echo    Applying world db mods...
+ping -n 3 127.0.0.1>nul
+for %%i in ("%mainfolder%\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 echo.
+echo    Locales are removed in this process!
+ping -n 3 127.0.0.1>nul
+echo    To reinstall use locales menu.
+ping -n 5 127.0.0.1>nul
+del "%mainfolder%\sql\%expansion%\world.sql"
 >"%mainfolder%\%expansion%_world_version.spp" echo %world_version%
 goto start_database
 
@@ -588,7 +688,7 @@ echo.
 echo    Please wait...
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Extracting db...
+echo    Extracting world db...
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\sql\%expansion%"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
@@ -601,15 +701,15 @@ echo.
 echo    Installing world db...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world.sql"
-echo.
-echo    Applying world db updates...
-ping -n 3 127.0.0.1>nul
-set /a next_world_version=%current_world_version%+1
-for /l %%x in (%next_world_version%, 1, %world_version%) do (
-   ping -n 2 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-)
-for %%i in ("%mainfolder%\sql\%expansion%\updates\world\common\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+rem echo.
+rem echo    Applying world db updates...
+rem ping -n 3 127.0.0.1>nul
+rem set /a next_world_version=%current_world_version%+1
+rem for /l %%x in (%next_world_version%, 1, %world_version%) do (
+rem    ping -n 2 127.0.0.1>nul
+rem    for %%i in ("%mainfolder%\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+rem )
+rem for %%i in ("%mainfolder%\sql\%expansion%\updates\world\common\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
 echo    Applying world db mods...
 ping -n 3 127.0.0.1>nul
