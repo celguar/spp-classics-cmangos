@@ -895,7 +895,7 @@ ping -n 2 127.0.0.1>nul
 echo.
 echo    Edit carefully!
 ping -n 2 127.0.0.1>nul
-start "%mainfolder%\Server\Tools\Notepad\notepad++.exe" "%mainfolder%\Settings\%expansion%\mangosd.conf"
+"%mainfolder%\Server\Tools\Notepad\notepad++.exe" "%mainfolder%\Settings\%expansion%\mangosd.conf"
 goto menu
 
 :bots_settings
@@ -908,7 +908,7 @@ ping -n 2 127.0.0.1>nul
 echo.
 echo    Edit carefully!
 ping -n 2 127.0.0.1>nul
-start "%mainfolder%\Server\Tools\Notepad\notepad++.exe" "%mainfolder%\Settings\%expansion%\aiplayerbot.conf"
+"%mainfolder%\Server\Tools\Notepad\notepad++.exe" "%mainfolder%\Settings\%expansion%\aiplayerbot.conf"
 goto menu
 
 :reinstall_world
