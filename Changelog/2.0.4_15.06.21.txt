@@ -1,0 +1,12 @@
+
+                      Update 15.06.2021
+
+ - [DB]   Update localisations
+ - [Bots] Fix BG bots not joining (wotlk)
+ - [Bots] Fix bot glitchy follow movement
+ - [Bots] Fix possible crash
+ - [Bots] Fix arena season ending (tbc)
+ - [Bots] Fix warrior charge
+ - [Bots] Fix many random bots being dead
+ - [Bots] Invite command to join bot group
+ - Other fixes

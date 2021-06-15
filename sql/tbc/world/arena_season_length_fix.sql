@@ -1,5 +1,2 @@
 -- Fix Arena Season ending while server is running
-UPDATE `game_event` SET `length`='2592000' WHERE  `entry`=53;
-UPDATE `game_event` SET `length`='2592000' WHERE  `entry`=54;
-UPDATE `game_event` SET `length`='2592000' WHERE  `entry`=55;
-UPDATE `game_event` SET `length`='2592000' WHERE  `entry`=56;
+UPDATE `game_event` SET `length`='2592000', `schedule_type`='0' WHERE  `entry` IN(53,54,55,56);

@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.0.3
+set repack_version=2.0.4
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -86,16 +86,16 @@ echo.
 more < "%mainfolder%\credits.txt"
 ping -n 9 127.0.0.1>nul
 cls
-echo.
-echo  List of the active Patrons
-echo  --------------------------
-echo.
-more < "%mainfolder%\patrons.txt"
-echo.
-echo  ###################
-echo  # Thank you guys! #
-echo  ###################
-ping -n 9 127.0.0.1>nul
+rem echo.
+rem echo  List of the active Patrons
+rem echo  --------------------------
+rem echo.
+rem more < "%mainfolder%\patrons.txt"
+rem echo.
+rem echo  ###################
+rem echo  # Thank you guys! #
+rem echo  ###################
+rem ping -n 9 127.0.0.1>nul
 goto select_expansion
 
 :website_start
@@ -257,7 +257,7 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=2
+set /a world_version=3
 set /a chars_version=1
 set /a bots_version=1
 set core_version=1.2
@@ -400,7 +400,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading Vanilla module...(~520 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics_v2/vanilla.7z -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress 'ftp://207.244.228.248/spp_classics_v2/vanilla.7z' -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -411,7 +411,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading TBC module...(~740 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics_v2/tbc.7z -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress 'ftp://207.244.228.248/spp_classics_v2/tbc.7z' -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -422,7 +422,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading WotLK module...(~1100 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics_v2/wotlk.7z -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress 'ftp://207.244.228.248/spp_classics_v2/wotlk.7z' -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -553,8 +553,8 @@ echo.
 echo    Please wait...
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Downloading %expansion% files (~520 MB)
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress ftp://207.244.228.248/spp_classics_v2/%expansion%.7z -P "%mainfolder%\Modules"
+echo    Downloading %expansion% files...
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress 'ftp://207.244.228.248/spp_classics_v2/%expansion%.7z' -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul

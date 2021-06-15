@@ -2,7 +2,7 @@
  ------
  "MaNGOS"           "(C)ontinued MaNGOS"
  "AzerothCore"      "TrinityCore"
- "WoWruRU Project"
+ "WoWruRU Project"  "VMaNGOS"
 
  Persons:
  --------
