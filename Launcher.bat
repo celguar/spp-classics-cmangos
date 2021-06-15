@@ -400,7 +400,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading Vanilla module...(~520 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress 'ftp://207.244.228.248/spp_classics_v2/vanilla.7z' -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "ftp://207.244.228.248/spp_classics_v2/vanilla.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -411,7 +411,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading TBC module...(~740 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress 'ftp://207.244.228.248/spp_classics_v2/tbc.7z' -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "ftp://207.244.228.248/spp_classics_v2/tbc.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -422,7 +422,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading WotLK module...(~1100 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress 'ftp://207.244.228.248/spp_classics_v2/wotlk.7z' -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "ftp://207.244.228.248/spp_classics_v2/wotlk.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -554,7 +554,7 @@ echo    Please wait...
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Downloading %expansion% files...
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress 'ftp://207.244.228.248/spp_classics_v2/%expansion%.7z' -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "ftp://207.244.228.248/spp_classics_v2/%expansion%.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
