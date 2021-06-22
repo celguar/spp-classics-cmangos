@@ -1,0 +1,13 @@
+
+                      Update 22.06.2021
+
+ - [Core] Fix Arathi Basin base graveyard
+ - [Core] Fix AV mines neutral state
+ - [Core] Fix rare crash (wotlk)
+ - [Bots] Fix Guild charter sign (vanilla)
+ - [Bots] Tweak WSG pathing
+ - [Bots] Make flag carriers less likely to fight
+ - [Bots] Fix hidden cloak/helm
+ - [Bots] Fix bots always detecting stealth
+ - [Bots] Fix bots always turning to enemy
+ - Other fixes
