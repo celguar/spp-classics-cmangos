@@ -1,0 +1,12 @@
+
+                      Update 20.07.2021
+
+ - [Core] Fix one of wotlk crashes
+ - [Bots] Tweak warrior rotation/talents
+ - [Bots] Slower bots login (less lags after start)
+ - [Bots] Fix bots flying mounts
+ - [Bots] Performance tweaks
+ - [Bots] Tweak bots approaching target
+ - [Bots] Tweak bots fleeing
+ - [Bots] Many tweaks for bot automation
+ - Other fixes

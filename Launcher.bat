@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.0.5
+set repack_version=2.0.6
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -216,7 +216,7 @@ if "%choose_exp%"=="9" (goto website_switch)
 if "%choose_exp%"=="0" (goto music_switch)
 if "%choose_exp%"=="5" (goto service_menu)
 if "%choose_exp%"=="6" (goto changelog)
-if "%menu%"=="" (goto select_expansion)
+if "%choose_exp%"=="" (goto select_expansion)
 
 :setup_vanilla
 SET NAME=SPP - Vanilla
