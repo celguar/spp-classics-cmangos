@@ -30,8 +30,8 @@ echo.
 echo Create local git config file...
 echo.
 cd "%mainfolder%\%installpath%"
-REM ..\git\cmd\git.exe config user.name "SPP User"
-REM ..\git\cmd\git.exe config user.email sppuser@spp.com
+..\git\cmd\git.exe config user.name "SPP User"
+..\git\cmd\git.exe config user.email sppuser@spp.com
 echo.
 echo Add realm settings to git system...
 echo.
