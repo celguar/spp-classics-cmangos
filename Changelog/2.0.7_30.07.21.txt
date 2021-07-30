@@ -1,0 +1,11 @@
+
+                      Update 30.07.2021
+
+ - [Core] Add fixes from CMaNGOS
+ - [Core] Fix one more crash
+ - [Bots] Bots no longer auto teleport to master
+ - [Bots] Fix Hunter low ammo notification
+ - [Bots] Fix bots stuck at GY
+ - [Bots] Improve bot automation
+ - [Launcher] Fix installation
+ - Other fixes

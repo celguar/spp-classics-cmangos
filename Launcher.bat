@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.0.6
+set repack_version=2.0.7
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -234,10 +234,10 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=1
-set /a world_version=2
+set /a world_version=3
 set /a chars_version=1
 set /a bots_version=1
-set core_version=1.2
+set core_version=3
 
 goto settings
 
@@ -257,10 +257,10 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=3
+set /a world_version=4
 set /a chars_version=1
 set /a bots_version=1
-set core_version=1.2
+set core_version=3
 
 goto settings
 
@@ -280,10 +280,10 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=1
-set /a world_version=3
+set /a world_version=4
 set /a chars_version=1
 set /a bots_version=1
-set core_version=1.2
+set core_version=3
 
 goto settings
 
@@ -328,7 +328,6 @@ set pass=123456
 REM --- Settings ---
 
 :start_database
-endlocal
 if not exist "%mainfolder%\Saves\%expansion%\autosave" mkdir "%mainfolder%\Saves\%expansion%\autosave"
 
 IF NOT EXIST "%mainfolder%\autosave.on" (
@@ -836,7 +835,7 @@ tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if NOT "%ERRORLEVEL%"=="0" echo   9 - Back to expansion selector
 echo   0 - Shutdown all servers
 echo.
-echo    Ver: %repack_version% Core: %core_version% DB: w%current_world_version%.c%current_chars_version%.b%current_bots_version%
+echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version%
 echo.
 set /P menu_option=Enter your choice: 
 REM if "%menu_option%"=="1" (goto quick_start_servers_x86)
@@ -2254,7 +2253,7 @@ echo    6 - More logs...)
 )
 )
 echo.
-echo    0 - Go back
+echo    Press Enter to continue
 echo.
 set /P choose_log=Enter your choice: 
 if %choose_log% NEQ 0 (
@@ -2269,6 +2268,7 @@ rem set lognametemp=testingstuffultra
 goto changelog
 )
 if "%choose_log%"=="0" (goto select_expansion)
+if "%choose_log%"=="" (goto select_expansion)
 goto select_expansion
 
 :service_menu
