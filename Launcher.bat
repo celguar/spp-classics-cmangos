@@ -1877,7 +1877,7 @@ if "%savemenu%"=="1" (goto saveslot_choose)
 if "%savemenu%"=="2" (goto saveslot_choose)
 if "%savemenu%"=="3" (goto saveslot_choose)
 if "%savemenu%"=="4" (goto autosave_switch)
-if "%savemenu%"=="5" (explorer.exe Saves\%expansion%)
+if "%savemenu%"=="5" (explorer.exe "%mainfolder%\Saves\%expansion%")
 if "%savemenu%"=="0" (goto menu)
 if "%savemenu%"=="" (goto save_menu)
 goto save_menu
@@ -2047,6 +2047,7 @@ ping -n 3 127.0.0.1>nul
 if "%saveslot%"=="old" goto import_playerbots
 
 :convert_transfer_data
+echo.
 echo    Upgrading accounts...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\transfer_realmd.sql"
@@ -2078,8 +2079,8 @@ ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
 if "%saveslot%"=="old" goto convert_old_data
 if "%saveslot%"=="transfer" goto convert_transfer_data
-echo.
 :import_playerbots
+echo.
 echo    Importing playerbots...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
