@@ -1,0 +1,14 @@
+
+                      Update 30.08.2021
+
+ - [Bots] Many improvements for random/self bot
+ - [Bots] Bot following tweaks
+ - [Bots] Fix mount if far from master
+ - [Bots] Tweak movement in combat
+ - [Bots] Save custom talent link
+ - [Bots] Priest AI tweaks
+ - [Bots] Fix some crashes
+ - [Bots] Tweak DPS bots threat calculation
+ - [Bots] Tweak bots flee mechanic
+ - [Launcher] Do not close DB if server is running
+ - Other fixes

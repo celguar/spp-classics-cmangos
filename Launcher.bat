@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.0.7
+set repack_version=2.0.8
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -145,14 +145,21 @@ goto beginning
 
 :select_expansion
 endlocal
-tasklist /FI "IMAGENAME eq mysqld.exe" 2>NUL | find /I /N "mysqld.exe">NUL
-if "%ERRORLEVEL%"=="0" ("%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown)
-tasklist /FI "IMAGENAME eq spp-httpd.exe" 2>NUL | find /I /N "spp-httpd.exe">NUL
-if "%ERRORLEVEL%"=="0" (taskkill /f /im spp-httpd.exe)
 mode con: cols=40 lines=30
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 COLOR 0F
+
+set mangos_running=false
+tasklist /FI "IMAGENAME eq mangosd.exe" 2>NUL | find /I /N "mangosd.exe">NUL
+if "%ERRORLEVEL%"=="0" set mangos_running=true
+tasklist /FI "IMAGENAME eq realmd.exe" 2>NUL | find /I /N "realmd.exe">NUL
+if "%ERRORLEVEL%"=="0" (if %mangos_running%==false taskkill /f /im realmd.exe)
+tasklist /FI "IMAGENAME eq mysqld.exe" 2>NUL | find /I /N "mysqld.exe">NUL
+if "%ERRORLEVEL%"=="0" (if %mangos_running%==false "%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown)
+tasklist /FI "IMAGENAME eq spp-httpd.exe" 2>NUL | find /I /N "spp-httpd.exe">NUL
+if "%ERRORLEVEL%"=="0" (if %mangos_running%==false taskkill /f /im spp-httpd.exe)
+
 if exist "%mainfolder%\music.on" set music=ON
 if exist "%mainfolder%\music.off" set music=OFF
 if exist "%mainfolder%\website.on" set website=ON
@@ -166,6 +173,17 @@ if exist "%mainfolder%\Modules\vanilla\dbc" set module_check_vanilla=Installed
 if exist "%mainfolder%\Modules\tbc\dbc" set module_check_tbc=Installed
 if exist "%mainfolder%\Modules\wotlk\dbc" set module_check_wotlk=Installed
 if exist "%mainfolder%\Modules\cata\dbc" set module_check_cata=Installed
+
+for /f "tokens=2 delims=," %%I in (
+    'wmic process where "name='mangosd.exe'" get ExecutablePath^,Handle /format:csv ^| find /i "mangosd.exe"'
+) do (
+if "%%~I"=="%mainfolder%\Server\Binaries\vanilla\Bin64\mangosd.exe" set module_running_vanilla=- [Running]
+if "%%~I"=="%mainfolder%\Server\Binaries\tbc\Bin64\mangosd.exe" set module_running_tbc=- [Running]
+if "%%~I"=="%mainfolder%\Server\Binaries\wotlk\Bin64\mangosd.exe" set module_running_wotlk=- [Running]
+rem if "%%~I"=="%mainfolder%\Server\Binaries\vanilla\Bin64\mangosd.exe" goto setup_vanilla
+rem if "%%~I"=="%mainfolder%\Server\Binaries\tbc\Bin64\mangosd.exe" goto setup_tbc
+rem if "%%~I"=="%mainfolder%\Server\Binaries\wotlk\Bin64\mangosd.exe" goto setup_wotlk
+)
 
 cd "%mainfolder%"
 
@@ -186,17 +204,17 @@ echo   Choose expansion:
 echo.
 echo   1 - World of Warcraft
 echo.
-echo          [%module_check_vanilla%]
+echo          [%module_check_vanilla%] %module_running_vanilla%
 echo.
 echo.
 echo   2 - The Burning Crusade
 echo.
-echo          [%module_check_tbc%]
+echo          [%module_check_tbc%] %module_running_tbc%
 echo.
 echo.
 echo   3 - Wrath of the Lich King
 echo.
-echo          [%module_check_wotlk%]
+echo          [%module_check_wotlk%] %module_running_wotlk%
 REM echo 4 - World of Warcraft: Cataclysm               [%module_check_cata%]
 echo.
 echo   9 - Players Map [%website%]
@@ -885,7 +903,6 @@ goto server_settings
 
 :world_settings
 cls
-if "%website%"=="OFF" (goto menu)
 more < "%mainfolder%\header_spp.txt"
 more < "%mainfolder%\logo_%expansion%.txt"
 echo.
