@@ -1,0 +1,10 @@
+
+                      Update 10.09.2021
+
+ - [Wotlk] - Fix crash in LFG
+ - [Bots] Fix low level priests not healing
+ - [Bots] Fix alt bots not rolling for BoP items
+ - [Bots] Fix using Hearthstone by use command
+ - [Bots] Performance tweaks
+ - [Bots] Random bots have more free will
+ - Other fixes
