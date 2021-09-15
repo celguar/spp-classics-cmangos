@@ -1,0 +1,6 @@
+
+                      Update 15.09.2021
+
+ - [Bots] Fix couple of crashes
+ - [Bots] Improve bots traveling
+ - Other fixes
