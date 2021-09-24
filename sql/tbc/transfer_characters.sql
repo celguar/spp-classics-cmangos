@@ -18,11 +18,10 @@ ALTER TABLE `characters`
   DROP COLUMN `honor_standing`,
   DROP COLUMN `stored_honor_rating`,
   DROP COLUMN `stored_dishonorable_kills`,
-  DROP COLUMN `stored_honorable_kills`,
+  CHANGE COLUMN `stored_honorable_kills` `totalKills` int(10) unsigned NOT NULL DEFAULT '0',
   ADD COLUMN `totalHonorPoints` int(10) unsigned NOT NULL DEFAULT '0' AFTER `arenaPoints`,
   ADD COLUMN `todayHonorPoints` int(10) unsigned NOT NULL DEFAULT '0' AFTER `totalHonorPoints`,
   ADD COLUMN `yesterdayHonorPoints` int(10) unsigned NOT NULL DEFAULT '0' AFTER `todayHonorPoints`,
-  ADD COLUMN `totalKills` int(10) UNSIGNED NOT NULL default '0' AFTER `yesterdayHonorPoints`,
   ADD COLUMN `todayKills` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `totalKills`,
   ADD COLUMN `yesterdayKills` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `todayKills`,
   ADD COLUMN `chosenTitle` int(10) unsigned NOT NULL DEFAULT '0' AFTER `yesterdayKills`,
@@ -96,6 +95,12 @@ DELETE FROM `pet_spell_cooldown`;
 DELETE FROM `character_aura`;
 DELETE FROM `pet_aura`;
 
+-- CONVERT ITEM ENCHANTMENT
+UPDATE `item_instance`
+  SET `enchantments` = CONCAT(`enchantments`, REPEAT('0 ', 12));
+
+-- UPDATE TOTAL KILLS WITH CURRENT WEEK KILLS
+UPDATE `characters` SET `totalKills` = (`totalKills` + (SELECT COUNT(*) FROM `character_honor_cp` WHERE `character_honor_cp`.`guid`=`characters`.`guid` AND `victim_type` > '0' AND `type` = '1'));
 -- REMOVE HONOR INFO
 DROP TABLE IF EXISTS `character_honor_cp`;
 
