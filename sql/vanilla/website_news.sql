@@ -1,0 +1,84 @@
+-- --------------------------------------------------------
+-- Host:                         127.0.0.1
+-- Server version:               5.7.26 - MySQL Community Server (GPL)
+-- Server OS:                    Win32
+-- HeidiSQL Version:             10.2.0.5599
+-- --------------------------------------------------------
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+-- Dumping structure for table classicrealmd.f_posts
+DROP TABLE IF EXISTS `f_posts`;
+CREATE TABLE IF NOT EXISTS `f_posts` (
+  `post_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `poster` varchar(12) NOT NULL,
+  `poster_id` int(8) unsigned NOT NULL DEFAULT '0',
+  `poster_ip` varchar(15) DEFAULT NULL,
+  `poster_character_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `posted` int(10) unsigned NOT NULL DEFAULT '0',
+  `edited` int(10) unsigned DEFAULT NULL,
+  `edited_by` varchar(30) DEFAULT NULL,
+  `topic_id` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`post_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+
+-- Dumping data for table classicrealmd.f_posts: 11 rows
+/*!40000 ALTER TABLE `f_posts` DISABLE KEYS */;
+INSERT INTO `f_posts` (`post_id`, `poster`, `poster_id`, `poster_ip`, `poster_character_id`, `message`, `posted`, `edited`, `edited_by`, `topic_id`) VALUES
+	(1, 'SPP Team', 0, '::1', 0, ' - Performance tweaks<br />\r\n - Cmangos AhBot added<br />\r\n - Update locales<br />\r\n - Fix bot stand while drinking<br />\r\n - Fix reset strategies on login<br />\r\n - Use healthstone instead of potion of available<br />\r\n - Random bots appear in different zones faster<br />\r\n - Temporary increase bot speed by 10% until fix<br />\r\n - Fix bots following while dead<br />\r\n - Disable Druid bots auto Prowl until fix<br />\r\n - Druid bots should now remove form to buff<br />\r\n - Fix auto/trainer learning of spells in tbc/wotlk<br />\r\n - Option to sync bots max level players level<br />\r\n - Hunter bots use melee if enemy is close or no ammo<br />\r\n - Hunter bots say if they are low on ammo<br />\r\n - &quot;ammo&quot; command to check ammunition<br />\r\n - <b>[Vanilla]</b> LFG using Meeting Stones<br />\r\n - <b>[Vanilla]</b> Random bots use LFG<br />\r\n - <b>[Wotlk]</b> Fix bots not confirming in LFG<br />\r\n - <i>Other fixes</i>', 1632615396, NULL, NULL, 1),
+	(2, 'SPP Team', 0, '::1', 0, ' - <b>[Wotlk]</b> Fix bots not confirming in LFG', 1632615416, NULL, NULL, 2),
+	(3, 'SPP Team', 0, '::1', 0, ' - <b>[Core]</b> Latest CMaNGOS update<br />\r\n - <b>[Core]</b> Many fixes from CMaNGOS (quests, scripts, etc)<br />\r\n - <b>[Bots]</b> BG tactics for 3 vanilla BGs (Thanks to vmangos)<br />\r\n - <b>[Bots]</b> Tweaks fot bots auto questing<br />\r\n - <b>[Bots]</b> Fix several crashes<br />\r\n - <b>[Bots]</b> Tweak bots responsiveness in combat<br />\r\n - <b>[Bots]</b> Fix bots not attacking back in pvp<br />\r\n - <b>[Bots]</b> Fix shaman bots not having totems<br />\r\n - <b>[Bots]</b> Fix random bots missing bags<br />\r\n - <b>[Bots]</b> Fix random bot number not going more than 1.5k<br />\r\n - <i>Other fixes</i>', 1632615455, NULL, NULL, 3),
+	(4, 'SPP Team', 0, '::1', 0, ' - <b>[DB]</b>   Update localisations<br />\r\n - <b>[Bots]</b> Fix BG bots not joining (wotlk)<br />\r\n - <b>[Bots]</b> Fix bot glitchy follow movement<br />\r\n - <b>[Bots]</b> Fix possible crash<br />\r\n - <b>[Bots]</b> Fix arena season ending (tbc)<br />\r\n - <b>[Bots]</b> Fix warrior charge<br />\r\n - <b>[Bots]</b> Fix many random bots being dead<br />\r\n - <b>[Bots]</b> Invite command to join bot group<br />\r\n - <i>Other fixes</i>', 1632615492, NULL, NULL, 4),
+	(5, 'SPP Team', 0, '::1', 0, ' - <b>[Core]</b> Fix Arathi Basin base graveyard<br />\r\n - <b>[Core]</b> Fix AV mines neutral state<br />\r\n - <b>[Core]</b> Fix rare crash (wotlk)<br />\r\n - <b>[Bots]</b> Fix Guild charter sign (vanilla)<br />\r\n - <b>[Bots]</b> Tweak WSG pathing<br />\r\n - <b>[Bots]</b> Make flag carriers less likely to fight<br />\r\n - <b>[Bots]</b> Fix hidden cloak/helm<br />\r\n - <b>[Bots]</b> Fix bots always detecting stealth<br />\r\n - <b>[Bots]</b> Fix bots always turning to enemy<br />\r\n - <i>Other fixes</i>', 1632615530, NULL, NULL, 5),
+	(6, 'SPP Team', 0, '::1', 0, ' - <b>[Core]</b> Fix one of wotlk crashes<br />\r\n - <b>[Bots]</b> Tweak warrior rotation/talents<br />\r\n - <b>[Bots]</b> Slower bots login (less lags after start)<br />\r\n - <b>[Bots]</b> Fix bots flying mounts<br />\r\n - <b>[Bots]</b> Performance tweaks<br />\r\n - <b>[Bots]</b> Tweak bots approaching target<br />\r\n - <b>[Bots]</b> Tweak bots fleeing<br />\r\n - <b>[Bots]</b> Many tweaks for bot automation<br />\r\n - <i>Other fixes</i>', 1632615563, NULL, NULL, 6),
+	(7, 'SPP Team', 0, '::1', 0, ' - <b>[Core]</b> Add fixes from CMaNGOS<br />\r\n - <b>[Core]</b> Fix one more crash<br />\r\n - <b>[Bots]</b> Bots no longer auto teleport to master<br />\r\n - <b>[Bots]</b> Fix Hunter low ammo notification<br />\r\n - <b>[Bots]</b> Fix bots stuck at GY<br />\r\n - <b>[Bots]</b> Improve bot automation<br />\r\n - <b>[Launcher]</b> Fix installation<br />\r\n - <i>Other fixes</i>', 1632615598, NULL, NULL, 7),
+	(8, 'SPP Team', 0, '::1', 0, ' - <b>[Bots]</b> Many improvements for random/self bot<br />\r\n - <b>[Bots]</b> Bot following tweaks<br />\r\n - <b>[Bots]</b> Fix mount if far from master<br />\r\n - <b>[Bots]</b> Tweak movement in combat<br />\r\n - <b>[Bots]</b> Save custom talent link<br />\r\n - <b>[Bots]</b> Priest AI tweaks<br />\r\n - <b>[Bots]</b> Fix some crashes<br />\r\n - <b>[Bots]</b> Tweak DPS bots threat calculation<br />\r\n - <b>[Bots]</b> Tweak bots flee mechanic<br />\r\n - <b>[Launcher]</b> Do not close DB if server is running<br />\r\n - <i>Other fixes</i>', 1632615634, NULL, NULL, 8),
+	(9, 'SPP Team', 0, '::1', 0, ' - <b>[Wotlk]</b> - Fix crash in LFG<br />\r\n - <b>[Bots]</b> Fix low level priests not healing<br />\r\n - <b>[Bots]</b> Fix alt bots not rolling for BoP items<br />\r\n - <b>[Bots]</b> Fix using Hearthstone by use command<br />\r\n - <b>[Bots]</b> Performance tweaks<br />\r\n - <b>[Bots]</b> Random bots have more free will<br />\r\n - <i>Other fixes</i>', 1632615660, NULL, NULL, 9),
+	(10, 'SPP Team', 0, '::1', 0, ' - <b>[Bots]</b> Fix couple of crashes<br />\r\n - <b>[Bots]</b> Improve bots traveling<br />\r\n - <i>Other fixes</i>', 1632615681, NULL, NULL, 10),
+	(11, 'SPP Team', 0, '::1', 0, ' - <b>[Core]</b> Fix crashes<br />\r\n - <b>[Bots]</b> Fix bots attacking random mobs<br />\r\n - <b>[Bots]</b> Reduce free action radius in dungeons<br />\r\n - <b>[Bots]</b> Random bots create and manage guilds<br />\r\n - <b>[Bots]</b> Improve bot traveling<br />\r\n - <b>[Bots]</b> Performance tweaks<br />\r\n - <i>Other fixes</i>', 1632615713, NULL, NULL, 11);
+/*!40000 ALTER TABLE `f_posts` ENABLE KEYS */;
+
+-- Dumping structure for table classicrealmd.f_topics
+DROP TABLE IF EXISTS `f_topics`;
+CREATE TABLE IF NOT EXISTS `f_topics` (
+  `topic_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `topic_poster` varchar(12) NOT NULL,
+  `topic_poster_id` int(8) unsigned NOT NULL,
+  `topic_name` varchar(255) NOT NULL,
+  `topic_posted` int(10) unsigned NOT NULL DEFAULT '0',
+  `last_post` int(10) unsigned NOT NULL DEFAULT '0',
+  `last_post_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `last_poster` varchar(200) DEFAULT NULL,
+  `num_views` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `num_replies` mediumint(8) unsigned NOT NULL DEFAULT '1',
+  `closed` tinyint(1) NOT NULL DEFAULT '0',
+  `sticky` tinyint(1) NOT NULL DEFAULT '0',
+  `redirect_url` varchar(200) DEFAULT NULL,
+  `forum_id` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`topic_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+
+-- Dumping data for table classicrealmd.f_topics: 11 rows
+/*!40000 ALTER TABLE `f_topics` DISABLE KEYS */;
+INSERT INTO `f_topics` (`topic_id`, `topic_poster`, `topic_poster_id`, `topic_name`, `topic_posted`, `last_post`, `last_post_id`, `last_poster`, `num_views`, `num_replies`, `closed`, `sticky`, `redirect_url`, `forum_id`) VALUES
+	(1, 'SPP Team', 0, 'Update 06.04.2021', 1632615396, 1632615396, 1, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(2, 'SPP Team', 0, 'Update 22.04.2021', 1632615416, 1632615416, 2, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(3, 'SPP Team', 0, 'Update 07.06.2021', 1632615455, 1632615455, 3, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(4, 'SPP Team', 0, 'Update 15.06.2021', 1632615492, 1632615492, 4, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(5, 'SPP Team', 0, 'Update 22.06.2021', 1632615530, 1632615530, 5, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(6, 'SPP Team', 0, 'Update 20.07.2021', 1632615563, 1632615563, 6, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(7, 'SPP Team', 0, 'Update 30.07.2021', 1632615598, 1632615598, 7, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(8, 'SPP Team', 0, 'Update 30.08.2021', 1632615634, 1632615634, 8, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(9, 'SPP Team', 0, 'Update 10.09.2021', 1632615660, 1632615660, 9, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(10, 'SPP Team', 0, 'Update 15.09.2021', 1632615681, 1632615681, 10, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+	(11, 'SPP Team', 0, 'Update 26.09.2021', 1632615713, 1632615713, 11, 'SPP Team', 1, 1, 0, 0, NULL, 1);
+/*!40000 ALTER TABLE `f_topics` ENABLE KEYS */;
+
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -402,6 +402,10 @@ DELETE FROM `pet_spell_cooldown`;
 DELETE FROM `character_aura`;
 DELETE FROM `pet_aura`;
 
+-- CONVERT ITEM ENCHANTMENT
+UPDATE `item_instance`
+  SET `enchantments` = INSERT(`enchantments`, 36, 0, REPEAT('0 ', 9));
+
 -- CLEAR EQUIPMENT CACHE TO AVOID CLIENT CRASH
 -- UPDATE `characters`
 --  SET `equipmentCache` = '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ';

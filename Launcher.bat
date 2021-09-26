@@ -3,7 +3,8 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.1.0
+set repack_version=2.1.1
+set website_version=1
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -42,6 +43,30 @@ cd "%mainfolder%\Server\Tools"
 cd "%mainfolder%"
 echo    Done!
 ping -n 3 127.0.0.1>nul
+goto beginning
+
+:update_website
+mode con: cols=40 lines=30
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Website update required!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    %current_website_version% ---^> %website_version%
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
+ping -n 3 127.0.0.1>nul
+echo.
+rd /s /q "%mainfolder%\Server\website"
+cd "%mainfolder%\Server"
+mkdir website
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf -o"%mainfolder%\Server\website" website.7z > nul
+cd "%mainfolder%"
+echo    Done!
+ping -n 3 127.0.0.1>nul
+>"%mainfolder%\website_version.spp" echo %website_version%
 goto beginning
 
 :install_notepad
@@ -104,6 +129,16 @@ if "%ERRORLEVEL%"=="0" goto menu
 cd "%mainfolder%\Server\Tools\Apache24"
 start "" /min "apache_start.bat"
 cd "%mainfolder%"
+cls
+rem more < "%mainfolder%\header_spp.txt"
+rem echo.
+rem echo    Updating website news!
+rem ping -n 1 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website_news.sql"
+rem echo.
+rem echo    Done!
+rem ping -n 1 127.0.0.1>nul
+cls
 goto menu
 
 :music_switch
@@ -187,6 +222,11 @@ rem if "%%~I"=="%mainfolder%\Server\Binaries\wotlk\Bin64\mangosd.exe" goto setup
 
 cd "%mainfolder%"
 
+if not exist "%mainfolder%\website_version.spp" goto update_website
+set /p current_website_version=<"%mainfolder%\website_version.spp"
+if %current_website_version% LSS 1 (set current_website_version=1)
+if %current_website_version% LSS %website_version% goto update_website
+
 if not exist "%mainfolder%\version.spp" (
 echo %repack_version% > "%mainfolder%\version.spp"
 goto changelog
@@ -217,7 +257,7 @@ echo.
 echo          [%module_check_wotlk%] %module_running_wotlk%
 REM echo 4 - World of Warcraft: Cataclysm               [%module_check_cata%]
 echo.
-echo   9 - Players Map [%website%]
+echo   9 - Website [%website%]
 echo.
 echo   0 - Intro/Music [%music%]
 echo.
@@ -253,8 +293,9 @@ set worldserver=mangosd.exe
 set spp_update=vanilla_base
 set /a maps_version=1
 set /a world_version=3
-set /a chars_version=1
-set /a bots_version=1
+set /a chars_version=2
+set /a bots_version=2
+set /a website_db_version=1
 set core_version=3
 
 goto settings
@@ -276,8 +317,9 @@ set worldserver=mangosd.exe
 set spp_update=tbc_base
 set /a maps_version=1
 set /a world_version=4
-set /a chars_version=1
-set /a bots_version=1
+set /a chars_version=2
+set /a bots_version=2
+set /a website_db_version=1
 set core_version=3
 
 goto settings
@@ -299,8 +341,9 @@ set worldserver=mangosd.exe
 set spp_update=wotlk_base
 set /a maps_version=1
 set /a world_version=4
-set /a chars_version=1
-set /a bots_version=1
+set /a chars_version=2
+set /a bots_version=2
+set /a website_db_version=1
 set core_version=3
 
 goto settings
@@ -369,16 +412,19 @@ if not exist "%mainfolder%\%expansion%_maps_version.spp" goto update_maps
 if not exist "%mainfolder%\%expansion%_world_version.spp" goto update_world
 if not exist "%mainfolder%\%expansion%_chars_version.spp" goto update_chars
 if not exist "%mainfolder%\%expansion%_bots_version.spp" goto update_bots
+if not exist "%mainfolder%\%expansion%_website_version.spp" goto install_website_db
 
 set /p current_maps_version=<"%mainfolder%\%expansion%_maps_version.spp"
 set /p current_world_version=<"%mainfolder%\%expansion%_world_version.spp"
 set /p current_chars_version=<"%mainfolder%\%expansion%_chars_version.spp"
 set /p current_bots_version=<"%mainfolder%\%expansion%_bots_version.spp"
+set /p current_website_db_version=<"%mainfolder%\%expansion%_website_version.spp"
 
 if %current_maps_version% LSS 1 (set current_maps_version=1)
 if %current_world_version% LSS 1 (set current_world_version=1)
 if %current_chars_version% LSS 1 (set current_chars_version=1)
 if %current_bots_version% LSS 1 (set current_bots_version=1)
+if %current_website_db_version% LSS 1 (set current_website_db_version=1)
 
 rem echo %current_maps_version% - maps
 rem echo %current_world_version% - world
@@ -390,12 +436,14 @@ if %current_maps_version% LSS %maps_version% goto update_maps
 if %current_world_version% LSS %world_version% goto update_world
 if %current_chars_version% LSS %chars_version% goto update_chars
 if %current_bots_version% LSS %bots_version% goto update_bots
+if %current_website_db_version% LSS %website_db_version% goto goto update_website_db
 
 if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\vanilla.spp"
 if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\tbc.spp"
 if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\wotlk.spp"
 if exist "%mainfolder%\website.on" echo %expansion% > "%mainfolder%\Server\website\%expansion%.spp"
 if exist "%mainfolder%\website.on" goto website_start
+
 goto menu
 
 :module_not_found
@@ -801,9 +849,88 @@ for /l %%x in (%next_bots_version%, 1, %bots_version%) do (
    for %%i in ("%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 )
 echo.
+echo    Updating bots travel paths...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
+del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+cd "%mainfolder%"
 >"%mainfolder%\%expansion%_bots_version.spp" echo %bots_version%
+goto start_database
+
+:install_website_db
+mode con: cols=40 lines=30
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Installing Website db!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Extracting Armory db...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\armory.7z" > nul
+echo.
+cd "%mainfolder%"
+echo    Installing Armory db...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\armory.sql"
+echo.
+echo    Installing website tables...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+del "%mainfolder%\sql\%expansion%\armory.sql"
+>"%mainfolder%\%expansion%_website_version.spp" echo %website_db_version%
+goto start_database
+
+:update_website_db
+mode con: cols=40 lines=30
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Website db update required!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    %current_website_db_version% ---^> %website_db_version%
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Extracting Armory db...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\armory.7z" > nul
+echo.
+cd "%mainfolder%"
+echo    Installing Armory db...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\armory.sql"
+echo.
+echo    Installing Website updates...
+set /a next_website_db_version=%current_website_db_version%+1
+for /l %%x in (%next_website_db_version%, 1, %website_db_version%) do (
+   ping -n 1 127.0.0.1>nul
+   for %%i in ("%mainfolder%\sql\%expansion%\updates\website\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\website\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\website\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\website\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+)
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+del "%mainfolder%\sql\%expansion%\armory.sql"
+>"%mainfolder%\%expansion%_website_version.spp" echo %website_db_version%
 goto start_database
 
 :menu
@@ -840,7 +967,7 @@ echo.
 echo   3 - Create game account
 echo   4 - Server settings
 echo   R - Reset randombots
-if "%website%"=="ON" echo   M - Open players map
+if "%website%"=="ON" echo   M - Open website
 echo.
 echo   5 - Save Manager
 echo.
@@ -853,7 +980,7 @@ tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if NOT "%ERRORLEVEL%"=="0" echo   9 - Back to expansion selector
 echo   0 - Shutdown all servers
 echo.
-echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version%
+echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version% Web: %current_website_version%
 echo.
 set /P menu_option=Enter your choice: 
 REM if "%menu_option%"=="1" (goto quick_start_servers_x86)
@@ -952,7 +1079,7 @@ if "%website%"=="OFF" (goto menu)
 more < "%mainfolder%\header_spp.txt"
 more < "%mainfolder%\logo_%expansion%.txt"
 echo.
-echo    Opening players map
+echo    Opening website
 echo    in default browser...
 ping -n 3 127.0.0.1>nul
 start http://127.0.0.1
@@ -1221,7 +1348,6 @@ for /l %%x in (%next_chars_version%, 1, %chars_version%) do (
 echo    Applying characters db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
-echo.
 echo    Applying accounts db updates...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\realmd_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
@@ -1236,6 +1362,10 @@ for /l %%x in (%next_bots_version%, 1, %bots_version%) do (
    ping -n 2 127.0.0.1>nul
    for %%i in ("%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 )
+echo.
+echo    Installing website tables...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul

@@ -97,7 +97,7 @@ DELETE FROM `pet_aura`;
 
 -- CONVERT ITEM ENCHANTMENT
 UPDATE `item_instance`
-  SET `enchantments` = CONCAT(`enchantments`, REPEAT('0 ', 12));
+  SET `enchantments` = CONCAT(INSERT(`enchantments`, 18, 0, REPEAT('0 ', 9), REPEAT('0 ', 3));
 
 -- UPDATE TOTAL KILLS WITH CURRENT WEEK KILLS
 UPDATE `characters` SET `totalKills` = (`totalKills` + (SELECT COUNT(*) FROM `character_honor_cp` WHERE `character_honor_cp`.`guid`=`characters`.`guid` AND `victim_type` > '0' AND `type` = '1'));
@@ -139,6 +139,60 @@ ALTER TABLE `characters`
 -- SET AS FIRST LOGIN TO GET COLLECTORS REWARD
 UPDATE `characters`
   SET `at_login` = `at_login` | '32' WHERE (at_login & '32') = '0';
+  
+-- DROP OLD ARENA TEAMS
+DROP TABLE IF EXISTS `arena_team`;
+CREATE TABLE `arena_team` (
+  `arenateamid` int(10) unsigned NOT NULL DEFAULT '0',
+  `name` char(255) NOT NULL,
+  `captainguid` int(10) unsigned NOT NULL DEFAULT '0',
+  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `BackgroundColor` int(10) unsigned NOT NULL DEFAULT '0',
+  `EmblemStyle` int(10) unsigned NOT NULL DEFAULT '0',
+  `EmblemColor` int(10) unsigned NOT NULL DEFAULT '0',
+  `BorderStyle` int(10) unsigned NOT NULL DEFAULT '0',
+  `BorderColor` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`arenateamid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOCK TABLES `arena_team` WRITE;
+/*!40000 ALTER TABLE `arena_team` DISABLE KEYS */;
+/*!40000 ALTER TABLE `arena_team` ENABLE KEYS */;
+UNLOCK TABLES;
+
+DROP TABLE IF EXISTS `arena_team_member`;
+CREATE TABLE `arena_team_member` (
+  `arenateamid` int(10) unsigned NOT NULL DEFAULT '0',
+  `guid` int(10) unsigned NOT NULL DEFAULT '0',
+  `played_week` int(10) unsigned NOT NULL DEFAULT '0',
+  `wons_week` int(10) unsigned NOT NULL DEFAULT '0',
+  `played_season` int(10) unsigned NOT NULL DEFAULT '0',
+  `wons_season` int(10) unsigned NOT NULL DEFAULT '0',
+  `personal_rating` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`arenateamid`,`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOCK TABLES `arena_team_member` WRITE;
+/*!40000 ALTER TABLE `arena_team_member` DISABLE KEYS */;
+/*!40000 ALTER TABLE `arena_team_member` ENABLE KEYS */;
+UNLOCK TABLES;
+
+DROP TABLE IF EXISTS `arena_team_stats`;
+CREATE TABLE `arena_team_stats` (
+  `arenateamid` int(10) unsigned NOT NULL DEFAULT '0',
+  `rating` int(10) unsigned NOT NULL DEFAULT '0',
+  `games_week` int(10) unsigned NOT NULL DEFAULT '0',
+  `wins_week` int(10) unsigned NOT NULL DEFAULT '0',
+  `games_season` int(10) unsigned NOT NULL DEFAULT '0',
+  `wins_season` int(10) unsigned NOT NULL DEFAULT '0',
+  `rank` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`arenateamid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOCK TABLES `arena_team_stats` WRITE;
+/*!40000 ALTER TABLE `arena_team_stats` DISABLE KEYS */;
+/*!40000 ALTER TABLE `arena_team_stats` ENABLE KEYS */;
+UNLOCK TABLES;
 
 -- DROP WORLD STATE INFO  
 DROP TABLE IF EXISTS world_state;

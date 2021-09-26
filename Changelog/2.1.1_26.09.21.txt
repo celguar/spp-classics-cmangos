@@ -1,0 +1,11 @@
+
+                      Update 26.09.2021
+
+ - [Core] Fix crashes
+ - [Bots] Fix bots attacking random mobs
+ - [Bots] Reduce free action radius in dungeons
+ - [Bots] Random bots create and manage guilds
+ - [Bots] Improve bot traveling
+ - [Bots] Performance tweaks
+ - [Launcher] Added webpage and armory
+ - Other fixes
