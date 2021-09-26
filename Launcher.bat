@@ -878,13 +878,24 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Extracting Armory db...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\armory.7z" > nul
 echo.
+echo    Please wait...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\sql\vanilla"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\vanilla\armory.7z" > nul
 cd "%mainfolder%"
+cd "%mainfolder%\sql\tbc"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\tbc\armory.7z" > nul
+cd "%mainfolder%"
+cd "%mainfolder%\sql\wotlk"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\wotlk\armory.7z" > nul
+cd "%mainfolder%"
+echo.
 echo    Installing Armory db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\armory.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\vanilla\armory.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\tbc\armory.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\wotlk\armory.sql"
 echo.
 echo    Installing website tables...
 ping -n 3 127.0.0.1>nul
@@ -892,7 +903,10 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\sql\%expansion%\armory.sql"
+del "%mainfolder%\sql\vanilla\armory.sql"
+del "%mainfolder%\sql\tbc\armory.sql"
+del "%mainfolder%\sql\wotlk\armory.sql"
+cls
 >"%mainfolder%\%expansion%_website_version.spp" echo %website_db_version%
 goto start_database
 
