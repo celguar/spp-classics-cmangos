@@ -97,7 +97,7 @@ DELETE FROM `pet_aura`;
 
 -- CONVERT ITEM ENCHANTMENT
 UPDATE `item_instance`
-  SET `enchantments` = CONCAT(INSERT(`enchantments`, 18, 0, REPEAT('0 ', 9), REPEAT('0 ', 3));
+  SET `enchantments` = CONCAT(INSERT(`enchantments`, 18, 0, REPEAT('0 ', 9)), REPEAT('0 ', 3));
 
 -- UPDATE TOTAL KILLS WITH CURRENT WEEK KILLS
 UPDATE `characters` SET `totalKills` = (`totalKills` + (SELECT COUNT(*) FROM `character_honor_cp` WHERE `character_honor_cp`.`guid`=`characters`.`guid` AND `victim_type` > '0' AND `type` = '1'));
