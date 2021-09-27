@@ -4,7 +4,7 @@ SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
 set repack_version=2.1.1
-set website_version=1
+set website_version=2
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -58,12 +58,20 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Please wait...
 ping -n 3 127.0.0.1>nul
-echo.
 rd /s /q "%mainfolder%\Server\website"
 cd "%mainfolder%\Server"
 mkdir website
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf -o"%mainfolder%\Server\website" website.7z > nul
 cd "%mainfolder%"
+echo.
+echo    Updating Webserver...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please, wait...
+cd "%mainfolder%\Server\Tools"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf Apache.7z > nul
+cd "%mainfolder%"
+echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 >"%mainfolder%\website_version.spp" echo %website_version%
