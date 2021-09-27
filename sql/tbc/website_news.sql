@@ -82,3 +82,13 @@ INSERT INTO `f_topics` (`topic_id`, `topic_poster`, `topic_poster_id`, `topic_na
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+
+-- SYNC ACC GROUPS
+INSERT IGNORE INTO `website_accounts` (`account_id`, `display_name`) SELECT `id`, `username` FROM `account`;
+
+UPDATE `website_accounts`
+  SET `g_id` = '3' WHERE `account_id` IN (SELECT `id` FROM `account` WHERE `gmlevel` = '3');
+  
+UPDATE `website_accounts`
+  SET `g_id` = '4' WHERE `account_id` IN (SELECT `id` FROM `account` WHERE `gmlevel` = '4');
+  

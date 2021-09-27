@@ -576,7 +576,7 @@ rem )
 echo    Applying world db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-echo.
+rem echo.
 echo    Applying characters db updates...
 ping -n 3 127.0.0.1>nul
 set /a next_chars_version=%current_chars_version%+1
@@ -587,14 +587,14 @@ for /l %%x in (%next_chars_version%, 1, %chars_version%) do (
 echo    Applying characters db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
-echo.
+rem echo.
 echo    Applying accounts db updates...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\updates\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 echo    Applying accounts db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
-echo.
+rem echo.
 echo    Applying playerbot db updates...
 ping -n 3 127.0.0.1>nul
 set /a next_bots_version=%current_bots_version%+1
@@ -602,6 +602,14 @@ for /l %%x in (%next_bots_version%, 1, %bots_version%) do (
    ping -n 2 127.0.0.1>nul
    for %%i in ("%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 )
+echo.
+echo    Updating bots travel paths...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+cd "%mainfolder%"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -858,9 +866,6 @@ for /l %%x in (%next_bots_version%, 1, %bots_version%) do (
 )
 echo.
 echo    Updating bots travel paths...
-ping -n 3 127.0.0.1>nul
-echo.
-echo    Please wait...
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\sql\%expansion%\playerbot"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
@@ -1303,11 +1308,10 @@ for /l %%x in (%next_chars_version%, 1, %chars_version%) do (
    ping -n 2 127.0.0.1>nul
    for %%i in ("%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 )
-echo.
 echo    Applying characters db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
-echo.
+rem echo.
 echo    Applying playerbot db updates...
 ping -n 3 127.0.0.1>nul
 set /a next_bots_version=%current_bots_version%+1
@@ -1315,6 +1319,14 @@ for /l %%x in (%next_bots_version%, 1, %bots_version%) do (
    ping -n 2 127.0.0.1>nul
    for %%i in ("%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 )
+echo.
+echo    Updating bots travel paths...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+cd "%mainfolder%"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -1376,7 +1388,6 @@ for %%i in ("%mainfolder%\sql\%expansion%\realmd_updates\*sql") do if %%i neq "%
 echo    Applying accounts db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
-echo.
 echo    Applying playerbot db updates...
 ping -n 3 127.0.0.1>nul
 set /a next_bots_version=%current_bots_version%+1
@@ -1384,6 +1395,14 @@ for /l %%x in (%next_bots_version%, 1, %bots_version%) do (
    ping -n 2 127.0.0.1>nul
    for %%i in ("%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 )
+echo.
+echo    Updating bots travel paths...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+cd "%mainfolder%"
 echo.
 echo    Installing website tables...
 ping -n 3 127.0.0.1>nul
