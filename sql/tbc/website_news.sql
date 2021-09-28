@@ -78,7 +78,7 @@ INSERT INTO `f_topics` (`topic_id`, `topic_poster`, `topic_poster_id`, `topic_na
 	(9, 'SPP Team', 0, 'Update 10.09.2021', 1632615660, 1632615660, 9, 'SPP Team', 1, 1, 0, 0, NULL, 1),
 	(10, 'SPP Team', 0, 'Update 15.09.2021', 1632615681, 1632615681, 10, 'SPP Team', 1, 1, 0, 0, NULL, 1),
 	(11, 'SPP Team', 0, 'Update 26.09.2021', 1632615713, 1632615713, 11, 'SPP Team', 1, 1, 0, 0, NULL, 1),
-  (12, 'SPP Team', 0, 'Hotfix 28.09.2021', 1632615713, 1632832745, 12, 'SPP Team', 1, 1, 0, 0, NULL, 1);
+  (12, 'SPP Team', 0, 'Hotfix 28.09.2021', 1632832745, 1632832745, 12, 'SPP Team', 1, 1, 0, 0, NULL, 1);
 /*!40000 ALTER TABLE `f_topics` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
