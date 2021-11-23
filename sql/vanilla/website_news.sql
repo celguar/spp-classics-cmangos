@@ -41,7 +41,8 @@ INSERT INTO `f_posts` (`post_id`, `poster`, `poster_id`, `poster_ip`, `poster_ch
 	(9, 'SPP Team', 0, '::1', 0, ' - <b>[Wotlk]</b> - Fix crash in LFG<br />\r\n - <b>[Bots]</b> Fix low level priests not healing<br />\r\n - <b>[Bots]</b> Fix alt bots not rolling for BoP items<br />\r\n - <b>[Bots]</b> Fix using Hearthstone by use command<br />\r\n - <b>[Bots]</b> Performance tweaks<br />\r\n - <b>[Bots]</b> Random bots have more free will<br />\r\n - <i>Other fixes</i>', 1632615660, NULL, NULL, 9),
 	(10, 'SPP Team', 0, '::1', 0, ' - <b>[Bots]</b> Fix couple of crashes<br />\r\n - <b>[Bots]</b> Improve bots traveling<br />\r\n - <i>Other fixes</i>', 1632615681, NULL, NULL, 10),
 	(11, 'SPP Team', 0, '::1', 0, ' - <b>[Core]</b> Fix crashes<br />\r\n - <b>[Bots]</b> Fix bots attacking random mobs<br />\r\n - <b>[Bots]</b> Reduce free action radius in dungeons<br />\r\n - <b>[Bots]</b> Random bots create and manage guilds<br />\r\n - <b>[Bots]</b> Improve bot traveling<br />\r\n - <b>[Bots]</b> Performance tweaks<br />\r\n - <i>Other fixes</i>', 1632615713, NULL, NULL, 11),
-  (12, 'SPP Team', 0, '::1', 0, ' - <b>[Bots]</b> Fix bots stuck at inns<br />\r\n - <b>[Bots]</b> Fix Armory<br />\r\n - <b>[Bots]</b> Fix webpage registration<br />', 1632832745, NULL, NULL, 12);
+  (12, 'SPP Team', 0, '::1', 0, ' - <b>[Bots]</b> Fix bots stuck at inns<br />\r\n - <b>[Bots]</b> Fix Armory<br />\r\n - <b>[Bots]</b> Fix webpage registration<br />', 1632832745, NULL, NULL, 12),
+  (13, 'SPP Team', 0, '::1', 0, ' - <b>[Core]</b> Fix several crashes<br />\r\n - <b>[Core]</b> Instant taxi config<br />\r\n - <b>[Core]</b> Chars/Bots on taxi are visible from afar<br />\r\n - <b>[Core]</b> Allow signing guild/arena petitions by same account bots<br />\r\n - <b>[Bots]</b> Many tweaks for random/self bot automation<br />\r\n - <b>[Bots]</b> Less random actions with real player<br />\r\n - <b>[Bots]</b> Speed up random bot character creation<br />\r\n - <b>[Bots]</b> Tweak performance with many random bots<br />\r\n - <b>[Bots]</b> Bots now use TBC LFG Tool<br />\r\n - <b>[Bots]</b> Bots have 20 second logout delay in open world<br />\r\n - <b>[Bots]</b> Fix some cases of bots being stuck for several seconds<br />\r\n - <b>[Bots]</b> Fix bots not attacking mobs with threat strategy enabled<br />\r\n - <b>[Bots]</b> Random arena teams now have random rating<br />\r\n - <b>[Bots]</b> Fix bots decline invite if very far away<br />\r\n - <b>[Bots]</b> Random bots now accept any loot type if same guild or player is gm<br />\r\n - <b>[Bots]</b> Less often random emotes and phrases<br />\r\n - <b>[Bots]</b> Tweak BG/Arena queues<br />\r\n - <b>[Bots]</b> Fix Mangosbot addon crash if DK is on account<br />\r\n - <b>[Bots]</b> Fix bots number dropping after some time<br />\r\n - <i>Other fixes</i>', 1637666235, NULL, NULL, 13);
 /*!40000 ALTER TABLE `f_posts` ENABLE KEYS */;
 
 -- Dumping structure for table classicrealmd.f_topics
@@ -78,7 +79,8 @@ INSERT INTO `f_topics` (`topic_id`, `topic_poster`, `topic_poster_id`, `topic_na
 	(9, 'SPP Team', 0, 'Update 10.09.2021', 1632615660, 1632615660, 9, 'SPP Team', 1, 1, 0, 0, NULL, 1),
 	(10, 'SPP Team', 0, 'Update 15.09.2021', 1632615681, 1632615681, 10, 'SPP Team', 1, 1, 0, 0, NULL, 1),
 	(11, 'SPP Team', 0, 'Update 26.09.2021', 1632615713, 1632615713, 11, 'SPP Team', 1, 1, 0, 0, NULL, 1),
-  (12, 'SPP Team', 0, 'Hotfix 28.09.2021', 1632832745, 1632832745, 12, 'SPP Team', 1, 1, 0, 0, NULL, 1);
+  (12, 'SPP Team', 0, 'Hotfix 28.09.2021', 1632832745, 1632832745, 12, 'SPP Team', 1, 1, 0, 0, NULL, 1),
+  (13, 'SPP Team', 0, 'Update 23.11.2021', 1637666235, 1637666235, 13, 'SPP Team', 1, 1, 0, 0, NULL, 1);
 /*!40000 ALTER TABLE `f_topics` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

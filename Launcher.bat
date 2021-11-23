@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.1.1
+set repack_version=2.1.2
 set website_version=3
 
 IF NOT EXIST "%mainfolder%\music.on" (
@@ -2237,6 +2237,12 @@ echo.
 echo    Updating realmlist...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+echo.
+echo    Installing website tables...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
+echo.
+echo    Done!
 if "%saveslot%"=="transfer" goto import_playerbots
 
 :import_char_1

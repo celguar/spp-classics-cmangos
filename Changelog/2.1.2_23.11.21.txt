@@ -1,0 +1,23 @@
+
+                      Update 23.11.2021
+
+ - [Core] Fix several crashes
+ - [Core] Instant taxi config
+ - [Core] Chars/Bots on taxi are visible from afar
+ - [Core] Allow signing guild/arena petitions by same account bots
+ - [Bots] Many tweaks for random/self bot automation
+ - [Bots] Less random actions with real player
+ - [Bots] Speed up random bot character creation
+ - [Bots] Tweak performance with many random bots
+ - [Bots] Bots now use TBC LFG Tool
+ - [Bots] Bots have 20 second logout delay in open world
+ - [Bots] Fix some cases of bots being stuck for several seconds
+ - [Bots] Fix bots not attacking mobs with threat strategy enabled
+ - [Bots] Random arena teams now have random rating
+ - [Bots] Fix bots decline invite if very far away
+ - [Bots] Random bots now accept any loot type if same guild or player is gm
+ - [Bots] Less often random emotes and phrases
+ - [Bots] Tweak BG/Arena queues
+ - [Bots] Fix Mangosbot addon crash if DK is on account
+ - [Bots] Fix bots number dropping after some time
+ - Other fixes
