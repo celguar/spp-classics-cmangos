@@ -3,8 +3,8 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.1.2
-set website_version=3
+set repack_version=2.1.3
+set website_version=4
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -301,9 +301,10 @@ set worldserver=mangosd.exe
 set spp_update=vanilla_base
 set /a maps_version=1
 set /a world_version=3
-set /a chars_version=2
-set /a bots_version=2
-set /a website_db_version=1
+set /a chars_version=3
+set /a realm_version=1
+set /a bots_version=3
+set /a website_db_version=2
 set core_version=3
 
 goto settings
@@ -325,9 +326,10 @@ set worldserver=mangosd.exe
 set spp_update=tbc_base
 set /a maps_version=1
 set /a world_version=4
-set /a chars_version=2
-set /a bots_version=2
-set /a website_db_version=1
+set /a chars_version=3
+set /a realm_version=1
+set /a bots_version=3
+set /a website_db_version=2
 set core_version=3
 
 goto settings
@@ -349,9 +351,10 @@ set worldserver=mangosd.exe
 set spp_update=wotlk_base
 set /a maps_version=1
 set /a world_version=4
-set /a chars_version=2
-set /a bots_version=2
-set /a website_db_version=1
+set /a chars_version=3
+set /a realm_version=1
+set /a bots_version=3
+set /a website_db_version=2
 set core_version=3
 
 goto settings
@@ -419,18 +422,21 @@ if not exist "%mainfolder%\%spp_update%.spp" goto update_install
 if not exist "%mainfolder%\%expansion%_maps_version.spp" goto update_maps
 if not exist "%mainfolder%\%expansion%_world_version.spp" goto update_world
 if not exist "%mainfolder%\%expansion%_chars_version.spp" goto update_chars
+if not exist "%mainfolder%\%expansion%_realm_version.spp" goto update_realm
 if not exist "%mainfolder%\%expansion%_bots_version.spp" goto update_bots
 if not exist "%mainfolder%\%expansion%_website_version.spp" goto install_website_db
 
 set /p current_maps_version=<"%mainfolder%\%expansion%_maps_version.spp"
 set /p current_world_version=<"%mainfolder%\%expansion%_world_version.spp"
 set /p current_chars_version=<"%mainfolder%\%expansion%_chars_version.spp"
+set /p current_realm_version=<"%mainfolder%\%expansion%_realm_version.spp"
 set /p current_bots_version=<"%mainfolder%\%expansion%_bots_version.spp"
 set /p current_website_db_version=<"%mainfolder%\%expansion%_website_version.spp"
 
 if %current_maps_version% LSS 1 (set current_maps_version=1)
 if %current_world_version% LSS 1 (set current_world_version=1)
 if %current_chars_version% LSS 1 (set current_chars_version=1)
+if %current_realm_version% LSS 1 (set current_realm_version=1)
 if %current_bots_version% LSS 1 (set current_bots_version=1)
 if %current_website_db_version% LSS 1 (set current_website_db_version=1)
 
@@ -443,8 +449,9 @@ rem pause
 if %current_maps_version% LSS %maps_version% goto update_maps
 if %current_world_version% LSS %world_version% goto update_world
 if %current_chars_version% LSS %chars_version% goto update_chars
+if %current_realm_version% LSS %realm_version% goto update_realm
 if %current_bots_version% LSS %bots_version% goto update_bots
-if %current_website_db_version% LSS %website_db_version% goto goto update_website_db
+if %current_website_db_version% LSS %website_db_version% goto update_website_db
 
 if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\vanilla.spp"
 if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\tbc.spp"
@@ -590,7 +597,10 @@ for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%main
 rem echo.
 echo    Applying accounts db updates...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\updates\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+for /l %%x in (%next_realm_version%, 1, %realm_version%) do (
+   ping -n 2 127.0.0.1>nul
+   for %%i in ("%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+)
 echo    Applying accounts db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
@@ -617,6 +627,7 @@ del "%mainfolder%\sql\%expansion%\world.sql"
 echo %spp_update% > "%mainfolder%\%spp_update%.spp"
 >"%mainfolder%\%expansion%_world_version.spp" echo %world_version%
 >"%mainfolder%\%expansion%_chars_version.spp" echo %chars_version%
+>"%mainfolder%\%expansion%_realm_version.spp" echo %realm_version%
 >"%mainfolder%\%expansion%_bots_version.spp" echo %bots_version%
 goto start_database
 
@@ -827,17 +838,39 @@ echo    Applying characters db updates...
 ping -n 3 127.0.0.1>nul
 set /a next_chars_version=%current_chars_version%+1
 for /l %%x in (%next_chars_version%, 1, %chars_version%) do (
-   ping -n 2 127.0.0.1>nul
+   ping -n 1 127.0.0.1>nul
    for %%i in ("%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 )
-echo.
-echo    Applying accounts db updates...
-ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\realmd_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 >"%mainfolder%\%expansion%_chars_version.spp" echo %chars_version%
+goto start_database
+
+:update_realm
+mode con: cols=40 lines=30
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Accounts db update required!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    %current_realm_version% ---^> %realm_version%
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Applying accounts db updates...
+ping -n 3 127.0.0.1>nul
+for /l %%x in (%next_realm_version%, 1, %realm_version%) do (
+   ping -n 1 127.0.0.1>nul
+   for %%i in ("%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+)
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+>"%mainfolder%\%expansion%_realm_version.spp" echo %realm_version%
 goto start_database
 
 :update_bots
@@ -938,6 +971,7 @@ ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\armory.sql"
 echo.
 echo    Installing Website updates...
+ping -n 3 127.0.0.1>nul
 set /a next_website_db_version=%current_website_db_version%+1
 for /l %%x in (%next_website_db_version%, 1, %website_db_version%) do (
    ping -n 1 127.0.0.1>nul
@@ -997,7 +1031,7 @@ tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if NOT "%ERRORLEVEL%"=="0" echo   9 - Back to expansion selector
 echo   0 - Shutdown all servers
 echo.
-echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version% Web: %current_website_version%
+echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version%:%current_chars_version%:%current_realm_version% Web: %current_website_version%
 echo.
 set /P menu_option=Enter your choice: 
 REM if "%menu_option%"=="1" (goto quick_start_servers_x86)
@@ -1374,7 +1408,10 @@ ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 echo    Applying accounts db updates...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\realmd_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+for /l %%x in (%next_realm_version%, 1, %realm_version%) do (
+   ping -n 2 127.0.0.1>nul
+   for %%i in ("%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+)
 echo    Applying accounts db mods...
 ping -n 3 127.0.0.1>nul
 for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
@@ -2104,10 +2141,13 @@ more < "%mainfolder%\header_save.txt"
 echo.
 echo    Removing save #%saveslot%...
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
-del "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
-del "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
-del "%mainfolder%\Saves\%expansion%\%saveslot%\name.txt"
+rem remove whole folder to wipe version files
+rd /s /q "%mainfolder%\Saves\%expansion%\%saveslot%"
+rem del "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
+rem del "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
+rem del "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
+rem del "%mainfolder%\Saves\%expansion%\%saveslot%\name.txt"
+mkdir "%mainfolder%\Saves\%expansion%\%saveslot%"
 echo.
 echo    Save #%saveslot% is empty now.
 echo.
@@ -2166,6 +2206,13 @@ echo    Exporting playerbots...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %playerbot% > "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
 echo.
+echo    Saving version info...
+ping -n 2 127.0.0.1>nul
+xcopy /y "%mainfolder%\%expansion%_chars_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
+xcopy /y "%mainfolder%\%expansion%_realm_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
+xcopy /y "%mainfolder%\%expansion%_bots_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
+xcopy /y "%mainfolder%\%expansion%_website_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
+echo.
 echo    Done!
 ping -n 2 127.0.0.1>nul
 echo.
@@ -2222,6 +2269,10 @@ echo.
 echo    Updating realmlist...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+echo.
+echo    Installing website tables...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
 if "%saveslot%"=="old" goto import_playerbots
 
 :convert_transfer_data
@@ -2241,8 +2292,6 @@ echo.
 echo    Installing website tables...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
-echo.
-echo    Done!
 if "%saveslot%"=="transfer" goto import_playerbots
 
 :import_char_1
@@ -2291,24 +2340,39 @@ REM if "%choose_exp%"=="2" echo  Done!
 REM if "%choose_exp%"=="3" echo  Done!
 :import_continue
 echo.
-echo    Applying characters db updates...
+echo    Loading version info...
 ping -n 2 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\characters_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
-echo.
-echo    Applying accounts db updates...
-ping -n 2 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\realmd_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
-echo.
-echo    Applying playerbot db updates...
-ping -n 2 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\playerbot_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
+if exist "%mainfolder%\%expansion%_chars_version.spp" del "%mainfolder%\%expansion%_chars_version.spp">nul
+if exist "%mainfolder%\%expansion%_realm_version.spp" del "%mainfolder%\%expansion%_realm_version.spp">nul
+if exist "%mainfolder%\%expansion%_bots_version.spp" del "%mainfolder%\%expansion%_bots_version.spp">nul
+if exist "%mainfolder%\%expansion%_website_version.spp" del "%mainfolder%\%expansion%_website_version.spp">nul
+if not "%saveslot%"=="transfer" (
+if not "%saveslot%"=="old" (
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_chars_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_chars_version.spp" "%mainfolder%">nul
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_realm_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_realm_version.spp" "%mainfolder%">nul
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_bots_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_bots_version.spp" "%mainfolder%">nul
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_website_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_website_version.spp" "%mainfolder%">nul
+)
+)
+rem echo.
+rem echo    Applying characters db updates...
+rem ping -n 2 127.0.0.1>nul
+rem for %%i in ("%mainfolder%\sql\%expansion%\characters_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
+rem echo.
+rem echo    Applying accounts db updates...
+rem ping -n 2 127.0.0.1>nul
+rem for %%i in ("%mainfolder%\sql\%expansion%\realmd_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+rem echo.
+rem echo    Applying playerbot db updates...
+rem ping -n 2 127.0.0.1>nul
+rem for %%i in ("%mainfolder%\sql\%expansion%\playerbot_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 echo.
 echo    Done!
 ping -n 2 127.0.0.1>nul
 echo.
 echo    Save #%saveslot% "%tempname%" loaded.
 ping -n 4 127.0.0.1>nul
-goto menu
+goto start_database
 
 :account_tool
 cls

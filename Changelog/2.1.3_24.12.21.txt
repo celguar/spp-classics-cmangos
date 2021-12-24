@@ -1,0 +1,15 @@
+
+                      Update 24.12.2021
+
+ - [Core] Tweak performance
+ - [Core] Fix some Eye of the Storm bugs
+ - [Core] Save new items, killed bosses, achievements to show on armory
+ - [Bots] Eye of the Storm bots logic
+ - [Bots] Tweak random bots items
+ - [Bots] Bots in your BG subgroup follow you if you have more honor points
+ - [Bots] Bots in your friends list are always active
+ - [Bots] Random arena teams got their max rating raised to 2700
+ - [Bots] Fix random bots not having mounts
+ - [Bots] Do not offer duel in non-pvp areas
+ - [Bots] Fix bots leaving battlegrounds
+ - Other fixes
