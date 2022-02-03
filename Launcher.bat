@@ -4,7 +4,7 @@ SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
 set repack_version=2.1.4
-set maps_date=07.06.2021
+set maps_date=06.06.2021
 set /a website_version=4
 
 IF NOT EXIST "%mainfolder%\music.on" (
@@ -574,7 +574,7 @@ echo.
 echo    Please, wait...
 rem check file last modified date
 FOR /F "TOKENS=2" %%A IN ('WHERE /T "%mainfolder%\Modules\%expansion%\maps:0002035.map"') do (
-if "%%A"=="%maps_date%" (
+if "%%A" GEQ "%maps_date%" (
 echo.
 echo    Existing maps version: OK!
 ping -n 3 127.0.0.1>nul
@@ -582,7 +582,7 @@ echo.
 echo    Skipping download...
 ping -n 3 127.0.0.1>nul
 )
-if not "%%A"=="%maps_date%" (
+if "%%A" LSS "%maps_date%" (
 echo.
 echo    Existing maps version: FAIL!
 ping -n 3 127.0.0.1>nul
@@ -736,7 +736,7 @@ echo    Please, wait...
 ping -n 3 127.0.0.1>nul
 rem check file last modified date
 FOR /F "TOKENS=2" %%A IN ('WHERE /T "%mainfolder%\Modules\%expansion%\maps:0002035.map"') do (
-if "%%A"=="%maps_date%" (
+if "%%A" GEQ "%maps_date%" (
 echo.
 echo    Existing maps version: OK!
 ping -n 3 127.0.0.1>nul
@@ -746,7 +746,7 @@ ping -n 3 127.0.0.1>nul
 >"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
 goto start_database
 )
-if not "%%A"=="%maps_date%" (
+if "%%A" LSS "%maps_date%" (
 echo.
 echo    Existing maps version: FAIL!
 ping -n 3 127.0.0.1>nul
