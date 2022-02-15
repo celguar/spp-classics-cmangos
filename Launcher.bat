@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.1.5
+set repack_version=2.1.6
 set maps_date=06.06.2021
 set /a website_version=4
 
