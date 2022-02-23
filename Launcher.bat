@@ -1167,8 +1167,8 @@ echo.
 echo   7 - Wipe Database
 echo.
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-rem if NOT "%ERRORLEVEL%"=="0" echo   8 - Install locales
-rem echo.
+if NOT "%ERRORLEVEL%"=="0" echo   8 - Install locales
+echo.
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if NOT "%ERRORLEVEL%"=="0" echo   9 - Back to expansion selector
 echo   0 - Shutdown all servers
