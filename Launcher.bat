@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.1.6
+set repack_version=2.1.7
 set maps_date=06.06.2021
 set /a website_version=4
 
@@ -320,7 +320,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=3
 set /a website_db_version=2
-set /a core_version=4
+set /a core_version=1
 
 goto settings
 
@@ -347,7 +347,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=3
 set /a website_db_version=2
-set /a core_version=4
+set /a core_version=1
 
 goto settings
 
@@ -368,13 +368,13 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=1
-set /a world_version=4
-set /a chars_version=3
-set /a realm_version=1
-set /a logs_version=0
+set /a world_version=5
+set /a chars_version=4
+set /a realm_version=2
+set /a logs_version=1
 set /a bots_version=3
 set /a website_db_version=2
-set /a core_version=3
+set /a core_version=2
 
 goto settings
 
@@ -445,6 +445,7 @@ if not exist "%mainfolder%\%expansion%_realm_version.spp" goto update_realm
 if not exist "%mainfolder%\%expansion%_logs_version.spp" (if not "%logs_version%"=="0" goto update_logs)
 if not exist "%mainfolder%\%expansion%_bots_version.spp" goto update_bots
 if not exist "%mainfolder%\%expansion%_website_version.spp" goto install_website_db
+if not exist "%mainfolder%\%expansion%_core_version.spp" (if not "%core_version%"=="1" goto update_core)
 
 set /p current_maps_version=<"%mainfolder%\%expansion%_maps_version.spp"
 set /p current_world_version=<"%mainfolder%\%expansion%_world_version.spp"
@@ -453,6 +454,7 @@ set /p current_realm_version=<"%mainfolder%\%expansion%_realm_version.spp"
 set /p current_logs_version=<"%mainfolder%\%expansion%_logs_version.spp"
 set /p current_bots_version=<"%mainfolder%\%expansion%_bots_version.spp"
 set /p current_website_db_version=<"%mainfolder%\%expansion%_website_version.spp"
+set /p current_core_version=<"%mainfolder%\%expansion%_core_version.spp"
 
 rem convert to int
 set /a "current_maps_version=current_maps_version"
@@ -462,6 +464,7 @@ set /a "current_realm_version=current_realm_version"
 set /a "current_logs_version=current_logs_version"
 set /a "current_bots_version=current_bots_version"
 set /a "current_website_db_version=current_website_db_version"
+set /a "current_core_version=current_core_version"
 
 if %current_maps_version% LSS 1 (set current_maps_version=1)
 if %current_world_version% LSS 1 (set current_world_version=1)
@@ -470,6 +473,7 @@ if %current_realm_version% LSS 1 (set current_realm_version=1)
 if %current_logs_version% LSS 1 (if not "%logs_version%"=="0" set current_logs_version=1)
 if %current_bots_version% LSS 1 (set current_bots_version=1)
 if %current_website_db_version% LSS 1 (set current_website_db_version=1)
+if %current_core_version% LSS 1 (if not "%core_version%"=="1" set current_core_version=1)
 
 rem echo %current_maps_version% - maps
 rem echo %current_world_version% - world
@@ -484,6 +488,7 @@ if %current_realm_version% LSS %realm_version% goto update_realm
 if %current_logs_version% LSS %logs_version% (if not "%logs_version%"=="0" goto update_logs)
 if %current_bots_version% LSS %bots_version% goto update_bots
 if %current_website_db_version% LSS %website_db_version% goto update_website_db
+if %current_core_version% LSS %core_version% (if not "%core_version%"=="1" goto update_core)
 
 if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\vanilla.spp"
 if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\tbc.spp"
@@ -532,9 +537,9 @@ goto check_modules
 :install_module_wotlk
 mode con: cols=80 lines=30
 echo.
-echo    Downloading WotLK module...(~1100 MB)
+echo    Downloading WotLK module...(~1500 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "ftp://207.244.228.248/spp_classics_v2/wotlk.7z" -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "ftp://207.244.228.248/spp_classics_new/wotlk.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -794,6 +799,31 @@ ping -n 3 127.0.0.1>nul
 del "%mainfolder%\Modules\%expansion%.7z"
 cd "%mainfolder%"
 >"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+goto start_database
+
+:update_core
+mode con: cols=40 lines=30
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Core update required!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    %current_core_version% ---^> %core_version%
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Extracting %expansion% binaries...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\Bin64.7z" > nul
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%"
+>"%mainfolder%\%expansion%_core_version.spp" echo %core_version%
 goto start_database
 
 :update_world
