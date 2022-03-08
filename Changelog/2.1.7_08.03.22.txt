@@ -1,6 +1,6 @@
 
-                      Update 15.02.2022
+                      Update 08.03.2022
 
- - [Core] Wotlk core stability fixes
- - [Bots] TBC: Warriors use rampage
+ - [Core] Wotlk core update to latest version
+ - [Core] Wotlk Solocraft added
  - Other fixes
