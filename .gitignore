@@ -12,6 +12,8 @@ Settings/wotlk/logs
 Server\Binaries\vanilla\Bin64\Crashes
 Server\Binaries\tbc\Bin64\Crashes
 Server\Binaries\wotlk\Bin64\Crashes
+Server\Binaries\vanilla\Bin64\*
+Server\Binaries\tbc\Bin64\*
 Server\Binaries\wotlk\Bin64\*
 !Server\Binaries\vanilla\Bin64\!Bin64.7z
 !Server\Binaries\tbc\Bin64\!Bin64.7z

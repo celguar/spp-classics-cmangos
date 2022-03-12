@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.1.7
+set repack_version=2.1.8
 set maps_date=06.06.2021
 set /a website_version=4
 
@@ -229,12 +229,25 @@ if exist "%mainfolder%\Modules\tbc\dbc" set module_check_tbc=Installed
 if exist "%mainfolder%\Modules\wotlk\dbc" set module_check_wotlk=Installed
 if exist "%mainfolder%\Modules\cata\dbc" set module_check_cata=Installed
 
+set vanilla_running=OFF
+set tbc_running=OFF
+set wotlk_running=OFF
+
 for /f "tokens=2 delims=," %%I in (
     'wmic process where "name='mangosd.exe'" get ExecutablePath^,Handle /format:csv ^| find /i "mangosd.exe"'
 ) do (
-if "%%~I"=="%mainfolder%\Server\Binaries\vanilla\Bin64\mangosd.exe" set module_running_vanilla=- [Running]
-if "%%~I"=="%mainfolder%\Server\Binaries\tbc\Bin64\mangosd.exe" set module_running_tbc=- [Running]
-if "%%~I"=="%mainfolder%\Server\Binaries\wotlk\Bin64\mangosd.exe" set module_running_wotlk=- [Running]
+if "%%~I"=="%mainfolder%\Server\Binaries\vanilla\Bin64\mangosd.exe" (
+  set module_running_vanilla=- [Running]
+  set vanilla_running=ON
+)
+if "%%~I"=="%mainfolder%\Server\Binaries\tbc\Bin64\mangosd.exe" (
+  set module_running_tbc=- [Running]
+  set tbc_running=ON
+)
+if "%%~I"=="%mainfolder%\Server\Binaries\wotlk\Bin64\mangosd.exe" (
+  set module_running_wotlk=- [Running]
+  set wotlk_running=ON
+)
 rem if "%%~I"=="%mainfolder%\Server\Binaries\vanilla\Bin64\mangosd.exe" goto setup_vanilla
 rem if "%%~I"=="%mainfolder%\Server\Binaries\tbc\Bin64\mangosd.exe" goto setup_tbc
 rem if "%%~I"=="%mainfolder%\Server\Binaries\wotlk\Bin64\mangosd.exe" goto setup_wotlk
@@ -287,9 +300,9 @@ echo.
 echo   6 - Changelog             Ver: %repack_version%
 echo.
 set /P choose_exp=What expansion do you want to play: 
-if "%choose_exp%"=="1" (goto setup_vanilla)
-if "%choose_exp%"=="2" (goto setup_tbc)
-if "%choose_exp%"=="3" (goto setup_wotlk)
+if "%choose_exp%"=="1" (if not "%tbc_running%"=="ON" if not "%wotlk_running%"=="ON" goto setup_vanilla)
+if "%choose_exp%"=="2" (if not "%vanilla_running%"=="ON" if not "%wotlk_running%"=="ON" goto setup_tbc)
+if "%choose_exp%"=="3" (if not "%tbc_running%"=="ON" if not "%vanilla_running%"=="ON" goto setup_wotlk)
 REM if "%choose_exp%"=="4" (goto setup_cata)
 if "%choose_exp%"=="9" (goto website_switch)
 if "%choose_exp%"=="0" (goto music_switch)
@@ -341,13 +354,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=5
-set /a chars_version=4
+set /a world_version=6
+set /a chars_version=5
 set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=3
 set /a website_db_version=2
-set /a core_version=1
+set /a core_version=2
 
 goto settings
 
@@ -436,6 +449,7 @@ IF NOT EXIST "%mainfolder%\website.on" (
 start "" /min "%mainfolder%\Server\Database\start.bat"
 
 if not exist "%mainfolder%\Modules\%expansion%\dbc" del "%mainfolder%\%expansion%_maps_version.spp"
+if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\%worldserver%" goto missing_core
 
 if not exist "%mainfolder%\%spp_update%.spp" goto update_install
 if not exist "%mainfolder%\%expansion%_maps_version.spp" goto update_maps
@@ -488,7 +502,7 @@ if %current_realm_version% LSS %realm_version% goto update_realm
 if %current_logs_version% LSS %logs_version% (if not "%logs_version%"=="0" goto update_logs)
 if %current_bots_version% LSS %bots_version% goto update_bots
 if %current_website_db_version% LSS %website_db_version% goto update_website_db
-if %current_core_version% LSS %core_version% (if not "%core_version%"=="1" goto update_core)
+if %current_core_version% LSS %core_version% goto update_core
 
 if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\vanilla.spp"
 if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\tbc.spp"
@@ -827,6 +841,28 @@ cd "%mainfolder%"
 >"%mainfolder%\%expansion%_core_version.spp" echo %core_version%
 goto start_database
 
+:missing_core
+mode con: cols=40 lines=30
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    %expansion% binaries missing!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Extracting %expansion% binaries...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\Bin64.7z" > nul
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%"
+>"%mainfolder%\%expansion%_core_version.spp" echo %core_version%
+goto start_database
+
 :update_world
 rem setlocal enableDelayedExpansion
 mode con: cols=40 lines=30
@@ -865,11 +901,11 @@ cd "%mainfolder%\sql\%expansion%"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
 cd "%mainfolder%"
 echo.
-echo    Wiping world db...
+echo    Wiping old world db...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_world.sql"
 echo.
-echo    Installing world db...
+echo    Installing new world db...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world.sql"
 rem echo    Applying world db updates...
@@ -932,11 +968,11 @@ cd "%mainfolder%\sql\%expansion%"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
 cd "%mainfolder%"
 echo.
-echo    Wiping world db...
+echo    Wiping old world db...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_world.sql"
 echo.
-echo    Installing world db...
+echo    Installing new world db...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world.sql"
 rem echo.
@@ -1181,16 +1217,16 @@ if not "%choose_exp%"=="1" (if not exist "%mainfolder%\Saves\%expansion%\transfe
 cls
 echo ########################################
 echo # %NAME%
-echo # https://spp-forum.de
+echo # https://www.singleplayerproject.com/
 echo ########################################
 more < "%mainfolder%\logo_%expansion%.txt"
 echo.
 REM echo 1 - Start servers (Win32)
-echo   2 - Start servers (Win64)
+echo   2 - Start Server (x64)
 echo.
-echo   3 - Create game account
-echo   4 - Server settings
-echo   R - Reset randombots
+echo   3 - Create Account
+echo   4 - Server Info
+echo   R - Reset RandomBots
 if "%website%"=="ON" echo   M - Open website
 echo.
 echo   5 - Save Manager
@@ -1198,13 +1234,14 @@ echo.
 echo   7 - Wipe Database
 echo.
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-if NOT "%ERRORLEVEL%"=="0" echo   8 - Install locales
+echo   8 - Install Translations
 echo.
-tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-if NOT "%ERRORLEVEL%"=="0" echo   9 - Back to expansion selector
-echo   0 - Shutdown all servers
+rem tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+rem if NOT "%ERRORLEVEL%"=="0" echo   9 - Back to expansion selector
+echo   9 - Main Menu
+echo   0 - Shutdown Repack
 echo.
-echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version%:%current_chars_version%:%current_realm_version% Web: %current_website_version%
+echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version% Web: %current_website_version%
 echo.
 set /P menu_option=Enter your choice: 
 REM if "%menu_option%"=="1" (goto quick_start_servers_x86)
@@ -1228,7 +1265,7 @@ goto menu
 cls
 more < "%mainfolder%\header_spp.txt"
 more < "%mainfolder%\logo_%expansion%.txt"
-echo    -------- Server Settings --------
+echo    -------- Server Info --------
 echo.
 echo   MySQL Host: %host%  Port: %port%
 echo         User: %user%  Pass: %pass%
@@ -1241,6 +1278,11 @@ echo   3 - Change server address
 echo.
 echo   4 - Change realm name
 echo.
+echo   5 - Server Logs
+echo.
+if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes" echo   6 - Crash Logs [No logs]
+if exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes" echo   6 - Crash Logs
+echo.
 echo   0 - Go back
 echo.
 set /P choose_setting=Enter your choice: 
@@ -1248,6 +1290,8 @@ if "%choose_setting%"=="1" (goto world_settings)
 if "%choose_setting%"=="2" (goto bots_settings)
 if "%choose_setting%"=="3" (goto ip_changer)
 if "%choose_setting%"=="4" (goto rename_realm)
+if "%choose_setting%"=="5" (explorer.exe "%mainfolder%\Settings\%expansion%\logs")
+if "%choose_setting%"=="6" (if exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes" explorer.exe "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes")
 if "%choose_setting%"=="0" (goto menu)
 if "%choose_setting%"=="" (goto server_settings)
 goto server_settings
@@ -2124,7 +2168,7 @@ set serverstartoption=1
 set /p realmname1=<"%mainfolder%\Settings\%expansion%\name.txt"
 echo ########################################
 echo # %NAME%
-echo # https://spp-forum.de
+echo # https://www.singleplayerproject.com/
 echo ########################################
 echo.
 echo  Starting the first realm...
@@ -2647,7 +2691,7 @@ mode con: cols=60 lines=40
 rem more < "%mainfolder%\header_spp.txt"
 echo ############################################################
 echo # SPP - Classics Collection                                #
-echo # https://spp-forum.de                                     #
+echo # https://www.singleplayerproject.com/                     #
 echo ############################################################
 echo.
 set /a count=0

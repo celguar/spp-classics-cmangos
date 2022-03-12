@@ -1,0 +1,6 @@
+
+                      Update 12.03.2022
+
+ - [Core] TBC core update to latest version
+ - [Core] TBC Solocraft added
+ - Other fixes
