@@ -1,0 +1,10 @@
+
+                      Update 19.03.2022
+
+ - [Core] Improve pathfinding (fix NormalizeZ)
+ - [Core] Vanilla: Fix Reckoning talent
+ - [Bots] Allow alt bots to keep leader
+ - [Bots] Limit auto sell/destroy/disench if bot is in real guild
+ - [Bots] Don't leave real guilds
+ - [Bots] Fix bots low stats after randomize
+ - Other fixes
