@@ -1,0 +1,14 @@
+
+                      Update 27.03.2022
+
+ - [Core] Fix couple of crashes
+ - [Bots] Less often group invites from guild bots
+ - [Bots] Only queue WSG if no real player is in queue
+ - [Bots] One more fix to bots leaving guild
+ - [Bots] Fix alts giving leader in open world
+ - [Bots] Fix missing error messages from bots
+ - [Bots] Tweak movement when CCed
+ - [Bots] Ignore pets and priest spirits in pvp
+ - [Bots] guild leader command to ask for guild master
+ - [Bots] World buffs config for tbc bots included
+ - Other fixes
