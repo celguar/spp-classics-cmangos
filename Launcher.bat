@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.2.0
+set repack_version=2.2.1
 set maps_date=06.06.2021
 set /a website_version=4
 
@@ -333,7 +333,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=4
 set /a website_db_version=2
-set /a core_version=5
+set /a core_version=6
 
 goto settings
 
@@ -360,7 +360,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=4
 set /a website_db_version=2
-set /a core_version=5
+set /a core_version=6
 
 goto settings
 
@@ -387,7 +387,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=4
 set /a website_db_version=2
-set /a core_version=6
+set /a core_version=7
 
 goto settings
 

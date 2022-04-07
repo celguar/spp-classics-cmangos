@@ -1,0 +1,13 @@
+
+                      Update 07.04.2022
+
+ - [Core] Fix crash
+ - [Core] Vanilla: War Effort resource rates
+ - [Bots] Less often chat spams
+ - [Bots] Tweak caster AI stuck doing nothing
+ - [Bots] Paladin AI tweaks
+ - [Bots] Rogue AI use Slice and Dice as finisher
+ - [Bots] Fix bot text translations (WIP)
+ - [Bots] Fix bots using swim form not in deep water
+ - [Bots] Remove many annoyoing emotes in combat
+ - Other fixes
