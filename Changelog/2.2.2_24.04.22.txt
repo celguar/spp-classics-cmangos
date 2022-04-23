@@ -1,0 +1,13 @@
+
+                      Update 22.04.2022
+
+ - [Core] Fix couple of crashes
+ - [Core] Increase visibility of objects in open world
+ - [Bots] Less often emote spams
+ - [Bots] Tweak caster AI stuck in combat
+ - [Bots] Add racial spells to bots
+ - [Bots] Tweak CC spam
+ - [Bots] Tweak healing logic, start healing earlier
+ - [Bots] Auto BG queue config
+ - [Bots] Bots not try to dispel/decurse earlier
+ - Other fixes

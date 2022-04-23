@@ -3,8 +3,9 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.2.1
+set repack_version=2.2.2
 set maps_date=06.06.2021
+set "maps_date2"="06/06/2021" 
 set /a website_version=4
 
 IF NOT EXIST "%mainfolder%\music.on" (
@@ -333,7 +334,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=4
 set /a website_db_version=2
-set /a core_version=7
+set /a core_version=8
 
 goto settings
 
@@ -360,7 +361,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=4
 set /a website_db_version=2
-set /a core_version=7
+set /a core_version=8
 
 goto settings
 
@@ -387,7 +388,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=4
 set /a website_db_version=2
-set /a core_version=8
+set /a core_version=9
 
 goto settings
 
@@ -834,6 +835,11 @@ ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\Bin64.7z" > nul
 echo.
+echo    Copying debug info...
+ping -n 3 127.0.0.1>nul
+xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+del "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb"
+echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%"
@@ -855,6 +861,11 @@ echo    Extracting %expansion% binaries...
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\Bin64.7z" > nul
+echo.
+echo    Copying debug info...
+ping -n 3 127.0.0.1>nul
+xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+del "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
