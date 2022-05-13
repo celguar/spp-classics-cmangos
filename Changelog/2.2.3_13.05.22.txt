@@ -1,0 +1,12 @@
+
+                      Update 13.05.2022
+
+ - [Core] Vanilla core update
+ - [Core] Increase visibility of objects in open world
+ - [Bots] Tweak AI healers
+ - [Bots] Fix paladins switching auras
+ - [Bots] Fix bots running to master after each mob
+ - [Bots] Fix bot stuck in looting animation
+ - [Bots] Tweak healing logic, start healing earlier
+ - [Bots] Tweak rogues getting behind target
+ - Other fixes
