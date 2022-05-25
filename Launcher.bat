@@ -355,13 +355,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=7
+set /a world_version=8
 set /a chars_version=5
 set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=4
 set /a website_db_version=2
-set /a core_version=8
+set /a core_version=9
 
 goto settings
 
