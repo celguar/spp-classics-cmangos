@@ -2498,6 +2498,7 @@ IF /I "%AREYOUSURE%" NEQ "Y" GOTO save_menu
 goto import_char_1
 
 :convert_old_data
+echo.
 echo    Converting accounts...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\convert_realmd.sql"
@@ -2582,6 +2583,11 @@ REM if "%choose_exp%"=="3" echo  Done!
 echo.
 echo    Loading version info...
 ping -n 2 127.0.0.1>nul
+rem set cur version to 0
+set /a "current_chars_version=0"
+set /a "current_bots_version=0"
+set /a "current_realm_version=0"
+set /a "current_logs_version=0"
 if exist "%mainfolder%\%expansion%_chars_version.spp" del "%mainfolder%\%expansion%_chars_version.spp">nul
 if exist "%mainfolder%\%expansion%_realm_version.spp" del "%mainfolder%\%expansion%_realm_version.spp">nul
 if not "%logs_version%"=="0" (

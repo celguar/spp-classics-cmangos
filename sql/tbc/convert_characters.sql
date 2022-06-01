@@ -227,8 +227,7 @@ ALTER TABLE `gm_tickets` MODIFY COLUMN `closed` bigint(40) unsigned NOT NULL DEF
 ALTER TABLE `gm_tickets` MODIFY COLUMN `created` bigint(40) unsigned NOT NULL;
 
 ALTER TABLE `saved_variables`
-	ADD COLUMN `NextWeeklyQuestResetTime` bigint(40) unsigned NOT NULL DEFAULT '0' AFTER `NextDailyQuestResetTime`,
-        ADD COLUMN `NextMonthlyQuestResetTime` bigint(40) unsigned NOT NULL DEFAULT '0' AFTER `NextWeeklyQuestResetTime`;
+ADD COLUMN `NextWeeklyQuestResetTime` bigint(40) unsigned NOT NULL DEFAULT '0' AFTER `NextDailyQuestResetTime`;
 
 ALTER TABLE `instance`
 	ADD COLUMN `encountersMask` int(10) unsigned NOT NULL DEFAULT '0' AFTER `resettime`;
