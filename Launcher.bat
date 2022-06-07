@@ -962,6 +962,7 @@ del "%mainfolder%\%expansion%_ru_re.spp"
 del "%mainfolder%\%expansion%_tw_re.spp"
 del "%mainfolder%\%expansion%_es_re.spp"
 del "%mainfolder%\%expansion%_world_version.spp"
+del "%mainfolder%\%expansion%_logs_version.spp"
 set current_world_version=0
 cls
 more < "%mainfolder%\header_spp.txt"
@@ -1582,6 +1583,7 @@ cd "%mainfolder%\sql\%expansion%\playerbot"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+del "%mainfolder%\%expansion%_logs_version.spp"
 cd "%mainfolder%"
 echo.
 echo    Done!
@@ -1671,6 +1673,7 @@ echo.
 echo    Installing website tables...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
+del "%mainfolder%\%expansion%_logs_version.spp"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
