@@ -611,16 +611,16 @@ echo    Skipping download...
 ping -n 3 127.0.0.1>nul
 )
 if "%%A" LSS "%maps_date%" if "%%A" LSS "%maps_date2%" (
-echo.
-echo    Existing maps version: FAIL!
-ping -n 3 127.0.0.1>nul
-echo.
-echo    NEED: %maps_date% HAVE: %%A
-ping -n 3 127.0.0.1>nul
-echo.
-echo    Resuming download...
-ping -n 3 127.0.0.1>nul
-goto module_not_found
+rem echo.
+rem echo    Existing maps version: FAIL!
+rem ping -n 3 127.0.0.1>nul
+rem echo.
+rem echo    NEED: %maps_date% HAVE: %%A
+rem ping -n 3 127.0.0.1>nul
+rem echo.
+rem echo    Resuming download...
+rem ping -n 3 127.0.0.1>nul
+rem goto module_not_found
 )
 )
 )
