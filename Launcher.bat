@@ -4,8 +4,8 @@ SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
 set repack_version=2.2.3
-set maps_date=06.06.2021
-set "maps_date2"="06/06/2021" 
+set "maps_date=06.06.2021"
+set "maps_date2=06/06/2021" 
 set /a website_version=4
 
 IF NOT EXIST "%mainfolder%\music.on" (
@@ -602,7 +602,15 @@ echo.
 echo    Skipping download...
 ping -n 3 127.0.0.1>nul
 )
-if "%%A" LSS "%maps_date%" (
+if "%%A" GEQ "%maps_date2%" (
+echo.
+echo    Existing maps version: OK!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Skipping download...
+ping -n 3 127.0.0.1>nul
+)
+if "%%A" LSS "%maps_date%" if "%%A" LSS "%maps_date2%" (
 echo.
 echo    Existing maps version: FAIL!
 ping -n 3 127.0.0.1>nul
