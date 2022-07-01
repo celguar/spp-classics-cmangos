@@ -332,9 +332,9 @@ set /a world_version=9
 set /a chars_version=5
 set /a realm_version=2
 set /a logs_version=1
-set /a bots_version=4
+set /a bots_version=5
 set /a website_db_version=2
-set /a core_version=10
+set /a core_version=11
 
 goto settings
 
@@ -1131,6 +1131,10 @@ ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\sql\%expansion%\playerbot"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+echo.
+echo    Updating bots equip cache...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
