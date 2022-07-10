@@ -1,0 +1,15 @@
+
+                      Update 11.07.2022
+
+ - [Core] Vanilla core & db update
+ - [Bots] Gear update (vanilla)
+ - [Bots] Bots have more appropriate gear
+ - [Bots] Tweak bots stuck in AFK
+ - [Bots] Tweak bots stuck in BG
+ - [Bots] Bots release spirit faster
+ - [Bots] Fix leave/invite commands
+ - [Bots] Fix trinkets spam
+ - [Bots] Tweak mount/dismount range
+ - [Bots] Real guild bots are always active
+ - [Bots] Add wait X command
+ - Other fixes
