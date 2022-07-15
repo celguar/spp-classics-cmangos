@@ -3,10 +3,10 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.2.4
+set repack_version=2.2.5
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=4
+set /a website_version=5
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -332,9 +332,9 @@ set /a world_version=11
 set /a chars_version=6
 set /a realm_version=2
 set /a logs_version=1
-set /a bots_version=6
+set /a bots_version=7
 set /a website_db_version=2
-set /a core_version=12
+set /a core_version=13
 
 goto settings
 
@@ -355,13 +355,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=8
-set /a chars_version=5
+set /a world_version=9
+set /a chars_version=6
 set /a realm_version=2
 set /a logs_version=1
-set /a bots_version=4
+set /a bots_version=5
 set /a website_db_version=2
-set /a core_version=10
+set /a core_version=11
 
 goto settings
 

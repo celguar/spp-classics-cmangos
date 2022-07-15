@@ -1,0 +1,8 @@
+
+                      Update 15.07.2022
+
+ - [Core] TBC core & db update
+ - [Bots] Gear update (tbc)
+ - [Bots] Tweak bots stuck in BG
+
+ - Other fixes
