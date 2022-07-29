@@ -1,0 +1,13 @@
+
+                      Update 29.07.2022
+
+ - [Core] Transmog NPC (vanilla/tbc, wrath soon)
+ - [Bots] Random bots gear tweaks
+ - [Bots] Warsong Gulch pathing improved
+ - [Bots] Bots pick PvP targets more randomly
+ - [Bots] Improve random bots leveling
+ - [Bots] Fix bots stuck near portals
+ - [Bots] Fix Hunter bots stuck in FD
+ - [Bots] Fix guild invite from bots in group
+ - [Bots] Fix bots not using flying mounts
+ - Other fixes
