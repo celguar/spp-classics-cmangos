@@ -3,10 +3,10 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.2.6
+set repack_version=2.2.7
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=5
+set /a website_version=6
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -333,8 +333,8 @@ set /a chars_version=7
 set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=8
-set /a website_db_version=2
-set /a core_version=14
+set /a website_db_version=3
+set /a core_version=15
 
 goto settings
 
@@ -360,8 +360,8 @@ set /a chars_version=7
 set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=6
-set /a website_db_version=2
-set /a core_version=12
+set /a website_db_version=3
+set /a core_version=13
 
 goto settings
 
@@ -387,7 +387,7 @@ set /a chars_version=4
 set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=4
-set /a website_db_version=2
+set /a website_db_version=3
 set /a core_version=10
 
 goto settings
@@ -1250,6 +1250,8 @@ more < "%mainfolder%\logo_%expansion%.txt"
 echo.
 REM echo 1 - Start servers (Win32)
 echo   2 - Start Server (x64)
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if "%ERRORLEVEL%"=="0" echo   T - Restarter Mode
 echo.
 echo   3 - Create Account
 echo   4 - Server Info
@@ -1261,7 +1263,8 @@ echo.
 echo   7 - Wipe Database
 echo.
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-echo   8 - Install Translations
+if not "%expansion%"=="tbc" echo   8 - Install Translations
+if "%expansion%"=="tbc" echo.
 echo.
 rem tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 rem if NOT "%ERRORLEVEL%"=="0" echo   9 - Back to expansion selector
@@ -1274,6 +1277,8 @@ set /P menu_option=Enter your choice:
 REM if "%menu_option%"=="1" (goto quick_start_servers_x86)
 rem if "%menu_option%"=="1" (goto menu)
 if "%menu_option%"=="2" (goto quick_start_servers_x64)
+if "%menu_option%"=="T" (goto server_restart_x64)
+if "%menu_option%"=="t" (goto server_restart_x64)
 if "%menu_option%"=="3" (goto account_tool)
 if "%menu_option%"=="4" (goto server_settings)
 if "%menu_option%"=="r" (goto bots_menu)
@@ -2288,6 +2293,33 @@ if "%ERRORLEVEL%"=="0" goto menu
 start /min ..\..\Server\Binaries\%expansion%\Bin64\%realmserver%
 REM start Server\Tools\server_check.bat"
 goto menu
+
+:server_restart_x64
+mode con: cols=40 lines=23
+cls
+echo ########################################
+echo # %NAME%
+echo # https://www.singleplayerproject.com/
+echo ########################################
+more < "%mainfolder%\logo_%expansion%.txt"
+echo.
+echo    -------- Server Restarter --------
+echo.
+echo.       Automatically restart
+echo.       if crashed / closed.
+echo.
+echo.       Checking every 10 seconds...
+echo.
+echo.
+echo        Press 0 to go back to menu
+echo.
+CHOICE /C 01 /T 10 /D 1 /N /M ""
+IF %ERRORLEVEL% EQU 1 goto menu
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if "%ERRORLEVEL%"=="0" goto server_restart_x64
+cd "%mainfolder%\Settings\%expansion%"
+Start ..\..\Server\Binaries\%expansion%\Bin64\%worldserver%
+goto server_restart_x64
 
 :save_menu
 cls

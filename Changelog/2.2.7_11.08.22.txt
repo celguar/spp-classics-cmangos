@@ -1,0 +1,15 @@
+
+                      Update 11.08.2022
+
+ - [Core] Fixed some crashes
+ - [Bots] Random bots gear tweaks (vanilla/tbc)
+ - [Bots] Arathi Basin login improved
+ - [Bots] Mage rotation tweaked
+ - [Bots] Fix rndbot init command only level up
+ - [Bots] Bots use more CC spells in PvP
+ - [Bots] Fix rogues not using stealth openers
+ - [Bots] Random arena teams now include 3v3 & 5v5
+ - [Bots] Fix bots not using AoE spells
+ - [Website] Armory shows owners on item page
+ - [Website] More items show proper source
+ - Other fixes
