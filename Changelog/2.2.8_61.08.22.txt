@@ -1,0 +1,11 @@
+
+                      Update 16.08.2022 (Vanilla/Tbc)
+
+ - [Core] Fix crash when sharing quests
+ - [Core] Restore Collectors Edition reward
+ - [Bots] Random bots gear tweaks
+ - [Bots] Add more spells to bots rotations
+ - [Bots] Bots auto questing and traveling fixes
+ - [Bots] Performance tweaks
+ - [Bots] Fix create/delete random guilds/teams
+ - Other fixes

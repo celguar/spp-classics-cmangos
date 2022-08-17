@@ -3,10 +3,10 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.2.7
+set repack_version=2.2.8
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=6
+set /a website_version=7
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -334,7 +334,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=8
 set /a website_db_version=3
-set /a core_version=15
+set /a core_version=16
 
 goto settings
 
@@ -361,7 +361,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=6
 set /a website_db_version=3
-set /a core_version=13
+set /a core_version=14
 
 goto settings
 
