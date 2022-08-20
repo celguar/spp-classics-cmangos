@@ -1259,6 +1259,17 @@ echo   R - Reset RandomBots
 if "%website%"=="ON" echo   M - Open website
 echo.
 echo   5 - Save Manager
+::#########################################################################################
+::#########################################################################################
+:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
+::#########################################################################################
+::#########################################################################################
+if "%choose_exp%"=="3" echo   6 - Account-wide Achievements
+::#########################################################################################
+::#########################################################################################
+:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
+::#########################################################################################
+::#########################################################################################
 echo.
 echo   7 - Wipe Database
 echo.
@@ -1284,6 +1295,17 @@ if "%menu_option%"=="4" (goto server_settings)
 if "%menu_option%"=="r" (goto bots_menu)
 if "%menu_option%"=="R" (goto bots_menu)
 if "%menu_option%"=="5" (goto save_menu)
+::#########################################################################################
+::#########################################################################################
+:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
+::#########################################################################################
+::#########################################################################################
+if "%menu_option%"=="6" (goto achievements_menu)
+::#########################################################################################
+::#########################################################################################
+:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
+::#########################################################################################
+::#########################################################################################
 if "%menu_option%"=="7" (goto wipe_db)
 if "%menu_option%"=="8" (goto install_locales_pre)
 if "%menu_option%"=="9" (goto select_expansion)
@@ -1510,7 +1532,34 @@ echo    On next restart bots will be removed
 echo    and new bots will be created
 ping -n 5 127.0.0.1>nul
 goto menu
+::#########################################################################################
+::#########################################################################################
+:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | 1 NEWLINE BETWEEN DECLARATIONS
+::#########################################################################################
+::#########################################################################################
 
+:achievements_menu
+cls
+:PROMPT
+SET /P SHAREACHIEVEMENTS=Share achievements (Y/[N])?
+IF /I "%SHAREACHIEVEMENTS%" NEQ "Y" GOTO menu
+cd "%mainfolder%\Server\Tools\"
+start spp-achievements.exe
+
+:: IMPLEMENT ERROR HANDLING IN CASE OF SQL ERROR
+
+GOTO achievements_success
+
+:achievements_success
+cls
+SET /P ACHIEVEERROR=Achievements successfully shared!
+IF /I "%ACHIEVEERROR%"=="0" GOTO menu
+
+::#########################################################################################
+::#########################################################################################
+:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | 1 NEWLINE BETWEEN DECLARATIONS
+::#########################################################################################
+::#########################################################################################
 :wipe_db
 cls
 more < "%mainfolder%\header_spp.txt"
