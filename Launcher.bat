@@ -1545,7 +1545,8 @@ echo # WARNING!                             #
 echo # Please make a backup save before     #
 echo # running!                             #
 echo #                                      #
-echo # Achievement sharing is irreversible! #
+echo # Achievement transfer cannot be       #
+echo # undone!                              #
 echo ########################################
 echo.
 echo    Share achievements between all of
@@ -1555,8 +1556,8 @@ echo    Can be used while playing, requires
 echo    relog to show in-game.
 echo.
 :PROMPT
-set /P SHAREACHIEVEMENTS=Share achievements (Y/[N])?
-if /I "%SHAREACHIEVEMENTS%" NEQ "Y" goto menu
+set /P transfer_achievements=Transfer achievements (Y/[N])?
+if /I "%transfer_achievements%" NEQ "Y" goto menu
 cd "%mainfolder%\Server\Tools\"
 start spp-achievements.exe
 tasklist /FI "IMAGENAME eq spp-achievements.exe" 2>NUL | find /I /N "spp-achievements.exe">NUL
@@ -1567,7 +1568,7 @@ goto aw_achievements_menu
 :aw_achievements_running
 cls
 echo.
-echo   Sharing achievements...
+echo   Transferring achievements...
 echo.
 echo   Please monitor progress in the pop-up
 echo   window and return to menu once it
