@@ -1300,7 +1300,7 @@ if "%menu_option%"=="5" (goto save_menu)
 :: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
 ::#########################################################################################
 ::#########################################################################################
-if "%menu_option%"=="6" (goto achievements_menu)
+if "%menu_option%"=="6" (goto aw_achievements_menu)
 ::#########################################################################################
 ::#########################################################################################
 :: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
@@ -1538,22 +1538,68 @@ goto menu
 ::#########################################################################################
 ::#########################################################################################
 
-:achievements_menu
+:aw_achievements_menu
 cls
+echo ########################################
+echo # WARNING!                             #
+echo # Please make a backup save before     #
+echo # running!                             #
+echo #                                      #
+echo # Achievement sharing is irreversible! #
+echo ########################################
+echo.
+echo    Share achievements between all of
+echo    your characters.
+echo.
+echo    Can be used while playing, requires
+echo    relog to show in-game.
+echo.
 :PROMPT
 SET /P SHAREACHIEVEMENTS=Share achievements (Y/[N])?
 IF /I "%SHAREACHIEVEMENTS%" NEQ "Y" GOTO menu
 cd "%mainfolder%\Server\Tools\"
 start spp-achievements.exe
+tasklist /FI "IMAGENAME eq spp-achievements.exe" 2>NUL | find /I /N "spp-achievements.exe">NUL
+IF "%ERRORLEVEL%"=="0" GOTO aw_achievements_running
+IF "%ERRORLEVEL%" NEQ "0" GOTO aw_achievements_error
+goto aw_achievements_menu
 
-:: IMPLEMENT ERROR HANDLING IN CASE OF SQL ERROR
-
-GOTO achievements_success
-
-:achievements_success
+:aw_achievements_running
 cls
-SET /P ACHIEVEERROR=Achievements successfully shared!
+echo.
+echo    Sharing achievements...
+echo.
+echo    Please monitor progress in the 
+echo    pop-up window and return to menu  
+echo    once it closes.
+echo.
+echo    Please report any issues at:
+echo    github.com/akaClay/spp-achievements
+echo.
+echo   1 - Return to WotLK Menu
+echo.
+echo   2 - Report Issue
+echo.
+
+SET /P WOTLKMENU=Enter your choice:
+IF /I "%WOTLKMENU%"=="0" GOTO menu
+goto aw_achievements_menu
+
+:aw_achievements_error
+cls
+echo ########################################
+echo #                Error!                #
+echo ########################################
+echo.
+echo    Unable to run aw-achievements tool.
+echo    Error level: "%ERRORLEVEL%"
+echo.
+echo    Please report the issue at:
+echo    github.com/akaClay/spp-achievements
+echo.
+SET /P ACHIEVEERROR=Return to WotLK menu
 IF /I "%ACHIEVEERROR%"=="0" GOTO menu
+goto aw_achievements_error
 
 ::#########################################################################################
 ::#########################################################################################
