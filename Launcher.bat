@@ -1555,35 +1555,32 @@ echo    Can be used while playing, requires
 echo    relog to show in-game.
 echo.
 :PROMPT
-SET /P SHAREACHIEVEMENTS=Share achievements (Y/[N])?
-IF /I "%SHAREACHIEVEMENTS%" NEQ "Y" GOTO menu
+set /P SHAREACHIEVEMENTS=Share achievements (Y/[N])?
+if /I "%SHAREACHIEVEMENTS%" NEQ "Y" goto menu
 cd "%mainfolder%\Server\Tools\"
 start spp-achievements.exe
 tasklist /FI "IMAGENAME eq spp-achievements.exe" 2>NUL | find /I /N "spp-achievements.exe">NUL
-IF "%ERRORLEVEL%"=="0" GOTO aw_achievements_running
-IF "%ERRORLEVEL%" NEQ "0" GOTO aw_achievements_error
+if "%ERRORLEVEL%"=="0" goto aw_achievements_running
+if "%ERRORLEVEL%" NEQ "0" goto aw_achievements_error
 goto aw_achievements_menu
 
 :aw_achievements_running
 cls
 echo.
-echo    Sharing achievements...
+echo   Sharing achievements...
 echo.
-echo    Please monitor progress in the 
-echo    pop-up window and return to menu  
-echo    once it closes.
+echo   Please monitor progress in the pop-up
+echo   window and return to menu once it
+echo   closes.
 echo.
-echo    Please report any issues at:
-echo    github.com/akaClay/spp-achievements
+echo   R - Report Issue
 echo.
-echo   1 - Return to WotLK Menu
+echo   0 - Return to WotLK Menu
 echo.
-echo   2 - Report Issue
-echo.
-
-SET /P WOTLKMENU=Enter your choice:
-IF /I "%WOTLKMENU%"=="0" GOTO menu
-goto aw_achievements_menu
+set /P aw_achievements_option=Enter your choice:
+if /I "%aw_achievements_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
+if /I "%aw_achievements_option%"=="0" goto menu
+goto aw_achievements_running
 
 :aw_achievements_error
 cls
@@ -1594,11 +1591,13 @@ echo.
 echo    Unable to run aw-achievements tool.
 echo    Error level: "%ERRORLEVEL%"
 echo.
-echo    Please report the issue at:
-echo    github.com/akaClay/spp-achievements
+echo   R - Report Issue
 echo.
-SET /P ACHIEVEERROR=Return to WotLK menu
-IF /I "%ACHIEVEERROR%"=="0" GOTO menu
+echo   0 - Return to WotLK Menu
+echo.
+set /P aw_achievements_option=Enter your choice:
+if /I "%aw_achievements_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
+if /I "%aw_achievements_option%"=="0" goto menu
 goto aw_achievements_error
 
 ::#########################################################################################
