@@ -334,7 +334,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=11
 set /a website_db_version=4
-set /a core_version=17
+set /a core_version=18
 
 goto settings
 
@@ -361,7 +361,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=8
 set /a website_db_version=4
-set /a core_version=15
+set /a core_version=16
 
 goto settings
 
@@ -388,7 +388,7 @@ set /a realm_version=2
 set /a logs_version=1
 set /a bots_version=5
 set /a website_db_version=4
-set /a core_version=11
+set /a core_version=12
 
 goto settings
 
