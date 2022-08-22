@@ -1,0 +1,11 @@
+
+                      Update 22.08.2022
+
+ - [Core] Wotlk core update
+ - [Core] Several crash fixes for wotlk
+ - [Core] Fix Solocraft giving crazy stats in BGs
+ - [Bots] Random bots geat update for wotlk
+ - [Bots] Fix bots not moving from arena start
+ - [Bots] Bots auto questing and traveling tweaks
+ - [Bots] With auto bg enabled bots join WSG and rated arena
+ - Other fixes
