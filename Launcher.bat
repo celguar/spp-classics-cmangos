@@ -1514,84 +1514,7 @@ echo    and new bots will be created
 ping -n 5 127.0.0.1>nul
 goto menu
 
-:account_wide_menu
-cls
-echo ########################################
-echo # WARNING!                             #
-echo # Please make a backup save before     #
-echo # running!                             #
-echo #                                      #
-echo # Must be logged out before running!   #
-echo ########################################
-echo.
-echo   Share achievements, pets, and mounts
-echo   between all player characters.
-echo.
-echo   S - Go To Save Manager
-echo.
-echo   T - Run Transfer
-echo.
-echo   0 - Return to WotLK Menu
-echo.
-set /P account_wide_option=Enter your choice:
-if /I "%account_wide_option%"=="S" goto save_menu
-if /I "%account_wide_option%"=="T" goto account_wide_confirm
-if /I "%account_wide_option%"=="0" goto menu
-goto menu
 
-:account_wide_confirm
-cls
-echo ########################################
-echo # WARNING!                             #
-echo # Achievement, pet, and mount transfer #
-echo # cannot be undone!                    #
-echo ########################################
-echo.
-:PROMPT
-set /P AREYOUSURE=Are you sure? (Y/[N])?
-if /I "%AREYOUSURE%" NEQ "Y" goto menu
-cd "%mainfolder%\Server\Tools\"
-start spp-account-wide.exe
-tasklist /FI "IMAGENAME eq spp-account-wide.exe" 2>NUL | find /I /N "spp-account-wide.exe">NUL
-if "%ERRORLEVEL%"=="0" goto account_wide_running
-if "%ERRORLEVEL%" NEQ "0" goto account_wide_error
-goto menu
-
-:account_wide_running
-cls
-echo.
-echo   Transferring achievements...
-echo.
-echo   Please monitor progress in the 
-echo   pop-up window and return to menu 
-echo   once it closes.
-echo.
-echo   R - Report Issue
-echo.
-echo   0 - Return to WotLK Menu
-echo.
-set /P account_wide_option=Enter your choice:
-if /I "%account_wide_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
-if /I "%account_wide_option%"=="0" goto menu
-goto menu
-
-:account_wide_error
-cls
-echo ########################################
-echo #                Error!                #
-echo ########################################
-echo.
-echo   Unable to run aw-achievements tool.
-echo   Error level: "%ERRORLEVEL%"
-echo.
-echo   R - Report Issue
-echo.
-echo   0 - Return to WotLK Menu
-echo.
-set /P account_wide_option=Enter your choice:
-if /I "%account_wide_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
-if /I "%account_wide_option%"=="0" goto menu
-goto menu
 
 :wipe_db
 cls
@@ -1718,7 +1641,7 @@ echo    Wiping characters and bots...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_characters.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
-
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_realmd.sql"
 echo.
 echo    Reinstalling characters db...
 ping -n 3 127.0.0.1>nul
@@ -2758,6 +2681,85 @@ echo.
 echo    Save #%saveslot% "%tempname%" loaded.
 ping -n 4 127.0.0.1>nul
 goto start_database
+
+:account_wide_menu
+cls
+echo ########################################
+echo # WARNING!                             #
+echo # Please make a backup save before     #
+echo # running!                             #
+echo #                                      #
+echo # Must be logged out before running!   #
+echo ########################################
+echo.
+echo   Share achievements, pets, and mounts
+echo   between all player characters.
+echo.
+echo   S - Go To Save Manager
+echo.
+echo   T - Run Transfer
+echo.
+echo   0 - Return to WotLK Menu
+echo.
+set /P account_wide_option=Enter your choice:
+if /I "%account_wide_option%"=="S" goto save_menu
+if /I "%account_wide_option%"=="T" goto account_wide_confirm
+if /I "%account_wide_option%"=="0" goto menu
+goto menu
+
+:account_wide_confirm
+cls
+echo ########################################
+echo # WARNING!                             #
+echo # Achievement, pet, and mount transfer #
+echo # cannot be undone!                    #
+echo ########################################
+echo.
+:PROMPT
+set /P AREYOUSURE=Are you sure? (Y/[N])?
+if /I "%AREYOUSURE%" NEQ "Y" goto menu
+cd "%mainfolder%\Server\Tools\"
+start spp-account-wide.exe
+tasklist /FI "IMAGENAME eq spp-account-wide.exe" 2>NUL | find /I /N "spp-account-wide.exe">NUL
+if "%ERRORLEVEL%"=="0" goto account_wide_running
+if "%ERRORLEVEL%" NEQ "0" goto account_wide_error
+goto menu
+
+:account_wide_running
+cls
+echo.
+echo   Transferring achievements...
+echo.
+echo   Please monitor progress in the 
+echo   pop-up window and return to menu 
+echo   once it closes.
+echo.
+echo   R - Report Issue
+echo.
+echo   0 - Return to WotLK Menu
+echo.
+set /P account_wide_option=Enter your choice:
+if /I "%account_wide_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
+if /I "%account_wide_option%"=="0" goto menu
+goto menu
+
+:account_wide_error
+cls
+echo ########################################
+echo #                Error!                #
+echo ########################################
+echo.
+echo   Unable to run aw-achievements tool.
+echo   Error level: "%ERRORLEVEL%"
+echo.
+echo   R - Report Issue
+echo.
+echo   0 - Return to WotLK Menu
+echo.
+set /P account_wide_option=Enter your choice:
+if /I "%account_wide_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
+if /I "%account_wide_option%"=="0" goto menu
+goto menu
 
 :account_tool
 cls
