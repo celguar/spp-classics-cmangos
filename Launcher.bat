@@ -1259,17 +1259,7 @@ echo   R - Reset RandomBots
 if "%website%"=="ON" echo   M - Open website
 echo.
 echo   5 - Save Manager
-::#########################################################################################
-::#########################################################################################
-:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
-::#########################################################################################
-::#########################################################################################
-if "%choose_exp%"=="3" echo   6 - Account-wide Achievements
-::#########################################################################################
-::#########################################################################################
-:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
-::#########################################################################################
-::#########################################################################################
+if "%choose_exp%"=="3" echo   6 - Account-wide
 echo.
 echo   7 - Wipe Database
 echo.
@@ -1295,17 +1285,7 @@ if "%menu_option%"=="4" (goto server_settings)
 if "%menu_option%"=="r" (goto bots_menu)
 if "%menu_option%"=="R" (goto bots_menu)
 if "%menu_option%"=="5" (goto save_menu)
-::#########################################################################################
-::#########################################################################################
-:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
-::#########################################################################################
-::#########################################################################################
-if "%menu_option%"=="6" (goto aw_achievements_menu)
-::#########################################################################################
-::#########################################################################################
-:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | REMOVE NEWLINES IN CODE (NOT ECHO NL)
-::#########################################################################################
-::#########################################################################################
+if "%menu_option%"=="6" (goto account_wide_menu)
 if "%menu_option%"=="7" (goto wipe_db)
 if "%menu_option%"=="8" (goto install_locales_pre)
 if "%menu_option%"=="9" (goto select_expansion)
@@ -1532,80 +1512,86 @@ echo    On next restart bots will be removed
 echo    and new bots will be created
 ping -n 5 127.0.0.1>nul
 goto menu
-::#########################################################################################
-::#########################################################################################
-:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | 1 NEWLINE BETWEEN DECLARATIONS
-::#########################################################################################
-::#########################################################################################
 
-:aw_achievements_menu
+:account_wide_menu
 cls
 echo ########################################
 echo # WARNING!                             #
 echo # Please make a backup save before     #
 echo # running!                             #
 echo #                                      #
-echo # Achievement transfer cannot be       #
-echo # undone!                              #
+echo # Must be logged out before running!   #
 echo ########################################
 echo.
-echo    Share achievements between all of
-echo    your characters.
+echo   Share achievements, pets, and mounts
+echo   between all player characters.
 echo.
-echo    Can be used while playing, requires
-echo    relog to show in-game.
+echo   S - Go To Save Manager
+echo.
+echo   T - Run Transfer
+echo.
+echo   0 - Return to WotLK Menu
+echo.
+set /P account_wide_option=Enter your choice:
+if /I "%account_wide_option%"=="S" goto save_menu
+if /I "%account_wide_option%"=="T" goto account_wide_confirm
+if /I "%account_wide_option%"=="0" goto menu
+goto menu
+
+:account_wide_confirm
+cls
+echo ########################################
+echo # WARNING!                             #
+echo # Achievement, pet, and mount transfer #
+echo # cannot be undone!                    #
+echo ########################################
 echo.
 :PROMPT
-set /P transfer_achievements=Transfer achievements (Y/[N])?
-if /I "%transfer_achievements%" NEQ "Y" goto menu
+set /P AREYOUSURE=Are you sure? (Y/[N])?
+if /I "%AREYOUSURE%" NEQ "Y" goto menu
 cd "%mainfolder%\Server\Tools\"
-start spp-achievements.exe
-tasklist /FI "IMAGENAME eq spp-achievements.exe" 2>NUL | find /I /N "spp-achievements.exe">NUL
-if "%ERRORLEVEL%"=="0" goto aw_achievements_running
-if "%ERRORLEVEL%" NEQ "0" goto aw_achievements_error
-goto aw_achievements_menu
+start spp-account-wide.exe
+tasklist /FI "IMAGENAME eq spp-account-wide.exe" 2>NUL | find /I /N "spp-account-wide.exe">NUL
+if "%ERRORLEVEL%"=="0" goto account_wide_running
+if "%ERRORLEVEL%" NEQ "0" goto account_wide_error
+goto menu
 
-:aw_achievements_running
+:account_wide_running
 cls
 echo.
 echo   Transferring achievements...
 echo.
-echo   Please monitor progress in the pop-up
-echo   window and return to menu once it
-echo   closes.
+echo   Please monitor progress in the 
+echo   pop-up window and return to menu 
+echo   once it closes.
 echo.
 echo   R - Report Issue
 echo.
 echo   0 - Return to WotLK Menu
 echo.
-set /P aw_achievements_option=Enter your choice:
-if /I "%aw_achievements_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
-if /I "%aw_achievements_option%"=="0" goto menu
-goto aw_achievements_running
+set /P account_wide_option=Enter your choice:
+if /I "%account_wide_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
+if /I "%account_wide_option%"=="0" goto menu
+goto menu
 
-:aw_achievements_error
+:account_wide_error
 cls
 echo ########################################
 echo #                Error!                #
 echo ########################################
 echo.
-echo    Unable to run aw-achievements tool.
-echo    Error level: "%ERRORLEVEL%"
+echo   Unable to run aw-achievements tool.
+echo   Error level: "%ERRORLEVEL%"
 echo.
 echo   R - Report Issue
 echo.
 echo   0 - Return to WotLK Menu
 echo.
-set /P aw_achievements_option=Enter your choice:
-if /I "%aw_achievements_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
-if /I "%aw_achievements_option%"=="0" goto menu
-goto aw_achievements_error
+set /P account_wide_option=Enter your choice:
+if /I "%account_wide_option%"=="R" start https://github.com/akaClay/spp-achievements/issues
+if /I "%account_wide_option%"=="0" goto menu
+goto menu
 
-::#########################################################################################
-::#########################################################################################
-:: TEMPORARY COMMENT BLOCK TO HELP ME KEEP MY PLACE | 1 NEWLINE BETWEEN DECLARATIONS
-::#########################################################################################
-::#########################################################################################
 :wipe_db
 cls
 more < "%mainfolder%\header_spp.txt"
@@ -1731,7 +1717,7 @@ echo    Wiping characters and bots...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_characters.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_realmd.sql"
+
 echo.
 echo    Reinstalling characters db...
 ping -n 3 127.0.0.1>nul
