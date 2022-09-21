@@ -1514,8 +1514,6 @@ echo    and new bots will be created
 ping -n 5 127.0.0.1>nul
 goto menu
 
-
-
 :wipe_db
 cls
 more < "%mainfolder%\header_spp.txt"
