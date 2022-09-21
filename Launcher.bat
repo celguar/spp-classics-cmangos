@@ -2719,6 +2719,7 @@ echo.
 set /P AREYOUSURE=Are you sure? (Y/[N])?
 if /I "%AREYOUSURE%" NEQ "Y" goto menu
 cd "%mainfolder%\Server\Tools\"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf spp-account-wide.7z > nul
 start spp-account-wide.exe
 tasklist /FI "IMAGENAME eq spp-account-wide.exe" 2>NUL | find /I /N "spp-account-wide.exe">NUL
 if "%ERRORLEVEL%"=="0" goto account_wide_running
