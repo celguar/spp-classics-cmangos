@@ -3,10 +3,10 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.2.8
+set repack_version=2.2.9
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=7
+set /a website_version=8
 
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
@@ -332,9 +332,9 @@ set /a world_version=12
 set /a chars_version=7
 set /a realm_version=2
 set /a logs_version=1
-set /a bots_version=9
-set /a website_db_version=3
-set /a core_version=16
+set /a bots_version=11
+set /a website_db_version=4
+set /a core_version=18
 
 goto settings
 
@@ -359,9 +359,9 @@ set /a world_version=11
 set /a chars_version=7
 set /a realm_version=2
 set /a logs_version=1
-set /a bots_version=7
-set /a website_db_version=3
-set /a core_version=14
+set /a bots_version=8
+set /a website_db_version=4
+set /a core_version=16
 
 goto settings
 
@@ -382,13 +382,13 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=1
-set /a world_version=7
-set /a chars_version=4
+set /a world_version=8
+set /a chars_version=5
 set /a realm_version=2
 set /a logs_version=1
-set /a bots_version=4
-set /a website_db_version=3
-set /a core_version=10
+set /a bots_version=5
+set /a website_db_version=4
+set /a core_version=12
 
 goto settings
 
@@ -1131,6 +1131,7 @@ ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\sql\%expansion%\playerbot"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
