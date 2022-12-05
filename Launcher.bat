@@ -859,6 +859,7 @@ echo.
 echo    Copying debug info...
 ping -n 3 127.0.0.1>nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 del "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb"
 echo.
 echo    Done!
@@ -886,6 +887,7 @@ echo.
 echo    Copying debug info...
 ping -n 3 127.0.0.1>nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 del "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb"
 echo.
 echo    Done!
@@ -1372,6 +1374,11 @@ ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" > nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.exe" "%mainfolder%\Server\Binaries\%expansion%\Bin64">nul
+echo.
+echo    Copying debug info...
+ping -n 3 127.0.0.1>nul
+xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 rd /s /q "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo"
 echo.
 echo    Done!
@@ -1407,6 +1414,7 @@ echo.
 echo    Copying debug info...
 ping -n 3 127.0.0.1>nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 del "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb"
 echo.
 echo    Done!
@@ -1446,6 +1454,11 @@ ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" > nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.exe" "%mainfolder%\Server\Binaries\%expansion%\Bin64">nul
+echo.
+echo    Copying debug info...
+ping -n 3 127.0.0.1>nul
+xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 rd /s /q "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo"
 echo.
 echo    Done!
