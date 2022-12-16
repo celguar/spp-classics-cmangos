@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.2.9
+set repack_version=2.3.0
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
 set /a website_version=8
@@ -362,13 +362,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=11
+set /a world_version=12
 set /a chars_version=7
-set /a realm_version=2
+set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=8
+set /a bots_version=9
 set /a website_db_version=4
-set /a core_version=16
+set /a core_version=17
 
 goto settings
 
@@ -1155,6 +1155,7 @@ echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_texts.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
