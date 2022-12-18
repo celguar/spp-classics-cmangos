@@ -3038,19 +3038,16 @@ echo      -------- Service Menu --------
 echo.
 echo    1 - Fix Database after crash
 echo.
-echo    2 - Install VCredist x64
+echo    2 - Install Visual C++ Redist
 echo.
-echo    3 - Install VCredist x86
-echo.
-echo    4 - Report bug
+echo    3 - Report bug
 echo.
 echo    0 - Go back
 echo.
 set /P choose_service=Enter your choice: 
 if "%choose_service%"=="1" (goto fix_database)
-if "%choose_service%"=="2" (goto vcredist_install_x64)
-if "%choose_service%"=="3" (goto vcredist_install_x86)
-if "%choose_service%"=="4" (goto report_issue)
+if "%choose_service%"=="2" (goto vcredist_install_all)
+if "%choose_service%"=="3" (goto report_issue)
 if "%choose_service%"=="0" (goto select_expansion)
 goto service_menu
 
@@ -3058,7 +3055,7 @@ goto service_menu
 cls
 echo.
 cd "%mainfolder%\Addons\vcredist"
-start "InstallAll.bat"
+start "" "install_all.bat"
 cd "%mainfolder%"
 goto service_menu
 
@@ -3117,7 +3114,6 @@ rem echo    Press any key to go back
 rem echo.
 rem pause
 goto select_expansion
-
 
 :vcredist_install_x86
 cls
