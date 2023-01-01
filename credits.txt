@@ -6,11 +6,15 @@
 
  Persons:
  --------
- "Ike3"             "Lidocain"
+ "Ike3"             "Celguar"
+ "Mostlikely"       "Rym"
+ "conan513"         "thesawolf"
+ "Lidocain"         "Antz"
  "LordPsyan"        "jokerlfm"
  "Ovahlord"         "Talamortis"
- "Traesh"           "StygianTheBest"
+ "Traesh"           "chaosskynet"
  "5man999"          "Wowx"
  "ainslievaux"      "apock69"
- "Lillecarl"        "Mostlikely"
- "Boxhead"          "Blitzi"
+ "Lillecarl"        "Blitzi"
+ "Boxhead"          "Natsukawa"
+ "ileboii"          "Ghostbots"
