@@ -1,0 +1,10 @@
+
+                      Update 17.12.2022 (TBC Only)
+
+ - [Core] TBC Core update
+ - [Bots] A lot of improvements for random bots behavior
+ - [Bots] Tweak Alterac Valley BG stuck issue
+ - [Bots] Bots can now pull enemies with ranged attack
+ - [Bots] Added "wait for attack" strategy,
+          with it dps bots wait 10 secs before attacking
+ - Other fixes
