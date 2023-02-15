@@ -6,9 +6,8 @@
 
  Persons:
  --------
- "Ike3"             "Celguar"
- "Mostlikely"       "Rym"
- "conan513"         "thesawolf"
+ "Ike3"             "conan513"
+ "Rym"              "thesawolf"
  "Lidocain"         "Antz"
  "LordPsyan"        "jokerlfm"
  "Ovahlord"         "Talamortis"
@@ -16,5 +15,7 @@
  "5man999"          "Wowx"
  "ainslievaux"      "apock69"
  "Lillecarl"        "Blitzi"
+ "Celguar"          "Mostlikely"
  "Boxhead"          "Natsukawa"
+ "Lihvar"           "Flekz"
  "ileboii"          "Ghostbots"
