@@ -1277,7 +1277,6 @@ echo   2 - Start Server (x64)
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" echo   T - Restarter Mode
 if NOT "%ERRORLEVEL%"=="0" echo.
-echo.
 echo   3 - Create Account
 echo   4 - Server Info
 echo   R - Reset RandomBots
