@@ -2960,7 +2960,7 @@ goto exit
 :changelog
 cls
 setlocal EnableDelayedExpansion
-mode con: cols=60 lines=40
+mode con: cols=60 lines=55
 rem more < "%mainfolder%\header_spp.txt"
 echo ############################################################
 echo # SPP - Classics Collection                                #
