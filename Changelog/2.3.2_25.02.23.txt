@@ -1,0 +1,26 @@
+
+                      Update 25.02.2023
+
+ - [Core] Update all 3 cores to latest CMaNGOS
+ - [Feature] Add Hardcore mod by Flekz, check mangosd.conf for details (vanilla only)
+ - [Bots] Set bot class/race ratio based on WoW Census (configurable)
+ - [Bots] Add missing bots configs, check bots config
+ - [Bots] Fixed bot formations. Formations also work in flight
+ - [Bots] Fix EoTS BG logic loop issue
+ - [Bots] Bots now join all BGs if auto BG is enabled
+ - [Bots] Summon command is now default GM acc only (congigurable)
+ - [Bots] Added config for bots to set their spec in guild notes
+ - [Bots] Fixed issue with Druids leaving form back and forth
+ - [Bots] Bots now properly evaluate items with random stats for upgrade
+ - [Bots] Bots can roll by chat command if needed
+ - [Bots] Fix bots not protecting master outside group
+ - [Bots] You can now ask bot to invite or leave guild ("guild invite" / "guild leave")
+ - [Bots] Bots now react to commands in /say and /yell
+ - [Bots] Stay strategy now properly works in combat
+ - [Bots] "pull back" strategy paired with "pull" makes bots pull back with /w pull
+          Bot tanks have it by default but still require ranged weapon and ammo
+ - [Bots] "free" command makes bot not follow you but go to enemies if they attack
+ - [Bots] follow/stay/guard/free commands override each other
+ - [Bots] Added help texts for bot related stuff. /w help
+ - [Addon] Update Mangosbot addons included
+ - Other fixes

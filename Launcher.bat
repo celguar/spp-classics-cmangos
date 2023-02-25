@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.3.1
+set repack_version=2.3.2
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
 set /a website_version=8
@@ -335,13 +335,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=1
-set /a world_version=12
-set /a chars_version=7
-set /a realm_version=2
+set /a world_version=13
+set /a chars_version=8
+set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=11
+set /a bots_version=12
 set /a website_db_version=4
-set /a core_version=18
+set /a core_version=19
 
 goto settings
 
@@ -362,13 +362,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=12
+set /a world_version=13
 set /a chars_version=7
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=9
+set /a bots_version=11
 set /a website_db_version=4
-set /a core_version=17
+set /a core_version=18
 
 goto settings
 
@@ -389,13 +389,13 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=1
-set /a world_version=9
+set /a world_version=11
 set /a chars_version=5
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=6
+set /a bots_version=7
 set /a website_db_version=4
-set /a core_version=13
+set /a core_version=14
 
 goto settings
 
