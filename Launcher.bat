@@ -1285,8 +1285,7 @@ echo.
 echo   5 - Save Manager
 echo   6 - Wipe Database
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-if not "%expansion%"=="tbc" echo   7 - Install Translations
-if "%expansion%"=="tbc" echo.
+echo   7 - Install Translations
 echo.
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if NOT "%ERRORLEVEL%"=="0" (
