@@ -2203,7 +2203,7 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Installing text locales...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\BroadcastTextLocales.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\broadcast_text_locale.sql"
 
 ping -n 3 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_1
