@@ -1,0 +1,21 @@
+
+                      Update 19.03.2023
+
+ - [Core] Update all 3 cores to latest CMaNGOS
+ - [Core] Often client crash in BGs in WotLK should be fixed
+ - [Core] Several crashes fixed
+ - [Bots] Improve performance with bots
+ - [Bots] Many improvements to bots rpg activities
+ - [Bots] Bots queue all BGs (except SotA) if auto BG is enabled
+ - [Bots] Numerous crashes fixed
+ - [Bots] Attack tapped target if it's attacking the group
+ - [Bots] Priests fear is moved to cc strategy
+ - [Bots] Fixed high lvl enemy bots teleport to starting areas
+ - [Bots] Add more configs for bots inviting other bot/player
+ - [Bots] Added dynamic mob respawn config for bots
+ - [Bots] Fixed bots in vanila missing enchants
+ - [Bots] Add config for max ilvl and exluded items of random gear
+ - [Bots] Many other fixes
+ - [Website] Fixed selecting expansion when registering account
+ - [Website] Fixed website not working with more than 1 realms
+ - Other fixes

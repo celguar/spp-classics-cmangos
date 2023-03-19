@@ -3,14 +3,15 @@
 SET NAME=SPP - Classics Collection
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.3.2
+set repack_version=2.3.3
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=8
+set /a website_version=9
 
+rem disable music for now
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
-    echo music > "%mainfolder%\music.on"
+    echo music > "%mainfolder%\music.off"
   )
 )
 
@@ -335,13 +336,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=1
-set /a world_version=13
+set /a world_version=14
 set /a chars_version=8
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=12
+set /a bots_version=13
 set /a website_db_version=4
-set /a core_version=19
+set /a core_version=21
 
 goto settings
 
@@ -362,13 +363,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=13
+set /a world_version=14
 set /a chars_version=7
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=11
+set /a bots_version=12
 set /a website_db_version=4
-set /a core_version=18
+set /a core_version=19
 
 goto settings
 
@@ -389,13 +390,13 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=1
-set /a world_version=11
+set /a world_version=12
 set /a chars_version=5
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=7
+set /a bots_version=8
 set /a website_db_version=4
-set /a core_version=14
+set /a core_version=15
 
 goto settings
 
@@ -464,6 +465,16 @@ set /a beta_enable=1
 set /p beta_version=<"%mainfolder%\%expansion%_beta.on"
 )
 if not exist "%mainfolder%\%expansion%_beta.on" (set /a beta_enable=0)
+
+set /a "current_world_version=0"
+set /a "current_chars_version=0"
+set /a "current_bots_version=0"
+set /a "current_realm_version=0"
+set /a "current_logs_version=0"
+
+set /a "current_maps_version=0"
+set /a "current_website_db_version=0"
+set /a "current_core_version=0"
 
 if not exist "%mainfolder%\%spp_update%.spp" goto update_install
 if not exist "%mainfolder%\%expansion%_maps_version.spp" goto update_maps
@@ -614,6 +625,8 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Skipping download...
 ping -n 3 127.0.0.1>nul
+>"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+goto update_install
 )
 if "%%A" GEQ "%maps_date2%" (
 echo.
@@ -622,6 +635,8 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Skipping download...
 ping -n 3 127.0.0.1>nul
+>"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+goto update_install
 )
 if "%%A" LSS "%maps_date%" if "%%A" LSS "%maps_date2%" (
 rem echo.
@@ -1146,6 +1161,9 @@ ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\sql\%expansion%\playerbot"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+echo.
+echo    Clearing teleport cache...
+ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
 echo.
 echo    Updating bots equip cache...
@@ -1325,7 +1343,7 @@ if "%menu_option%"=="" (goto menu)
 goto menu
 
 :beta_on
-COLOR 01
+COLOR 09
 cls
 echo ########################################
 echo # WARNING!                             #
@@ -1390,7 +1408,7 @@ cd "%mainfolder%"
 goto settings
 
 :beta_off
-COLOR 01
+COLOR 09
 cls
 echo ########################################
 echo # WARNING!                             #
@@ -1424,7 +1442,7 @@ cd "%mainfolder%"
 goto settings
 
 :beta_update
-COLOR 01
+COLOR 09
 set "filename=cmangos-%expansion%.zip"
 if "%expansion%"=="vanilla" set "filename=cmangos-classic.zip"
 cls
@@ -1470,7 +1488,7 @@ goto beta_menu
 
 :beta_menu
 cls
-COLOR 01
+COLOR 09
 more < "%mainfolder%\header_spp.txt"
 echo.
 echo      -------- Beta Menu --------
@@ -3029,7 +3047,7 @@ goto select_expansion
 
 :service_menu
 cls
-COLOR 03
+COLOR 09
 more < "%mainfolder%\header_spp.txt"
 echo.
 echo      -------- Service Menu --------
