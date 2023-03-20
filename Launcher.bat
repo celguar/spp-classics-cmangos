@@ -390,7 +390,7 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=1
-set /a world_version=12
+set /a world_version=13
 set /a chars_version=5
 set /a realm_version=3
 set /a logs_version=1
