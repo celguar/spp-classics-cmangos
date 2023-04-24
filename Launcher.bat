@@ -525,7 +525,7 @@ if %current_website_version% LSS %website_version% goto update_website
 
 if not exist "%mainfolder%\version.spp" (
 echo %repack_version% > "%mainfolder%\version.spp"
-goto changelog
+rem goto changelog
 )
 if exist "%mainfolder%\version.spp" (set /p current_version=<"%mainfolder%\version.spp")
 if %current_version% LSS %repack_version% (
