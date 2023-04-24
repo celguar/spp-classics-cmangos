@@ -1,6 +1,6 @@
 @echo off
 :beginning
-SET NAME=SPP - Classics Collection
+SET NAME=SPP - Classics Collection V2
 TITLE %NAME%
 set mainfolder=%CD%
 set repack_version=2.3.3
@@ -11,7 +11,7 @@ set /a website_version=9
 rem disable music for now
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
-    echo music > "%mainfolder%\music.off"
+    echo music > "%mainfolder%\music.on"
   )
 )
 
@@ -95,8 +95,261 @@ ping -n 3 127.0.0.1>nul
 goto beginning
 
 :beginning_part2
-if exist "%mainfolder%\music.on" goto music_start
-if exist "%mainfolder%\music.off" goto select_expansion
+if exist "%mainfolder%\music.on" goto new_intro
+if exist "%mainfolder%\music.off" goto launcher_intro
+
+:new_intro
+mode con: cols=40 lines=30
+rem tasklist /FI "IMAGENAME eq cmdmp3win.exe" 2>NUL | find /I /N "cmdmp3win.exe">NUL
+rem if "%ERRORLEVEL%"=="0" goto select_expansion
+rem cd "%mainfolder%\Server\Tools"
+rem start cmdmp3win.exe launcher.mp3
+rem Only show intro once
+if exist "%mainfolder%\version.spp" goto launcher_intro
+cls
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+COLOR 08
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+cls
+COLOR 0F
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+cls
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+COLOR 08
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+cls
+COLOR 0F
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+rem if NOT %errorlevel% EQU 5 goto new_music 
+cls
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+COLOR 08
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+cls
+COLOR 0F
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+echo.
+goto launcher_intro
+
+:skip_music
+COLOR 0F
+taskkill /f /im cmdmp3win.exe
+cls
+if exist "%mainfolder%\music.on" del "%mainfolder%\music.on"
+cls
+echo music > "%mainfolder%\music.off"
+goto launcher_intro
+
+:launcher_intro
+rem Only show intro once
+if exist "%mainfolder%\version.spp" goto select_expansion
+COLOR 0F
+mode con: cols=40 lines=30
+rem echo ############################################################
+rem echo # SPP - Classics Collection                                #
+rem echo # https://www.singleplayerproject.com/                     #
+rem echo ############################################################
+
+rem if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_intro.mp3
+cd "%mainfolder%\Server\Tools"
+if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_intro.mp3
+cls
+echo #
+echo #
+echo #
+echo #
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+rem echo  Get ready...for something nostalgic...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo #
+echo #
+echo #
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo #                                      #
+echo #                                      #
+echo #                                      #
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+echo.
+echo             Get ready...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo #                                      #
+echo #                                      #
+echo ########################################
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+echo.
+echo             Get ready...
+echo.
+echo         for something nostalgic...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo # SPP Classics Collection V2           #
+echo # https://www.singleplayerproject.com/ #
+echo ########################################
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+echo.
+echo             Get ready...
+echo.
+echo         for something nostalgic...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo # SPP Classics Collection V2           #
+echo # https://www.singleplayerproject.com/ #
+echo ########################################
+echo.
+echo    CREDITS:
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo # SPP Classics Collection V2           #
+echo # https://www.singleplayerproject.com/ #
+echo ########################################
+echo.
+echo    CREDITS:
+echo.
+echo   Teams:
+echo    ------
+echo    "MaNGOS"           "CMaNGOS"
+echo    "AzerothCore"      "TrinityCore"
+echo    "WoWruRU Project"  "VMaNGOS"
+ping -n 3 127.0.0.1>nul
+rem goto select_expansion
+cls
+echo ########################################
+echo # SPP Classics Collection V2           #
+echo # https://www.singleplayerproject.com/ #
+echo ########################################
+echo.
+echo    CREDITS:
+echo.
+more < "%mainfolder%\credits.txt"
+ping -n 7 127.0.0.1>nul
+rem if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_intro.mp3
+if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_outro.mp3
+cd "%mainfolder%"
+goto select_expansion
 
 :music_start
 mode con: cols=40 lines=30
@@ -192,7 +445,7 @@ goto beginning
 :select_expansion
 endlocal
 mode con: cols=40 lines=30
-SET NAME=SPP - Classics Collection
+SET NAME=SPP - Classics Collection V2
 TITLE %NAME%
 COLOR 0F
 
@@ -585,6 +838,14 @@ ping -n 3 127.0.0.1>nul
 goto check_modules
 
 :check_modules
+
+rem PLAY INTRO PROCESS
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_process.mp3
+cd "%mainfolder%"
+)
+
 mode con: cols=40 lines=30
 if not exist "%mainfolder%\Modules\%expansion%\maps" (
 if not exist "%mainfolder%\Modules\%expansion%.7z" goto module_not_found
@@ -673,6 +934,14 @@ mode con: cols=40 lines=30
 cls
 if not exist "%mainfolder%\%expansion%_maps_version.spp" goto check_modules
 if not exist "%mainfolder%\sql\%expansion%\world.sql" goto extract_worlddb
+
+rem PLAY INTRO SHORT
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_long.mp3
+cd "%mainfolder%"
+)
+
 more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Installing database, please wait...
@@ -766,6 +1035,14 @@ if not "%logs_version%"=="0" (
 goto start_database
 
 :update_maps
+
+rem PLAY INTRO PROCESS
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_process.mp3
+cd "%mainfolder%"
+)
+
 mode con: cols=40 lines=30
 cls
 more < "%mainfolder%\header_spp.txt"
@@ -881,6 +1158,14 @@ echo    Done!
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%"
 >"%mainfolder%\%expansion%_core_version.spp" echo %core_version%
+
+rem PLAY INTRO READY
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_ready.mp3
+cd "%mainfolder%"
+)
+
 goto start_database
 
 :missing_core
@@ -912,6 +1197,14 @@ cd "%mainfolder%"
 goto start_database
 
 :update_world
+
+rem PLAY INTRO PROCESS
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_process.mp3
+cd "%mainfolder%"
+)
+
 rem setlocal enableDelayedExpansion
 mode con: cols=40 lines=30
 REM if "%choose_exp%"=="4" goto menu
@@ -981,6 +1274,14 @@ del "%mainfolder%\sql\%expansion%\world.sql"
 goto start_database
 
 :reinstall_world_do
+
+rem PLAY INTRO PROCESS
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_process.mp3
+cd "%mainfolder%"
+)
+
 mode con: cols=40 lines=30
 REM if "%choose_exp%"=="4" goto menu
 del "%mainfolder%\%expansion%_fr.spp"
@@ -2979,7 +3280,7 @@ setlocal EnableDelayedExpansion
 mode con: cols=60 lines=55
 rem more < "%mainfolder%\header_spp.txt"
 echo ############################################################
-echo # SPP - Classics Collection                                #
+echo # SPP - Classics Collection V2                             #
 echo # https://www.singleplayerproject.com/                     #
 echo ############################################################
 echo.

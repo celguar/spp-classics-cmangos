@@ -19,3 +19,4 @@
  "Boxhead"          "Natsukawa"
  "Lihvar"           "Flekz"
  "ileboii"          "Ghostbots"
+ "Helias"           "Nomadz"
