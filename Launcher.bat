@@ -555,7 +555,7 @@ REM echo 4 - World of Warcraft: Cataclysm               [%module_check_cata%]
 echo.
 echo   9 - Website [%website%]
 echo.
-echo   0 - Intro/Music [%music%]
+echo   0 - Music [%music%]
 echo.
 echo   5 - Service menu
 echo.
