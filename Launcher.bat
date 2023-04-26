@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection V2
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.3.3
+set repack_version=2.3.4
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
 set /a website_version=9
@@ -589,13 +589,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=1
-set /a world_version=14
-set /a chars_version=8
+set /a world_version=15
+set /a chars_version=9
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=14
+set /a bots_version=15
 set /a website_db_version=4
-set /a core_version=22
+set /a core_version=23
 
 goto settings
 
@@ -616,13 +616,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=14
-set /a chars_version=7
+set /a world_version=15
+set /a chars_version=8
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=13
+set /a bots_version=14
 set /a website_db_version=4
-set /a core_version=21
+set /a core_version=22
 
 goto settings
 
@@ -643,13 +643,13 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=1
-set /a world_version=13
+set /a world_version=14
 set /a chars_version=5
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=9
+set /a bots_version=11
 set /a website_db_version=4
-set /a core_version=16
+set /a core_version=17
 
 goto settings
 
@@ -2554,6 +2554,10 @@ if "%locMX%" == "X" goto LoadMX:
 if "%locRU%"== "X" goto LoadRU:
 
 :locales_end
+echo.
+echo    Installing quest locales...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\quest_locale_all.sql"
 cls
 more < "%mainfolder%\header_locale.txt"
 echo.

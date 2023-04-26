@@ -1,0 +1,26 @@
+
+                      Update 26.04.2023
+
+ - [Core] Achievements system added for vanilla version
+ - [Core] Added dual spec to vanilla & tbc (npc is in mage quarters)
+ - [Core] Added training dummies to vanilla & tbc
+ - [Core] Added a lot of items mined from new clients
+ - [Bots] Add spell immune config to make bots immune to certain spells
+ - [Bots] Many improvements to bots rpg activities
+ - [Bots] Fix bot guilds getting too big
+ - [Bots] Improvements to guard and follow strategies
+ - [Bots] Fix rogue bots idling in stealth
+ - [Bots] Added bot cheat to make bots not lose item durability
+ - [Bots] Tweakes to random gear
+ - [Bots] Tweaks to bg logic
+ - [Bots] Hunter bots now use flare on stealthed targets
+ - [Bots] Fix spam when bot learns spells
+ - [Bots] Add support for teleport spells to move around
+ - [Bots] Add .bot equip=sync command to give bot items close to your ilvl
+ - [Bots] Many improvements to mage rotations
+ - [Bots] Bots now auto use self res abilities
+ - [Bots] Bots now use grenades again
+ - [Bots] Fix bots CC their current target
+ - [Bots] Fix bots ignoring their pet being attacked
+ - [Bots] Add "focus heal Name" command to focus healing on someone
+ - Other fixes
