@@ -3,8 +3,8 @@ INSERT INTO creature_template (Entry, Name, SubName, MinLevel, MaxLevel, ModelId
 ('100601','Dual Specialization Crystal','','1','1','11659','11659','11659','11659','35','1','0','7','3','3','0','1','0','0','0','0','1','1.14286','20','0','0','0','0','1','0','1','1','1','1','1','1','42','42','0','0','2','2','0','0','7','11','0','2000','2000','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','','npc_custom_dualspec');
 
 DELETE FROM creature WHERE id IN (100601);
-INSERT INTO `creature` (`id`, `map`, `spawnMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `MovementType`) VALUES (100601, 0, 1, 0, -8988.56, 849.754, 29.621, 2.27687, 25, 25, 0, 0);
-INSERT INTO `creature` (`id`, `map`, `spawnMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `MovementType`) VALUES (100601, 1, 1, 0, 1471.63, -4216.46, 58.9942, 4.35778, 25, 25, 0, 0);
+INSERT INTO `creature` (`id`, `map`, `spawnMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `MovementType`) VALUES (100601, 0, 1, -8988.56, 849.754, 29.621, 2.27687, 25, 25, 0, 0);
+INSERT INTO `creature` (`id`, `map`, `spawnMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `MovementType`) VALUES (100601, 1, 1, 1471.63, -4216.46, 58.9942, 4.35778, 25, 25, 0, 0);
 
 SET @STRING_ENTRY := 12000;
 DELETE FROM `mangos_string` WHERE `entry` BETWEEN  @STRING_ENTRY+0 AND @STRING_ENTRY+21;
