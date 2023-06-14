@@ -1,0 +1,14 @@
+
+                      Update 10.06.2023
+
+ - [Core] Update vanilla to latest cmangos
+ - [Core] Sync tbc & wotlk to latest beta build
+ - [Bots] Fix blink not teleporting bots in vanilla
+ - [Bots] Iprovements to bots pathing
+ - [Bots] Fix bot guilds getting too big
+ - [Bots] Bots can cast spells without reagents
+ - [Bots] Fix charge being interrupted
+ - [Bots] Various improvements to bots automation
+ - [Bots] Various crash fixes
+ - [Bots] Full changelog https://github.com/celguar/mangosbot-bots/compare/r-2023-04-26...r-2023-06-10
+ - Other fixes

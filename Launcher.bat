@@ -1,13 +1,14 @@
 @echo off
 :beginning
-SET NAME=SPP - Classics Collection
+SET NAME=SPP - Classics Collection V2
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.2.9
+set repack_version=2.3.5
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=8
+set /a website_version=9
 
+rem disable music for now
 IF NOT EXIST "%mainfolder%\music.on" (
   IF NOT EXIST "%mainfolder%\music.off" (
     echo music > "%mainfolder%\music.on"
@@ -94,8 +95,261 @@ ping -n 3 127.0.0.1>nul
 goto beginning
 
 :beginning_part2
-if exist "%mainfolder%\music.on" goto music_start
-if exist "%mainfolder%\music.off" goto select_expansion
+if exist "%mainfolder%\music.on" goto new_intro
+if exist "%mainfolder%\music.off" goto launcher_intro
+
+:new_intro
+mode con: cols=40 lines=30
+rem tasklist /FI "IMAGENAME eq cmdmp3win.exe" 2>NUL | find /I /N "cmdmp3win.exe">NUL
+rem if "%ERRORLEVEL%"=="0" goto select_expansion
+rem cd "%mainfolder%\Server\Tools"
+rem start cmdmp3win.exe launcher.mp3
+rem Only show intro once
+if exist "%mainfolder%\version.spp" goto launcher_intro
+cls
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+COLOR 08
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+cls
+COLOR 0F
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+cls
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+COLOR 08
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+cls
+COLOR 0F
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+rem if NOT %errorlevel% EQU 5 goto new_music 
+cls
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+COLOR 08
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+cls
+COLOR 0F
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Press 1 to turn music off
+choice /t 1 /c 123456789qm /d q >nul
+if %errorlevel% EQU 1 goto skip_music
+rem ping -n 1 127.0.0.1>nul
+echo.
+goto launcher_intro
+
+:skip_music
+COLOR 0F
+taskkill /f /im cmdmp3win.exe
+cls
+if exist "%mainfolder%\music.on" del "%mainfolder%\music.on"
+cls
+echo music > "%mainfolder%\music.off"
+goto launcher_intro
+
+:launcher_intro
+rem Only show intro once
+if exist "%mainfolder%\version.spp" goto select_expansion
+COLOR 0F
+mode con: cols=40 lines=30
+rem echo ############################################################
+rem echo # SPP - Classics Collection                                #
+rem echo # https://www.singleplayerproject.com/                     #
+rem echo ############################################################
+
+rem if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_intro.mp3
+cd "%mainfolder%\Server\Tools"
+if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_intro.mp3
+cls
+echo #
+echo #
+echo #
+echo #
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+rem echo  Get ready...for something nostalgic...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo #
+echo #
+echo #
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo #                                      #
+echo #                                      #
+echo #                                      #
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+echo.
+echo             Get ready...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo #                                      #
+echo #                                      #
+echo ########################################
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+echo.
+echo             Get ready...
+echo.
+echo         for something nostalgic...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo # SPP Classics Collection V2           #
+echo # https://www.singleplayerproject.com/ #
+echo ########################################
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo         Starting the launcher...
+echo.
+echo             Get ready...
+echo.
+echo         for something nostalgic...
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo # SPP Classics Collection V2           #
+echo # https://www.singleplayerproject.com/ #
+echo ########################################
+echo.
+echo    CREDITS:
+ping -n 3 127.0.0.1>nul
+cls
+echo ########################################
+echo # SPP Classics Collection V2           #
+echo # https://www.singleplayerproject.com/ #
+echo ########################################
+echo.
+echo    CREDITS:
+echo.
+echo   Teams:
+echo    ------
+echo    "MaNGOS"           "CMaNGOS"
+echo    "AzerothCore"      "TrinityCore"
+echo    "WoWruRU Project"  "VMaNGOS"
+ping -n 3 127.0.0.1>nul
+rem goto select_expansion
+cls
+echo ########################################
+echo # SPP Classics Collection V2           #
+echo # https://www.singleplayerproject.com/ #
+echo ########################################
+echo.
+echo    CREDITS:
+echo.
+more < "%mainfolder%\credits.txt"
+ping -n 7 127.0.0.1>nul
+rem if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_intro.mp3
+if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_outro.mp3
+cd "%mainfolder%"
+goto select_expansion
 
 :music_start
 mode con: cols=40 lines=30
@@ -191,7 +445,7 @@ goto beginning
 :select_expansion
 endlocal
 mode con: cols=40 lines=30
-SET NAME=SPP - Classics Collection
+SET NAME=SPP - Classics Collection V2
 TITLE %NAME%
 COLOR 0F
 
@@ -224,6 +478,13 @@ set module_check_vanilla=Not Installed
 set module_check_tbc=Not Installed
 set module_check_wotlk=Not Installed
 set module_check_cata=Not Installed
+
+set vanilla_beta=
+set tbc_beta=
+set wotlk_beta=
+if exist "%mainfolder%\vanilla_beta.on" set vanilla_beta=- [BETA]
+if exist "%mainfolder%\tbc_beta.on" set tbc_beta=- [BETA]
+if exist "%mainfolder%\wotlk_beta.on" set wotlk_beta=- [BETA]
 
 if exist "%mainfolder%\Modules\vanilla\dbc" set module_check_vanilla=Installed
 if exist "%mainfolder%\Modules\tbc\dbc" set module_check_tbc=Installed
@@ -264,7 +525,7 @@ if %current_website_version% LSS %website_version% goto update_website
 
 if not exist "%mainfolder%\version.spp" (
 echo %repack_version% > "%mainfolder%\version.spp"
-goto changelog
+rem goto changelog
 )
 if exist "%mainfolder%\version.spp" (set /p current_version=<"%mainfolder%\version.spp")
 if %current_version% LSS %repack_version% (
@@ -279,22 +540,22 @@ echo   Choose expansion:
 echo.
 echo   1 - World of Warcraft
 echo.
-echo          [%module_check_vanilla%] %module_running_vanilla%
+echo          [%module_check_vanilla%] %module_running_vanilla% %vanilla_beta%
 echo.
 echo.
 echo   2 - The Burning Crusade
 echo.
-echo          [%module_check_tbc%] %module_running_tbc%
+echo          [%module_check_tbc%] %module_running_tbc% %tbc_beta%
 echo.
 echo.
 echo   3 - Wrath of the Lich King
 echo.
-echo          [%module_check_wotlk%] %module_running_wotlk%
+echo          [%module_check_wotlk%] %module_running_wotlk% %wotlk_beta%
 REM echo 4 - World of Warcraft: Cataclysm               [%module_check_cata%]
 echo.
 echo   9 - Website [%website%]
 echo.
-echo   0 - Intro/Music [%music%]
+echo   0 - Music [%music%]
 echo.
 echo   5 - Service menu
 echo.
@@ -328,13 +589,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=1
-set /a world_version=12
-set /a chars_version=7
-set /a realm_version=2
+set /a world_version=16
+set /a chars_version=9
+set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=11
+set /a bots_version=16
 set /a website_db_version=4
-set /a core_version=18
+set /a core_version=24
 
 goto settings
 
@@ -355,13 +616,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=11
-set /a chars_version=7
-set /a realm_version=2
+set /a world_version=15
+set /a chars_version=8
+set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=8
+set /a bots_version=15
 set /a website_db_version=4
-set /a core_version=16
+set /a core_version=23
 
 goto settings
 
@@ -382,13 +643,13 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=1
-set /a world_version=8
+set /a world_version=14
 set /a chars_version=5
-set /a realm_version=2
+set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=5
+set /a bots_version=12
 set /a website_db_version=4
-set /a core_version=12
+set /a core_version=18
 
 goto settings
 
@@ -451,6 +712,22 @@ start "" /min "%mainfolder%\Server\Database\start.bat"
 
 if not exist "%mainfolder%\Modules\%expansion%\dbc" del "%mainfolder%\%expansion%_maps_version.spp"
 if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\%worldserver%" goto missing_core
+
+if exist "%mainfolder%\%expansion%_beta.on" (
+set /a beta_enable=1
+set /p beta_version=<"%mainfolder%\%expansion%_beta.on"
+)
+if not exist "%mainfolder%\%expansion%_beta.on" (set /a beta_enable=0)
+
+set /a "current_world_version=0"
+set /a "current_chars_version=0"
+set /a "current_bots_version=0"
+set /a "current_realm_version=0"
+set /a "current_logs_version=0"
+
+set /a "current_maps_version=0"
+set /a "current_website_db_version=0"
+set /a "current_core_version=0"
 
 if not exist "%mainfolder%\%spp_update%.spp" goto update_install
 if not exist "%mainfolder%\%expansion%_maps_version.spp" goto update_maps
@@ -561,6 +838,14 @@ ping -n 3 127.0.0.1>nul
 goto check_modules
 
 :check_modules
+
+rem PLAY INTRO PROCESS
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_process.mp3
+cd "%mainfolder%"
+)
+
 mode con: cols=40 lines=30
 if not exist "%mainfolder%\Modules\%expansion%\maps" (
 if not exist "%mainfolder%\Modules\%expansion%.7z" goto module_not_found
@@ -601,6 +886,8 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Skipping download...
 ping -n 3 127.0.0.1>nul
+>"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+goto update_install
 )
 if "%%A" GEQ "%maps_date2%" (
 echo.
@@ -609,6 +896,8 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Skipping download...
 ping -n 3 127.0.0.1>nul
+>"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+goto update_install
 )
 if "%%A" LSS "%maps_date%" if "%%A" LSS "%maps_date2%" (
 rem echo.
@@ -645,6 +934,14 @@ mode con: cols=40 lines=30
 cls
 if not exist "%mainfolder%\%expansion%_maps_version.spp" goto check_modules
 if not exist "%mainfolder%\sql\%expansion%\world.sql" goto extract_worlddb
+
+rem PLAY INTRO SHORT
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_long.mp3
+cd "%mainfolder%"
+)
+
 more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Installing database, please wait...
@@ -738,6 +1035,14 @@ if not "%logs_version%"=="0" (
 goto start_database
 
 :update_maps
+
+rem PLAY INTRO PROCESS
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_process.mp3
+cd "%mainfolder%"
+)
+
 mode con: cols=40 lines=30
 cls
 more < "%mainfolder%\header_spp.txt"
@@ -846,12 +1151,21 @@ echo.
 echo    Copying debug info...
 ping -n 3 127.0.0.1>nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 del "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%"
 >"%mainfolder%\%expansion%_core_version.spp" echo %core_version%
+
+rem PLAY INTRO READY
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_ready.mp3
+cd "%mainfolder%"
+)
+
 goto start_database
 
 :missing_core
@@ -873,6 +1187,7 @@ echo.
 echo    Copying debug info...
 ping -n 3 127.0.0.1>nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 del "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb"
 echo.
 echo    Done!
@@ -882,6 +1197,14 @@ cd "%mainfolder%"
 goto start_database
 
 :update_world
+
+rem PLAY INTRO PROCESS
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_process.mp3
+cd "%mainfolder%"
+)
+
 rem setlocal enableDelayedExpansion
 mode con: cols=40 lines=30
 REM if "%choose_exp%"=="4" goto menu
@@ -951,6 +1274,14 @@ del "%mainfolder%\sql\%expansion%\world.sql"
 goto start_database
 
 :reinstall_world_do
+
+rem PLAY INTRO PROCESS
+if exist "%mainfolder%\music.on" (
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music/%expansion%_intro_process.mp3
+cd "%mainfolder%"
+)
+
 mode con: cols=40 lines=30
 REM if "%choose_exp%"=="4" goto menu
 del "%mainfolder%\%expansion%_fr.spp"
@@ -1131,6 +1462,9 @@ ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\sql\%expansion%\playerbot"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+echo.
+echo    Clearing teleport cache...
+ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
 echo.
 echo    Updating bots equip cache...
@@ -1140,6 +1474,10 @@ echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_texts.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
+echo    Updating bots stat weights...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_weightscales_vanilla.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -1242,37 +1580,49 @@ if not exist "%mainfolder%\Saves\%expansion%\8" mkdir "%mainfolder%\Saves\%expan
 if not exist "%mainfolder%\Saves\%expansion%\9" mkdir "%mainfolder%\Saves\%expansion%\9"
 if not exist "%mainfolder%\Saves\%expansion%\old" mkdir "%mainfolder%\Saves\%expansion%\old"
 if not "%choose_exp%"=="1" (if not exist "%mainfolder%\Saves\%expansion%\transfer" mkdir "%mainfolder%\Saves\%expansion%\transfer")
+if exist "%mainfolder%\%expansion%_beta.on" (
+set /a beta_enable=1
+set /p beta_version=<"%mainfolder%\%expansion%_beta.on"
+)
+if not exist "%mainfolder%\%expansion%_beta.on" (set /a beta_enable=0)
 cls
 echo ########################################
 echo # %NAME%
 echo # https://www.singleplayerproject.com/
 echo ########################################
 more < "%mainfolder%\logo_%expansion%.txt"
-echo.
+if "%beta_enable%"=="1" echo                             -=[BETA]=-
+rem if "%beta_enable"=="2" echo                         -=[RELEASE]=-
+if not "%beta_enable%"=="1" echo.
 REM echo 1 - Start servers (Win32)
 echo   2 - Start Server (x64)
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" echo   T - Restarter Mode
-echo.
+if NOT "%ERRORLEVEL%"=="0" echo.
 echo   3 - Create Account
 echo   4 - Server Info
 echo   R - Reset RandomBots
 if "%website%"=="ON" echo   M - Open website
 echo.
 echo   5 - Save Manager
-echo.
-echo   7 - Wipe Database
+echo   6 - Wipe Database
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+echo   7 - Install Translations
 echo.
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-if not "%expansion%"=="tbc" echo   8 - Install Translations
-if "%expansion%"=="tbc" echo.
+if NOT "%ERRORLEVEL%"=="0" (
+if "%beta_enable%"=="1" echo   8 - Beta Build Menu
+if not "%beta_enable%"=="1" echo   8 - Switch to Beta Build
 echo.
+)
+if "%ERRORLEVEL%"=="0" echo.
 rem tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 rem if NOT "%ERRORLEVEL%"=="0" echo   9 - Back to expansion selector
 echo   9 - Main Menu
 echo   0 - Shutdown Repack
 echo.
-echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version% Web: %current_website_version%
+if "%beta_enable%"=="1" echo    Ver: %repack_version% Core: Beta DB: %current_world_version% Web: %current_website_version%
+if not "%beta_enable%"=="1" echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version% Web: %current_website_version%
 echo.
 set /P menu_option=Enter your choice: 
 REM if "%menu_option%"=="1" (goto quick_start_servers_x86)
@@ -1285,14 +1635,189 @@ if "%menu_option%"=="4" (goto server_settings)
 if "%menu_option%"=="r" (goto bots_menu)
 if "%menu_option%"=="R" (goto bots_menu)
 if "%menu_option%"=="5" (goto save_menu)
-if "%menu_option%"=="7" (goto wipe_db)
-if "%menu_option%"=="8" (goto install_locales_pre)
+if "%menu_option%"=="6" (goto wipe_db)
+if "%menu_option%"=="7" (goto install_locales_pre)
+if not "%beta_enable%"=="1" if "%menu_option%"=="8" (goto beta_on)
+if "%beta_enable%"=="1" if "%menu_option%"=="8" (goto beta_menu)
 if "%menu_option%"=="9" (goto select_expansion)
 if "%menu_option%"=="0" (goto shutdown_servers)
 if "%menu_option%"=="m" (goto open_map)
 if "%menu_option%"=="M" (goto open_map)
 if "%menu_option%"=="" (goto menu)
 goto menu
+
+:beta_on
+COLOR 09
+cls
+echo ########################################
+echo # WARNING!                             #
+echo # You are about to download Beta Build #
+echo # It has latest features, but may be   #
+echo # buggy. You can revert it later.      #
+echo ########################################
+echo.
+setlocal
+:PROMPT
+SET /P AREYOUSURE=Are you sure (Y/[N])?
+IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
+set "filename=cmangos-%expansion%.zip"
+if "%expansion%"=="vanilla" set "filename=cmangos-classic.zip"
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+if exist "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%" (
+echo    Beta Build archive found!
+ping -n 3 127.0.0.1>nul
+echo.
+)
+if not exist "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%" (
+echo    Downloading Beta Build...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Tools\wget.exe" -q --show-progress "https://github.com/celguar/mangosbot-bots/releases/latest/download/%filename%" -O "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%"
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+)
+echo    Checking File...
+ping -n 3 127.0.0.1>nul
+if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" (
+echo.
+echo    Failed to download Beta Build!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Try again later...
+ping -n 3 127.0.0.1>nul
+goto settings
+)
+echo.
+echo    Extracting Beta Build...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" > nul
+xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.exe" "%mainfolder%\Server\Binaries\%expansion%\Bin64">nul
+echo.
+echo    Copying debug info...
+ping -n 3 127.0.0.1>nul
+xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
+rd /s /q "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo"
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+rem del "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%"
+set "beta_version=%date%"
+echo %date% > "%mainfolder%\%expansion%_beta.on"
+set /a beta_enable=1
+cd "%mainfolder%"
+goto settings
+
+:beta_off
+COLOR 09
+cls
+echo ########################################
+echo # WARNING!                             #
+echo # You are about to restore original    #
+echo # Server Binary (mangosd.exe)          #
+echo ########################################
+echo.
+setlocal
+:PROMPT
+SET /P AREYOUSURE=Are you sure (Y/[N])?
+IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Extracting %expansion% binaries...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\Bin64.7z" > nul
+echo.
+echo    Copying debug info...
+ping -n 3 127.0.0.1>nul
+xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
+del "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb"
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+del "%mainfolder%\%expansion%_beta.on"
+set /a beta_enable=0
+cd "%mainfolder%"
+goto settings
+
+:beta_update
+COLOR 09
+set "filename=cmangos-%expansion%.zip"
+if "%expansion%"=="vanilla" set "filename=cmangos-classic.zip"
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Downloading Beta Build...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Tools\wget.exe" -q --show-progress "https://github.com/celguar/mangosbot-bots/releases/latest/download/%filename%" -O "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%"
+cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Checking File...
+ping -n 3 127.0.0.1>nul
+if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" (
+echo.
+echo    Failed to download Beta Build!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Try again later...
+ping -n 3 127.0.0.1>nul
+goto settings
+)
+echo.
+echo    Extracting Beta Build...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" > nul
+xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.exe" "%mainfolder%\Server\Binaries\%expansion%\Bin64">nul
+echo.
+echo    Copying debug info...
+ping -n 3 127.0.0.1>nul
+xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
+"%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
+rd /s /q "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo"
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+rem del "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%"
+echo %date% > "%mainfolder%\%expansion%_beta.on"
+set "beta_version=%date%"
+cd "%mainfolder%"
+goto beta_menu
+
+:beta_menu
+cls
+COLOR 09
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo      -------- Beta Menu --------
+echo.
+FOR /F "TOKENS=2" %%A IN ('WHERE /T "%mainfolder%\Server\Binaries\%expansion%\Bin64:mangosd.exe"') do (
+echo         Version: %%A
+)
+rem echo         Version: %beta_version%
+echo.
+echo    1 - Update Beta Build
+echo.
+echo    2 - Switch back to Release
+echo.
+echo    0 - Go back
+echo.
+set /P choose_service=Enter your choice: 
+if "%choose_service%"=="1" (goto beta_update)
+if "%choose_service%"=="2" (goto beta_off)
+if "%choose_service%"=="0" (goto settings)
+goto beta_menu
+
+:music_on
+del "%mainfolder%\music.off"
+echo music > "%mainfolder%\music.on"
+goto beginning
 
 :server_settings
 cls
@@ -2000,7 +2525,7 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Installing text locales...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\BroadcastTextLocales.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\broadcast_text_locale.sql"
 
 ping -n 3 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_1
@@ -2032,6 +2557,10 @@ if "%locMX%" == "X" goto LoadMX:
 if "%locRU%"== "X" goto LoadRU:
 
 :locales_end
+echo.
+echo    Installing quest locales...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\quest_locale_all.sql"
 cls
 more < "%mainfolder%\header_locale.txt"
 echo.
@@ -2755,10 +3284,10 @@ goto exit
 :changelog
 cls
 setlocal EnableDelayedExpansion
-mode con: cols=60 lines=40
+mode con: cols=60 lines=55
 rem more < "%mainfolder%\header_spp.txt"
 echo ############################################################
-echo # SPP - Classics Collection                                #
+echo # SPP - Classics Collection V2                             #
 echo # https://www.singleplayerproject.com/                     #
 echo ############################################################
 echo.
@@ -2826,26 +3355,23 @@ goto select_expansion
 
 :service_menu
 cls
-COLOR 03
+COLOR 09
 more < "%mainfolder%\header_spp.txt"
 echo.
 echo      -------- Service Menu --------
 echo.
 echo    1 - Fix Database after crash
 echo.
-echo    2 - Install VCredist x64
+echo    2 - Install Visual C++ Redist
 echo.
-echo    3 - Install VCredist x86
-echo.
-echo    4 - Report bug
+echo    3 - Report bug
 echo.
 echo    0 - Go back
 echo.
 set /P choose_service=Enter your choice: 
 if "%choose_service%"=="1" (goto fix_database)
-if "%choose_service%"=="2" (goto vcredist_install_x64)
-if "%choose_service%"=="3" (goto vcredist_install_x86)
-if "%choose_service%"=="4" (goto report_issue)
+if "%choose_service%"=="2" (goto vcredist_install_all)
+if "%choose_service%"=="3" (goto report_issue)
 if "%choose_service%"=="0" (goto select_expansion)
 goto service_menu
 
@@ -2853,7 +3379,7 @@ goto service_menu
 cls
 echo.
 cd "%mainfolder%\Addons\vcredist"
-start "InstallAll.bat"
+start "" "install_all.bat"
 cd "%mainfolder%"
 goto service_menu
 
@@ -2912,7 +3438,6 @@ rem echo    Press any key to go back
 rem echo.
 rem pause
 goto select_expansion
-
 
 :vcredist_install_x86
 cls

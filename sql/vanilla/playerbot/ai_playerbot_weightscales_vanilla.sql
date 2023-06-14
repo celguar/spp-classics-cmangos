@@ -277,7 +277,6 @@ INSERT INTO `ai_playerbot_weightscale_data` (`id`, `field`, `val`) VALUES
 	(20, 'natsplpwr', 10),
 	(3, 'mledps', 28),
 	(31, 'spellcritstrkrtng', 100),
-	(31, 'splpwr', 10),
 	(30, 'defrtng', 12),
 	(30, 'armor', 2),
 	(7, 'rgddps', 14),

@@ -1,0 +1,7 @@
+
+                      Update 20.01.2023 (WOTLK Only)
+
+ - [Core] Wotlk Core update
+ - [Bots] A lot of improvements for random bots behavior
+ - [Bots] Bots can now pull back when using pull command
+ - Other fixes
