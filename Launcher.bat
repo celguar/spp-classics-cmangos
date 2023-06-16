@@ -1603,6 +1603,7 @@ echo   3 - Create Account
 echo   4 - Server Info
 echo   R - Reset RandomBots
 if "%website%"=="ON" echo   M - Open website
+echo   E - Open SPP Extras
 echo.
 echo   5 - Save Manager
 echo   6 - Wipe Database
@@ -1634,6 +1635,8 @@ if "%menu_option%"=="3" (goto account_tool)
 if "%menu_option%"=="4" (goto server_settings)
 if "%menu_option%"=="r" (goto bots_menu)
 if "%menu_option%"=="R" (goto bots_menu)
+if "%menu_option%"=="e" (goto open_spp_extras)
+if "%menu_option%"=="E" (goto open_spp_extras)
 if "%menu_option%"=="5" (goto save_menu)
 if "%menu_option%"=="6" (goto wipe_db)
 if "%menu_option%"=="7" (goto install_locales_pre)
@@ -1909,6 +1912,16 @@ echo    Opening website
 echo    in default browser...
 ping -n 3 127.0.0.1>nul
 start http://127.0.0.1
+goto menu
+
+:open_spp_extras
+cls
+echo ########################################
+echo #        Starting SPP Extras...        #
+echo ########################################
+cd "%mainfolder%\Server\Tools\"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf SPPE.7z>NUL
+start /min cmd /c SPPE.exe
 goto menu
 
 :bots_menu
