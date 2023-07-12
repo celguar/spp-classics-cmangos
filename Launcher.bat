@@ -3,10 +3,10 @@
 SET NAME=SPP - Classics Collection V2
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.3.5
+set repack_version=2.3.6
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=9
+set /a website_version=11
 
 rem disable music for now
 IF NOT EXIST "%mainfolder%\music.on" (
@@ -517,12 +517,6 @@ rem if "%%~I"=="%mainfolder%\Server\Binaries\wotlk\Bin64\mangosd.exe" goto setup
 
 cd "%mainfolder%"
 
-if not exist "%mainfolder%\website_version.spp" goto update_website
-set /p current_website_version=<"%mainfolder%\website_version.spp"
-set /a "current_website_version=current_website_version"
-if %current_website_version% LSS 1 (set /a "current_website_version=1")
-if %current_website_version% LSS %website_version% goto update_website
-
 if not exist "%mainfolder%\version.spp" (
 echo %repack_version% > "%mainfolder%\version.spp"
 rem goto changelog
@@ -532,6 +526,12 @@ if %current_version% LSS %repack_version% (
 echo %repack_version% > "%mainfolder%\version.spp"
 goto changelog
 )
+
+if not exist "%mainfolder%\website_version.spp" goto update_website
+set /p current_website_version=<"%mainfolder%\website_version.spp"
+set /a "current_website_version=current_website_version"
+if %current_website_version% LSS 1 (set /a "current_website_version=1")
+if %current_website_version% LSS %website_version% goto update_website
 
 cls
 more < "%mainfolder%\header_spp.txt"
@@ -589,13 +589,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=1
-set /a world_version=16
+set /a world_version=17
 set /a chars_version=9
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=16
+set /a bots_version=17
 set /a website_db_version=4
-set /a core_version=24
+set /a core_version=25
 
 goto settings
 
@@ -616,13 +616,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=1
-set /a world_version=15
+set /a world_version=16
 set /a chars_version=8
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=15
+set /a bots_version=16
 set /a website_db_version=4
-set /a core_version=23
+set /a core_version=24
 
 goto settings
 
@@ -643,13 +643,13 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=1
-set /a world_version=14
+set /a world_version=15
 set /a chars_version=5
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=12
+set /a bots_version=13
 set /a website_db_version=4
-set /a core_version=18
+set /a core_version=19
 
 goto settings
 

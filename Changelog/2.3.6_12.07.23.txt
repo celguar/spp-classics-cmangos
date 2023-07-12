@@ -1,0 +1,15 @@
+
+                      Update 12.07.2023
+
+ - [Core] Update to latest cmangos
+ - [Core] Sync cores to latest beta build
+ - [Bots] Ignore enemy players that are mind controlled
+ - [Bots] Allow pulling targets marked with rti
+ - [Bots] Allow bots to trade items from their equipped gear
+ - [Bots] Fix demonology warlocks spamming summons for demonic sacrifices
+ - [Bots] Fix rtsc actions not working during stay formation
+ - [Bots] Protection warriors will try to use berserker rage/death wish when feared
+ - [Bots] Reorder class priorities
+ - [Bots] Various crash fixes
+ - [Bots] Full changelog https://github.com/celguar/mangosbot-bots/compare/r-2023-06-10...r-2023-07-12
+ - Other fixes

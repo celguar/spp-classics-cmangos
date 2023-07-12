@@ -11,6 +11,15 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
+-- UPDATE website accounts
+REPLACE INTO `website_accounts` (`account_id`, `display_name`) SELECT `id`, `username` FROM `account`;
+
+UPDATE `website_accounts`
+  SET `g_id` = '3' WHERE `account_id` IN (SELECT `id` FROM `account` WHERE `gmlevel` = '3');
+  
+UPDATE `website_accounts`
+  SET `g_id` = '4' WHERE `account_id` IN (SELECT `id` FROM `account` WHERE `gmlevel` = '4');
+
 -- Dumping structure for table wotlkrealmd.f_posts
 DROP TABLE IF EXISTS `f_posts`;
 CREATE TABLE IF NOT EXISTS `f_posts` (
