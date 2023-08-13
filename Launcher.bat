@@ -1477,7 +1477,7 @@ ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
 echo    Updating bots stat weights...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_weightscales_vanilla.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_weightscales_%expansion%.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
