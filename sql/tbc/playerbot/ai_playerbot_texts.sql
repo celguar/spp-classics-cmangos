@@ -22,18 +22,18 @@ CREATE TABLE IF NOT EXISTS `ai_playerbot_texts` (
   `text` varchar(1024) NOT NULL COMMENT 'text',
   `say_type` tinyint(3) NOT NULL DEFAULT '0' COMMENT '0 - say, 1 - yell',
   `reply_type` tinyint(3) NOT NULL DEFAULT '0' COMMENT 'if > 0 then can be filtered as a response to chat',
-  `text_loc1` varchar(1024) NOT NULL,
-  `text_loc2` varchar(1024) NOT NULL,
-  `text_loc3` varchar(1024) NOT NULL,
-  `text_loc4` varchar(1024) NOT NULL,
-  `text_loc5` varchar(1024) NOT NULL,
-  `text_loc6` varchar(1024) NOT NULL,
-  `text_loc7` varchar(1024) NOT NULL,
-  `text_loc8` varchar(1024) NOT NULL,
+  `text_loc1` varchar(1024) NOT NULL DEFAULT '',
+  `text_loc2` varchar(1024) NOT NULL DEFAULT '',
+  `text_loc3` varchar(1024) NOT NULL DEFAULT '',
+  `text_loc4` varchar(1024) NOT NULL DEFAULT '',
+  `text_loc5` varchar(1024) NOT NULL DEFAULT '',
+  `text_loc6` varchar(1024) NOT NULL DEFAULT '',
+  `text_loc7` varchar(1024) NOT NULL DEFAULT '',
+  `text_loc8` varchar(1024) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=569 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=580 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
--- Dumping data for table classicplayerbots.ai_playerbot_texts: ~568 rows (approximately)
+-- Dumping data for table classicplayerbots.ai_playerbot_texts: ~579 rows (approximately)
 INSERT INTO `ai_playerbot_texts` (`id`, `name`, `text`, `say_type`, `reply_type`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES
   (1, 'suggest_instance', 'Anyone wants %instance?', 0, 0, '', 'Quelqu\'un fait %instance ?', '', '', '', '¿Alguien quiere ir a %instance?', '', ''),
   (2, 'suggest_instance', 'Any groups for %instance?', 0, 0, '', 'Des groupes pour %instance ?', '', '', '', '¿Algún grupo para %instance?', '', ''),
@@ -602,7 +602,18 @@ INSERT INTO `ai_playerbot_texts` (`id`, `name`, `text`, `say_type`, `reply_type`
   (565, 'quest_error_cant_take', 'I can\'t take %quest', 0, 0, '', '', '', '', '', 'No puedo aceptar la mision %quest', '', ''),
   (566, 'quest_error_log_full', 'I can\'t take %quest because my quest log is full', 0, 0, '', '', '', '', '', 'No puedo aceptar la mision %quest porque mi registro de misiones esta completo', '', ''),
   (567, 'quest_error_bag_full', 'I can\'t take %quest because my bag is full', 0, 0, '', '', '', '', '', 'No puedo aceptar la mision %quest porque mi inventario esta lleno', '', ''),
-  (568, 'quest_accepted', 'I have accepted %quest', 0, 0, '', '', '', '', '', 'He aceptado la mision %quest', '', '');
+  (568, 'quest_accepted', 'I have accepted %quest', 0, 0, '', '', '', '', '', 'He aceptado la mision %quest', '', ''),
+  (569, 'quest_status_incomplete', 'I have not completed the quest %quest', 0, 0, '', '', '', '', '', 'No he completado la mision %quest', '', ''),
+  (570, 'quest_status_available', 'Quest %quest available', 0, 0, '', '', '', '', '', 'Mision %quest disponible', '', ''),
+  (571, 'quest_status_failed', 'I have failed the quest %quest', 0, 0, '', '', '', '', '', 'He fallado la mision %quest', '', ''),
+  (572, 'quest_status_unable_to_complete', 'I am unable to turn in the quest %quest', 0, 0, '', '', '', '', '', 'No puedo entregar la mision %quest', '', ''),
+  (573, 'quest_status_completed', 'I have completed the quest %quest', 0, 0, '', '', '', '', '', 'He completado la mision %quest', '', ''),
+  (574, 'quest_status_complete_single_reward', 'I have completed the quest %quest and received %item', 0, 0, '', '', '', '', '', 'He completado la mision %quest y he recibido %item', '', ''),
+  (575, 'quest_status_complete_pick_reward', 'Which reward should I pick for completing the quest %quest?%rewards', 0, 0, '', '', '', '', '', '¿Que recompensa deberia escoger por completar la mision %quest?%rewards', '', ''),
+  (576, 'quest_choose_reward', 'Okay, I will pick %item as a reward', 0, 0, '', '', '', '', '', 'De acuerdo, voy a escoger %item de recompensa', '', ''),
+  (577, 'equip_command', 'Equipping %item', 0, 0, '', '', '', '', '', 'Me he equipado %item', '', ''),
+  (578, 'unequip_command', '%item unequipped', 0, 0, '', '', '', '', '', 'Me he quitado %item', '', ''),
+  (579, 'auto_learn_spell', 'I have learned the spells: %spells', 0, 0, '', '', '', '', '', 'He aprendido los hechizos: %spells', '', '');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
