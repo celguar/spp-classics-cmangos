@@ -593,7 +593,7 @@ set /a world_version=17
 set /a chars_version=9
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=18
+set /a bots_version=19
 set /a website_db_version=4
 set /a core_version=25
 
@@ -620,7 +620,7 @@ set /a world_version=16
 set /a chars_version=8
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=17
+set /a bots_version=18
 set /a website_db_version=4
 set /a core_version=24
 
@@ -647,7 +647,7 @@ set /a world_version=15
 set /a chars_version=5
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=14
+set /a bots_version=15
 set /a website_db_version=4
 set /a core_version=19
 
