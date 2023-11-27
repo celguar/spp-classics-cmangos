@@ -588,14 +588,14 @@ set realmserver=realmd.exe
 set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
-set /a maps_version=1
-set /a world_version=17
+set /a maps_version=2
+set /a world_version=18
 set /a chars_version=9
 set /a realm_version=3
 set /a logs_version=1
 set /a bots_version=19
 set /a website_db_version=4
-set /a core_version=25
+set /a core_version=26
 
 goto settings
 
@@ -1055,46 +1055,9 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Please wait...
 ping -n 3 127.0.0.1>nul
-if exist "%mainfolder%\Modules\%expansion%\maps" (
-cls
-more < "%mainfolder%\header_spp.txt"
-echo.
-echo    Existing %expansion% maps found!
-ping -n 3 127.0.0.1>nul
-echo.
-echo    Checking version...
-ping -n 3 127.0.0.1>nul
-echo.
-echo    Please, wait...
-ping -n 3 127.0.0.1>nul
-rem check file last modified date
-FOR /F "TOKENS=2" %%A IN ('WHERE /T "%mainfolder%\Modules\%expansion%\maps:0002035.map"') do (
-if "%%A" GEQ "%maps_date%" (
-echo.
-echo    Existing maps version: OK!
-ping -n 3 127.0.0.1>nul
-echo.
-echo    Skipping download...
-ping -n 3 127.0.0.1>nul
->"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
-goto start_database
-)
-if "%%A" LSS "%maps_date%" (
-echo.
-echo    Existing maps version: FAIL!
-ping -n 3 127.0.0.1>nul
-echo.
-echo    NEED: %maps_date% HAVE: %%A
-ping -n 3 127.0.0.1>nul
-echo.
-echo    Resuming download...
-ping -n 3 127.0.0.1>nul
-)
-)
-)
 echo.
 echo    Downloading %expansion% files...
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "http://ashamanecore.com/file repository/spp_classics_new/%expansion%.7z" -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/%expansion%.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
