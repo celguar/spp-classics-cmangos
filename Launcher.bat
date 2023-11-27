@@ -809,7 +809,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading Vanilla module...(~750 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "http://ashamanecore.com/file repository/spp_classics_new/vanilla.7z" -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/vanilla.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
