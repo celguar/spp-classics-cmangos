@@ -1021,6 +1021,11 @@ cd "%mainfolder%\sql\%expansion%\playerbot"
 del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 cd "%mainfolder%"
 echo.
+echo    Updating bots texts...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_texts.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
+echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 del "%mainfolder%\sql\%expansion%\world.sql"
@@ -2109,6 +2114,12 @@ del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 del "%mainfolder%\%expansion%_logs_version.spp"
 cd "%mainfolder%"
 echo.
+echo    Updating bots texts...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_texts.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
+
+echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 goto menu
@@ -2192,6 +2203,11 @@ cd "%mainfolder%\sql\%expansion%\playerbot"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 cd "%mainfolder%"
+echo.
+echo    Updating bots texts...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_texts.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
 echo.
 echo    Installing website tables...
 ping -n 3 127.0.0.1>nul
