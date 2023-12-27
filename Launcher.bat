@@ -1127,6 +1127,10 @@ ping -n 3 127.0.0.1>nul
 cd "%mainfolder%"
 >"%mainfolder%\%expansion%_core_version.spp" echo %core_version%
 
+rem Disable Beta tag
+if exist "%mainfolder%\%expansion%_beta.on" del "%mainfolder%\%expansion%_beta.on"
+set /a beta_enable=0
+
 rem PLAY INTRO READY
 if exist "%mainfolder%\music.on" (
 cd "%mainfolder%\Server\Tools"
