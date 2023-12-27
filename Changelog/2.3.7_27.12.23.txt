@@ -1,0 +1,33 @@
+
+                      Update 27.12.2023
+
+ - [Core] Update all 3 cores to latest cmangos
+ - [Core] Sync cores to latest beta build
+ - [Bots] Update combat rotations
+ - [Bots] Non healer bots will heal party only if co +offheal is enabled
+ - [Bots] Added attack rti command to attack marked targets
+ - [Bots] Added range heal to be able to limit party healing range
+ - [Bots] Allow to specify multiple focus heal targets
+ - [Bots] Fix loop cast spell which effect is on next swing
+ - [Bots] Hunter bots now can place traps near enemies
+ - [Bots] Fix hunter autoshot stuck after fleeing
+ - [Bots] Add manual hunter aspect and stings
+ - [Bots] Fix ressurecting only one char at a time
+ - [Bots] Add preheal and heal interrupt strategies
+ - [Bots] Tweak global channels spam
+ - [Bots] Follow master on transport such as ships, zeppelins, metro etc
+ - [Bots] Add offline random bots in real groups faster
+ - [Bots] Added automated bot gear progression system (vanilla only)
+ - [Bots] Allow bots to travel by command using go zone zonename
+ - [Bots] Disable automatic gear upgrade, add option to enable
+ - [Bots] Add enchants and ammo to bot command
+ - [Bots] Add movestyles, move style +wait - not rush to mob if moving to bot
+ - [Bots] Add always/skip loot list using ll command
+ - [Bots] Fix cast command - can now cast pet spell using it
+ - [Bots] Add more pet commands (attack, stay, follow, passive, defensive, aggresive and dismiss)
+ - [Bots] LFG command can now specify the size of group
+ - [Bots] Tweak AB and WSG Battleground logic
+ - [Bots] Fix automatic upgrades equip
+ - [Bots] Bots now can jump after you or enemy if no path found
+ - [Bots] Full changelog https://github.com/celguar/mangosbot-bots/compare/r-2023-07-12...r-2023-12-27
+ - Other fixes
