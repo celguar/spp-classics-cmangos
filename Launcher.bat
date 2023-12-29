@@ -593,7 +593,7 @@ set /a world_version=18
 set /a chars_version=9
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=19
+set /a bots_version=21
 set /a website_db_version=4
 set /a core_version=27
 
@@ -620,7 +620,7 @@ set /a world_version=17
 set /a chars_version=8
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=18
+set /a bots_version=19
 set /a website_db_version=4
 set /a core_version=26
 
@@ -647,7 +647,7 @@ set /a world_version=16
 set /a chars_version=5
 set /a realm_version=3
 set /a logs_version=1
-set /a bots_version=15
+set /a bots_version=16
 set /a website_db_version=4
 set /a core_version=21
 
@@ -1450,6 +1450,9 @@ ping -n 3 127.0.0.1>nul
 echo    Updating bots stat weights...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_weightscales_%expansion%.sql"
+echo    Updating bots enchants...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_enchants.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
