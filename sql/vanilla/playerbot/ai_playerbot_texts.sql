@@ -615,6 +615,23 @@ INSERT INTO `ai_playerbot_texts` (`id`, `name`, `text`, `say_type`, `reply_type`
   (578, 'unequip_command', '%item unequipped', 0, 0, '', '', '', '', '', 'Me he quitado %item', '', ''),
   (579, 'auto_learn_spell', 'I have learned the spells: %spells', 0, 0, '', '', '', '', '', 'He aprendido los hechizos: %spells', '', '');
 
+  -- Dumping structure for table tbcplayerbots.ai_playerbot_texts_chance
+DROP TABLE IF EXISTS `ai_playerbot_texts_chance`;
+CREATE TABLE IF NOT EXISTS `ai_playerbot_texts_chance` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `probability` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+
+-- Dumping data for table tbcplayerbots.ai_playerbot_texts_chance: ~3 rows (approximately)
+/*!40000 ALTER TABLE `ai_playerbot_texts_chance` DISABLE KEYS */;
+INSERT INTO `ai_playerbot_texts_chance` (`id`, `name`, `probability`) VALUES
+  (1, 'taunt', 30),
+  (2, 'aoe', 75),
+  (3, 'loot', 20);
+/*!40000 ALTER TABLE `ai_playerbot_texts_chance` ENABLE KEYS */;
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
