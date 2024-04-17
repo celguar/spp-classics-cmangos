@@ -1,0 +1,15 @@
+
+                      Update 17.04.2024
+
+ - [Core] Update vanilla & tbc to latest cmangos
+ - [Core] Add achievements system to tbc
+ - [Core] Add Hardcore, Immersive modules to vanilla & tbc
+ - [Bots] Update combat rotations
+ - [Bots] Add boost, buff and revive target values and commands
+ - [Bots] Fix for tank druids getting into bear form too late
+ - [Bots] Add offdps class strategy for healer specs
+ - [Bots] Fix lockpicking via trade, use command and cast command
+ - [Bots] Fix bots not attacking when mounted
+ - [Bots] Fix several crashes
+ - [Bots] Full changelog https://github.com/celguar/mangosbot-bots/compare/r-2023-12-27...r-2024-04-16
+ - Other fixes

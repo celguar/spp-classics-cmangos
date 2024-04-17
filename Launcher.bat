@@ -3,7 +3,7 @@
 SET NAME=SPP - Classics Collection V2
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.3.7
+set repack_version=2.3.8
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
 set /a website_version=11
@@ -589,13 +589,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=2
-set /a world_version=19
-set /a chars_version=9
-set /a realm_version=3
+set /a world_version=21
+set /a chars_version=11
+set /a realm_version=4
 set /a logs_version=1
-set /a bots_version=21
+set /a bots_version=22
 set /a website_db_version=4
-set /a core_version=28
+set /a core_version=29
 
 goto settings
 
@@ -616,13 +616,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=2
-set /a world_version=18
-set /a chars_version=8
-set /a realm_version=3
+set /a world_version=19
+set /a chars_version=9
+set /a realm_version=4
 set /a logs_version=1
-set /a bots_version=19
+set /a bots_version=22
 set /a website_db_version=4
-set /a core_version=27
+set /a core_version=28
 
 goto settings
 
@@ -967,11 +967,11 @@ ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmd.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
 rem echo.
-echo    Installing playerbot db...
-ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
-for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
-echo.
+rem echo    Installing playerbot db...
+rem ping -n 3 127.0.0.1>nul
+rem "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
+rem for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
+rem echo.
 rem echo    Applying world db updates...
 rem ping -n 3 127.0.0.1>nul
 rem set /a "next_world_version=current_world_version+1"
@@ -1008,16 +1008,15 @@ rem echo.
 echo.
 echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%\playerbot"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
-del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+rem cd "%mainfolder%\sql\%expansion%\playerbot"
+rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_zones.sql"
+rem del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 cd "%mainfolder%"
 echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_texts.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_texts.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -1424,28 +1423,27 @@ for /l %%x in (%next_bots_version%, 1, %bots_version%) do (
 echo.
 echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%\playerbot"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+rem cd "%mainfolder%\sql\%expansion%\playerbot"
+rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_zones.sql"
 echo.
 echo    Clearing teleport cache...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
 echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_texts.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_texts.sql"
 echo    Updating bots stat weights...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_weightscales_%expansion%.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_weightscales.sql"
 echo    Updating bots enchants...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_enchants.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_enchants.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -1942,7 +1940,7 @@ more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Reseting random bots...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -1972,8 +1970,8 @@ more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Scheduling deleting random bots...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\delete_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\delete_randombots.sql"
 echo.
 echo    Done!
 ping -n 2 127.0.0.1>nul
@@ -2007,8 +2005,8 @@ more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Scheduling deleting random bots...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\delete_all_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\delete_all_randombots.sql"
 echo.
 echo    Done!
 ping -n 2 127.0.0.1>nul
@@ -2071,7 +2069,7 @@ echo.
 echo    Wiping characters and bots...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_characters.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
+rem "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_logs.sql"
 echo.
 echo    Reinstalling characters db...
@@ -2081,10 +2079,10 @@ echo.
 echo    Reinstalling logs db...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\sql\%expansion%\logs.sql"
-echo.
-echo    Reinstalling bots db...
-ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
+rem echo.
+rem echo    Reinstalling bots db...
+rem ping -n 3 127.0.0.1>nul
+rem for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 echo.
 echo    Applying characters db updates...
 ping -n 3 127.0.0.1>nul
@@ -2100,17 +2098,16 @@ rem echo.
 echo.
 echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%\playerbot"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
-del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+rem cd "%mainfolder%\sql\%expansion%\playerbot"
+rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_zones.sql"
+rem del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 del "%mainfolder%\%expansion%_logs_version.spp"
 cd "%mainfolder%"
 echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_texts.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_texts.sql"
 
 echo.
 echo    Done!
@@ -2141,7 +2138,7 @@ echo.
 echo    Wiping characters and bots...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_characters.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
+rem "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_realmd.sql"
 echo.
 echo    Reinstalling characters db...
@@ -2156,10 +2153,10 @@ echo.
 echo    Reinstalling logs db...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\sql\%expansion%\logs.sql"
-echo.
-echo    Reinstalling bots db...
-ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
+rem echo.
+rem echo    Reinstalling bots db...
+rem ping -n 3 127.0.0.1>nul
+rem for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 echo.
 echo    Applying characters db updates...
 ping -n 3 127.0.0.1>nul
@@ -2184,16 +2181,15 @@ for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfold
 echo.
 echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%\playerbot"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
-del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+rem cd "%mainfolder%\sql\%expansion%\playerbot"
+rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_zones.sql"
+rem del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 cd "%mainfolder%"
 echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_texts.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\ai_playerbot_help_texts.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_texts.sql"
 echo.
 echo    Installing website tables...
 ping -n 3 127.0.0.1>nul
@@ -3113,6 +3109,8 @@ ping -n 2 127.0.0.1>nul
 if "%saveslot%"=="old" goto convert_old_data
 if "%saveslot%"=="transfer" goto convert_transfer_data
 :import_playerbots
+rem no more separate bots db
+goto import_continue
 echo.
 echo    Importing playerbots...
 ping -n 2 127.0.0.1>nul
@@ -3246,13 +3244,13 @@ echo.
 echo    Done!
 ping -n 1 127.0.0.1>nul
 echo.
-echo    Exporting playerbots...
-"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %playerbot% > "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
-ping -n 1 127.0.0.1>nul
-echo.
-echo    Done!
-echo.
-ping -n 1 127.0.0.1>nul
+rem echo    Exporting playerbots...
+rem "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %playerbot% > "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
+rem ping -n 1 127.0.0.1>nul
+rem echo.
+rem echo    Done!
+rem echo.
+rem ping -n 1 127.0.0.1>nul
 echo    Shutting down...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown
