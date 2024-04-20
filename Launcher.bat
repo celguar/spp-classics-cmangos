@@ -3206,11 +3206,27 @@ pause
 goto menu
 
 :shutdown_servers
+setlocal EnableDelayedExpansion
+:shutdown_start
+start "" "%mainfolder%\Server\Tools\shutdown.vbs"
+set /a shutdown_attempts=0
 cls
+more < "%mainfolder%\header_spp.txt"
+echo.
+echo    Waiting for the server to shutdown...
+:shutdown_wait
+if %shutdown_attempts% LSS 10 (
+ping -n 6 127.0.0.1>nul
+rem check if still running
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if "%ERRORLEVEL%"=="0" (
+set /a shutdown_attempts+=1
+goto shutdown_wait
+)
+)
+:shutdown_end
 tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
-tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
 tasklist /FI "IMAGENAME eq cmdmp3win.exe" 2>NUL | find /I /N "cmdmp3win.exe">NUL
