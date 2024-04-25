@@ -590,12 +590,12 @@ set worldserver=mangosd.exe
 set spp_update=vanilla_base
 set /a maps_version=2
 set /a world_version=21
-set /a chars_version=12
+set /a chars_version=13
 set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=22
 set /a website_db_version=4
-set /a core_version=29
+set /a core_version=31
 
 goto settings
 
