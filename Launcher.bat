@@ -1018,6 +1018,9 @@ echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_texts.sql"
 echo.
+echo    Updating bots equip cache...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
 echo    Done!
 ping -n 3 127.0.0.1>nul
 del "%mainfolder%\sql\%expansion%\world.sql"
