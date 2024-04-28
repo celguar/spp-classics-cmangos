@@ -3211,6 +3211,10 @@ goto menu
 :shutdown_servers
 setlocal EnableDelayedExpansion
 :shutdown_start
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if NOT "%ERRORLEVEL%"=="0" (
+goto shutdown_end
+)
 start "" "%mainfolder%\Server\Tools\shutdown.vbs"
 set /a shutdown_attempts=0
 cls
