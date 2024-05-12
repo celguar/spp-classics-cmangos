@@ -57,7 +57,7 @@ INSERT INTO `ai_playerbot_weightscales` (`id`, `name`, `class`) VALUES
 	(32, 'feraldps', 11);
 /*!40000 ALTER TABLE `ai_playerbot_weightscales` ENABLE KEYS */;
 
--- Dumping structure for table classicplayerbots.ai_playerbot_weightscale_data
+-- Dumping structure for table classicmangos.ai_playerbot_weightscale_data
 DROP TABLE IF EXISTS `ai_playerbot_weightscale_data`;
 CREATE TABLE IF NOT EXISTS `ai_playerbot_weightscale_data` (
   `id` int(32) NOT NULL,
@@ -66,8 +66,7 @@ CREATE TABLE IF NOT EXISTS `ai_playerbot_weightscale_data` (
   KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Dumping data for table classicplayerbots.ai_playerbot_weightscale_data: ~272 rows (approximately)
-/*!40000 ALTER TABLE `ai_playerbot_weightscale_data` DISABLE KEYS */;
+-- Dumping data for table classicmangos.ai_playerbot_weightscale_data: ~217 rows (approximately)
 INSERT INTO `ai_playerbot_weightscale_data` (`id`, `field`, `val`) VALUES
 	(1, 'str', 4),
 	(1, 'critstrkrtng', 40),
@@ -277,15 +276,21 @@ INSERT INTO `ai_playerbot_weightscale_data` (`id`, `field`, `val`) VALUES
 	(20, 'natsplpwr', 10),
 	(3, 'mledps', 28),
 	(31, 'spellcritstrkrtng', 100),
+	(31, 'splpwr', 10),
 	(30, 'defrtng', 12),
 	(30, 'armor', 2),
 	(7, 'rgddps', 14),
 	(10, 'mledps', 10),
 	(11, 'mledps', 10),
 	(1, 'mledps', 28),
-	(2, 'mledps', 28);
-/*!40000 ALTER TABLE `ai_playerbot_weightscale_data` ENABLE KEYS */;
+	(2, 'mledps', 28),
+	(15, 'int', 2),
+	(15, 'spi', 1),
+	(15, 'manargn', 1),
+	(22, 'spi', 1);
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;

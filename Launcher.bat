@@ -6,7 +6,7 @@ set mainfolder=%CD%
 set repack_version=2.3.8
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=12
+set /a website_version=13
 
 rem disable music for now
 IF NOT EXIST "%mainfolder%\music.on" (
@@ -593,9 +593,9 @@ set /a world_version=21
 set /a chars_version=13
 set /a realm_version=4
 set /a logs_version=1
-set /a bots_version=22
+set /a bots_version=23
 set /a website_db_version=4
-set /a core_version=35
+set /a core_version=36
 
 goto settings
 
@@ -622,7 +622,7 @@ set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=23
 set /a website_db_version=4
-set /a core_version=35
+set /a core_version=36
 
 goto settings
 
