@@ -1020,11 +1020,9 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
-if not exist "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql" (
 cd "%mainfolder%\sql\%expansion%\playerbot"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
 cd "%mainfolder%"
-)
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -1441,11 +1439,9 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
-if not exist "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql" (
 cd "%mainfolder%\sql\%expansion%\playerbot"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
 cd "%mainfolder%"
-)
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
 echo.
 echo    Updating bots texts...
