@@ -595,7 +595,7 @@ set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=23
 set /a website_db_version=4
-set /a core_version=37
+set /a core_version=38
 
 goto settings
 
@@ -620,9 +620,9 @@ set /a world_version=19
 set /a chars_version=13
 set /a realm_version=4
 set /a logs_version=1
-set /a bots_version=23
+set /a bots_version=24
 set /a website_db_version=4
-set /a core_version=37
+set /a core_version=38
 
 goto settings
 
@@ -643,13 +643,13 @@ set worldserver=mangosd.exe
 
 set spp_update=wotlk_base
 set /a maps_version=2
-set /a world_version=17
+set /a world_version=18
 set /a chars_version=5
-set /a realm_version=3
+set /a realm_version=4
 set /a logs_version=1
-set /a bots_version=16
+set /a bots_version=17
 set /a website_db_version=4
-set /a core_version=22
+set /a core_version=23
 
 goto settings
 
@@ -1020,6 +1020,11 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
+if not exist "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql" (
+cd "%mainfolder%\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
+cd "%mainfolder%"
+)
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -1436,6 +1441,11 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
+if not exist "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql" (
+cd "%mainfolder%\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
+cd "%mainfolder%"
+)
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
 echo.
 echo    Updating bots texts...
@@ -3222,8 +3232,8 @@ more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Waiting for the server to shutdown...
 :shutdown_wait
-if %shutdown_attempts% LSS 10 (
-ping -n 6 127.0.0.1>nul
+if %shutdown_attempts% LSS 30 (
+ping -n 3 127.0.0.1>nul
 rem check if still running
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" (
