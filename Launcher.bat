@@ -589,13 +589,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=2
-set /a world_version=21
+set /a world_version=22
 set /a chars_version=14
 set /a realm_version=4
 set /a logs_version=1
-set /a bots_version=24
+set /a bots_version=25
 set /a website_db_version=4
-set /a core_version=39
+set /a core_version=41
 
 goto settings
 
@@ -1010,7 +1010,7 @@ echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
 rem cd "%mainfolder%\sql\%expansion%\playerbot"
 rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_zones.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
 rem del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 cd "%mainfolder%"
 echo.
@@ -1433,7 +1433,7 @@ echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
 rem cd "%mainfolder%\sql\%expansion%\playerbot"
 rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_zones.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
 echo.
 echo    Clearing teleport cache...
 ping -n 3 127.0.0.1>nul
@@ -2113,7 +2113,7 @@ echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
 rem cd "%mainfolder%\sql\%expansion%\playerbot"
 rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_zones.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
 rem del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 del "%mainfolder%\%expansion%_logs_version.spp"
 cd "%mainfolder%"
@@ -2196,7 +2196,7 @@ echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
 rem cd "%mainfolder%\sql\%expansion%\playerbot"
 rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_zones.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
 rem del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 cd "%mainfolder%"
 echo.

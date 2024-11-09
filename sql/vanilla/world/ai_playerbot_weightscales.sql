@@ -85,7 +85,7 @@ INSERT INTO `ai_playerbot_weightscale_data` (`id`, `field`, `val`) VALUES
 	(3, 'block', 3),
 	(3, 'agi', 4),
 	(3, 'parryrtng', 6),
-	(3, 'blockrtng', 6),
+	(3, 'blockrtng', 100),
 	(3, 'str', 7),
 	(3, 'atkpwr', 4),
 	(3, 'hitrtng', 100),
