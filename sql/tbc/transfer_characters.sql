@@ -67,6 +67,53 @@ ALTER TABLE `guild_member`
 ALTER TABLE `guild_rank`
   ADD COLUMN `BankMoneyPerDay` int(11) unsigned NOT NULL DEFAULT '0' AFTER `rights`;
 
+DROP TABLE IF EXISTS `guild_bank_eventlog`;
+CREATE TABLE `guild_bank_eventlog` (
+  `guildid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Guild Identificator',
+  `LogGuid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Log record identificator - auxiliary column',
+  `TabId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Guild bank TabId',
+  `EventType` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Event type',
+  `PlayerGuid` int(11) unsigned NOT NULL DEFAULT '0',
+  `ItemOrMoney` int(11) unsigned NOT NULL DEFAULT '0',
+  `ItemStackCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `DestTabId` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Destination Tab Id',
+  `TimeStamp` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Event UNIX time',
+  PRIMARY KEY (`guildid`,`LogGuid`,`TabId`),
+  KEY `Idx_PlayerGuid` (`PlayerGuid`),
+  KEY `Idx_LogGuid` (`LogGuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `guild_bank_item`;
+CREATE TABLE `guild_bank_item` (
+  `guildid` int(11) unsigned NOT NULL DEFAULT '0',
+  `TabId` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `SlotId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `item_guid` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_entry` int(11) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guildid`,`TabId`,`SlotId`),
+  KEY `Idx_item_guid` (`item_guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `guild_bank_right`;
+CREATE TABLE `guild_bank_right` (
+  `guildid` int(11) unsigned NOT NULL DEFAULT '0',
+  `TabId` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `rid` int(11) unsigned NOT NULL DEFAULT '0',
+  `gbright` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `SlotPerDay` int(11) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guildid`,`TabId`,`rid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `guild_bank_tab`;
+CREATE TABLE `guild_bank_tab` (
+  `guildid` int(11) unsigned NOT NULL DEFAULT '0',
+  `TabId` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `TabName` varchar(100) NOT NULL DEFAULT '',
+  `TabIcon` varchar(100) NOT NULL DEFAULT '',
+  `TabText` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`guildid`,`TabId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 ALTER TABLE `petition`
   ADD COLUMN `type` int(10) unsigned NOT NULL DEFAULT '0' AFTER `name`,
   DROP PRIMARY KEY,
@@ -98,6 +145,20 @@ DELETE FROM `pet_aura`;
 -- CONVERT ITEM ENCHANTMENT
 UPDATE `item_instance`
   SET `enchantments` = CONCAT(INSERT(`enchantments`, 18, 0, REPEAT('0 ', 9)), REPEAT('0 ', 3));
+
+-- SHIFT BECAUSE EXTRA 4 BANK SLOTS
+UPDATE `character_inventory`
+  SET `slot` = (`slot` + 4) WHERE `slot` >= 63;
+-- SHIFT BECAUSE EXTRA 1 BANK BAG
+UPDATE `character_inventory`
+  SET `slot` = (`slot` + 1) WHERE `slot` >= 73;
+-- SHIFT BECAUSE NEED TO PRESERVE ITEM ORDER AND MAKE NEW BANK COLUMN EMPTY
+UPDATE `character_inventory`
+  SET `slot` = (`slot` + 1) WHERE `slot` > 44 AND `slot` < 67; -- FIRST ROW
+UPDATE `character_inventory`
+  SET `slot` = (`slot` + 1) WHERE `slot` > 51 AND `slot` < 67; -- SECOND ROW
+UPDATE `character_inventory`
+  SET `slot` = (`slot` + 1) WHERE `slot` > 58 AND `slot` < 67; -- THIRD ROW
 
 -- UPDATE TOTAL KILLS WITH CURRENT WEEK KILLS
 UPDATE `characters` SET `totalKills` = (`totalKills` + (SELECT COUNT(*) FROM `character_honor_cp` WHERE `character_honor_cp`.`guid`=`characters`.`guid` AND `victim_type` > '0' AND `type` = '1'));
