@@ -589,13 +589,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=2
-set /a world_version=22
+set /a world_version=23
 set /a chars_version=14
 set /a realm_version=4
 set /a logs_version=1
-set /a bots_version=25
+set /a bots_version=26
 set /a website_db_version=4
-set /a core_version=41
+set /a core_version=42
 
 goto settings
 
@@ -616,13 +616,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=2
-set /a world_version=19
+set /a world_version=21
 set /a chars_version=14
 set /a realm_version=4
 set /a logs_version=1
-set /a bots_version=24
+set /a bots_version=26
 set /a website_db_version=4
-set /a core_version=39
+set /a core_version=42
 
 goto settings
 
@@ -1457,6 +1457,9 @@ ping -n 3 127.0.0.1>nul
 echo    Updating bots enchants...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_enchants.sql"
+echo    Updating bots names...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\characters\ai_playerbot_names.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
