@@ -595,7 +595,7 @@ set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=26
 set /a website_db_version=4
-set /a core_version=42
+set /a core_version=43
 
 goto settings
 
