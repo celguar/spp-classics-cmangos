@@ -105,16 +105,29 @@ jobs:
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Read README.md and use it as a body of new release
+        id: read_release
+        shell: bash
+        run: |
+          r=$(cat path/to/README.md)                        # <--- Read README.md (Provide correct path as per your repo)
+          r="${r//'%'/'%25'}"                               # Multiline escape sequences for %
+          r="${r//$'\n'/'%0A'}"                             # Multiline escape sequences for '\n'
+          r="${r//$'\r'/'%0D'}"                             # Multiline escape sequences for '\r'
+          echo "RELEASE_BODY=$r" >> $GITHUB_OUTPUT          # <--- Set environment variable
           
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
-          release_name: "Windows Build (${{ steps.date.outputs.date }})"
+          release_name: "Classic Build (${{ steps.date.outputs.date }})"
           tag: "release-${{env.CORE_EXPANSION}}" 
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: all_snapshots/${{env.ARCHIVE_FILENAME}}
           overwrite: true
           make_latest: false
+          body: |
+            ${{ steps.read_release.outputs.RELEASE_BODY }}  # <--- Use environment variables that was created earlier
+
 
   notify-success:
     name: Discord release successfully notification
