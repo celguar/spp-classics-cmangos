@@ -112,7 +112,7 @@ jobs:
         id: read_release
         shell: bash
         run: |
-          r=$(${{env.REPO_DIR}}/README.md)                  # <--- Read README.md (Provide correct path as per your repo)
+          r=$(${{github.workspace}}/README.md)              # <--- Read README.md (Provide correct path as per your repo)
           r="${r//'%'/'%25'}"                               # Multiline escape sequences for %
           r="${r//$'\n'/'%0A'}"                             # Multiline escape sequences for '\n'
           r="${r//$'\r'/'%0D'}"                             # Multiline escape sequences for '\r'
