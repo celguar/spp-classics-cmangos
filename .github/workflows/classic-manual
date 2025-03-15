@@ -1,0 +1,175 @@
+name: Classic Manual Release
+
+# use manual run
+on: [workflow_dispatch]
+
+# use schedule
+#on:
+#  schedule:
+#    # every day at 6am
+#    - cron:  '0 6 * * *'
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  CORE_TYPE: "cmangos"
+  CORE_EXPANSION: "classic"
+  CORE_BRANCH: "ike3-bots"
+  BOTS_BRANCH: "master"
+  CORE_REPO_OWNER: ${{github.repository_owner}}
+  BUILD_TYPE: RelWithDebInfo
+  BUILD_OPTIONS: "-DBUILD_EXTRACTORS=ON -DBUILD_PLAYERBOTS=ON -DBUILD_AHBOT=ON -DBUILD_GIT_ID=ON -DBUILD_MODULES=ON -DBUILD_MODULE_ACHIEVEMENTS=ON -DBUILD_MODULE_DUALSPEC=ON -DBUILD_MODULE_HARDCORE=ON -DBUILD_MODULE_IMMERSIVE=ON -DBUILD_MODULE_TRANSMOG=ON -DBUILD_MODULE_BOOST=ON -DBUILD_MODULE_BARBER=ON -DBUILD_MODULE_TRAININGDUMMIES=ON"
+  REPO_DIR : ${{github.workspace}}
+  BUILD_DIR: ${{github.workspace}}/bin/builddir
+  BOOST_TOOLSET: "msvc"
+  BOOST_VERSION: "1.86.0"
+  BOOST_INSTALL_DIR: "${{github.workspace}}/bin"
+  ARCHIVE_FILENAME: "cmangos-classic.zip"
+
+jobs:
+  build:
+    runs-on: windows-2022
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout CMaNGOS Classic
+        uses: actions/checkout@v2
+        with:
+          ref: ${{env.CORE_BRANCH}}
+          repository: ${{env.CORE_REPO_OWNER}}/mangos-${{env.CORE_EXPANSION}}
+          path: ${{env.REPO_DIR}}
+
+      - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Create Build Environment
+        run: |
+          cmake -E make_directory ${{ env.BUILD_DIR }}
+      # install dependencies
+      - name: Cache Windows boost
+        uses: actions/cache@v4
+        id: cache-boost
+        with:
+          path: "${{env.BOOST_INSTALL_DIR}}/boost"
+          key: ${{ runner.os }}-boost
+
+      - if: steps.cache-boost.outputs.cache-hit != 'true'
+        name: Install boost
+        uses: MarkusJx/install-boost@v2.3.0
+        id: install-boost
+        with:
+          # REQUIRED: Specify the required boost version
+          # A list of supported versions can be found here:
+          # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
+          boost_version: ${{env.BOOST_VERSION}}
+          # OPTIONAL: Specify a toolset on windows
+          toolset: ${{env.BOOST_TOOLSET}}
+          # OPTIONAL: Specify a custon install location
+          boost_install_dir: ${{env.BOOST_INSTALL_DIR}}
+          platform_version: 2022
+          # NOTE: If a boost version matching all requirements cannot be found,
+          # this build step will fail
+
+      - name: Configure
+        env:
+          BOOST_ROOT: "${{env.BOOST_INSTALL_DIR}}/boost/boost"
+        run: cmake ${{env.BUILD_OPTIONS}} -B ${{env.BUILD_DIR}} -S ${{env.REPO_DIR}}
+
+      - name: Build
+        env:
+          MAKEFLAGS: "-j8"
+        run: cmake --build ${{env.BUILD_DIR}} --config ${{env.BUILD_TYPE}}
+
+      - name: Archive files
+        run: |
+          cd ${{env.BUILD_DIR}}/bin
+          7z a -tzip ${{env.ARCHIVE_FILENAME}} "x64_${{env.BUILD_TYPE}}\*"
+          
+      - name: Archive this artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-${{env.CORE_EXPANSION}}
+          path: "${{env.BUILD_DIR}}/bin/${{env.ARCHIVE_FILENAME}}"
+
+  upload:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write  # for marvinpinto/action-automatic-releases to generate pre-release
+    needs: build
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: snapshot-${{env.CORE_EXPANSION}}
+          path: all_snapshots
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+          
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          release_name: "Windows Build (${{ steps.date.outputs.date }})"
+          tag: "release-${{env.CORE_EXPANSION}}" 
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: all_snapshots/${{env.ARCHIVE_FILENAME}}
+          overwrite: true
+          make_latest: false
+
+  notify-success:
+    name: Discord release successfully notification
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: none
+    needs:
+      - upload
+
+    steps:
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        
+      - name: Get previous date
+        id: dateprev
+        run: echo "::set-output name=date::$(date --date='1 day ago' +'%Y-%m-%d')"
+          
+      - name: Notify
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        with:
+          severity: info
+          username: ${{env.CORE_TYPE}}-${{env.CORE_EXPANSION}}
+          description: |
+            **Classic Dev Build ${{ steps.date.outputs.date }}!**
+          details: |
+            [**Changelog**](${{github.server_url}}/${{ github.repository }}/compare/r-${{ steps.dateprev.outputs.date }}...r-${{ steps.date.outputs.date }}) - [**All Releases**](${{github.server_url}}/${{ github.repository }}/tags) - [**Build Log**](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}})
+            [**Download Windows Binaries**](${{github.server_url}}/${{ github.repository }}/releases/download/r-${{ steps.date.outputs.date }}/${{env.ARCHIVE_FILENAME}})
+          footer: Build success
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_BUILD }}
+          avatarUrl: https://github.githubassets.com/favicons/favicon-success.png
+
+  notify:
+    name: Discord Notification
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: none
+    needs: # make sure the notification is sent AFTER the jobs you want included have completed
+      - build
+    if: failure()
+
+    steps:
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+          
+      - name: Notify
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        with:
+          severity: error
+          username: ${{env.CORE_TYPE}}-${{env.CORE_EXPANSION}}
+          description: |
+            **Classic Dev Build failed!**
+          details: |
+            [**Last commits**](${{github.server_url}}/${{ github.repository }}/commits/${{env.BOTS_BRANCH}}) - [**Build Log**](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}})
+          footer: Build fail
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_BUILD }}
+          avatarUrl: https://github.githubassets.com/favicons/favicon-failure.png
