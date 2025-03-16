@@ -96,7 +96,6 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@v3
     
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -108,15 +107,12 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
-      - name: Read README.md and use it as a body of new release
-        id: read_release
-        shell: bash
-        run: |
-          r=$(README.md)              # <--- Read README.md (Provide correct path as per your repo)
-          r="${r//'%'/'%25'}"                               # Multiline escape sequences for %
-          r="${r//$'\n'/'%0A'}"                             # Multiline escape sequences for '\n'
-          r="${r//$'\r'/'%0D'}"                             # Multiline escape sequences for '\r'
-          echo "RELEASE_BODY=$r" >> $GITHUB_OUTPUT          # <--- Set environment variable
+      - name: Read README.md(gh-pages)
+        id: ghpages
+        uses: jaywcjlove/github-action-read-file@main
+        with:
+          branch: master
+          path: README.md
           
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
@@ -128,7 +124,7 @@ jobs:
           overwrite: true
           make_latest: false
           body: |
-            ${{ steps.read_release.outputs.RELEASE_BODY }}  # <--- Use environment variables that was created earlier
+            "${{ steps.ghpages.outputs.content }}"  # <--- Use environment variables that was created earlier
 
 
   notify-success:
