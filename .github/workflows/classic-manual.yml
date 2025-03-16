@@ -124,7 +124,7 @@ jobs:
           overwrite: true
           make_latest: false
           body: |
-            "${{ steps.ghpages.outputs.content }}"  # <--- Use environment variables that was created earlier
+            ${{ steps.ghpages.outputs.content }}"
 
 
   notify-success:
