@@ -593,7 +593,7 @@ set /a world_version=24
 set /a chars_version=14
 set /a realm_version=4
 set /a logs_version=1
-set /a bots_version=26
+set /a bots_version=27
 set /a website_db_version=4
 set /a core_version=44
 
