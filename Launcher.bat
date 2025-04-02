@@ -6,7 +6,7 @@ set mainfolder=%CD%
 set repack_version=2.3.8
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=13
+set /a website_version=14
 
 rem disable music for now
 IF NOT EXIST "%mainfolder%\music.on" (
@@ -589,13 +589,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=2
-set /a world_version=24
+set /a world_version=25
 set /a chars_version=14
 set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=27
-set /a website_db_version=4
-set /a core_version=44
+set /a website_db_version=5
+set /a core_version=45
 
 goto settings
 
