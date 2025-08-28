@@ -809,7 +809,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading Vanilla module...(~750 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/vanilla.7z" -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress --no-check-certificate "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/vanilla.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -820,7 +820,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading TBC module...(~1000 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/tbc.7z" -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress --no-check-certificate "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/tbc.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -831,7 +831,7 @@ mode con: cols=80 lines=30
 echo.
 echo    Downloading WotLK module...(~1500 MB)
 echo.
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/wotlk.7z" -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress --no-check-certificate "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/wotlk.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -1066,7 +1066,7 @@ echo    Please wait...
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Downloading %expansion% files...
-"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/%expansion%.7z" -P "%mainfolder%\Modules"
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress --no-check-certificate "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/%expansion%.7z" -P "%mainfolder%\Modules"
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
@@ -1665,7 +1665,7 @@ echo.
 if not exist "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%" (
 echo    Downloading Beta Build...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Tools\wget.exe" -q --show-progress "https://github.com/celguar/mangosbot-bots/releases/latest/download/%filename%" -O "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%"
+"%mainfolder%\Server\Tools\wget.exe" -q --show-progress --no-check-certificate "https://github.com/celguar/mangosbot-bots/releases/latest/download/%filename%" -O "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%"
 cls
 more < "%mainfolder%\header_spp.txt"
 echo.
@@ -1746,7 +1746,7 @@ more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Downloading Beta Build...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Tools\wget.exe" -q --show-progress "https://github.com/celguar/mangosbot-bots/releases/latest/download/%filename%" -O "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%"
+"%mainfolder%\Server\Tools\wget.exe" -q --show-progress --no-check-certificate "https://github.com/celguar/mangosbot-bots/releases/latest/download/%filename%" -O "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%"
 cls
 more < "%mainfolder%\header_spp.txt"
 echo.
