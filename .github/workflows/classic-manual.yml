@@ -82,7 +82,7 @@ jobs:
           path: "${{env.BUILD_DIR}}/bin/${{env.ARCHIVE_FILENAME}}"
 
   upload:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       contents: write  # for marvinpinto/action-automatic-releases to generate pre-release
     needs: build
@@ -121,7 +121,7 @@ jobs:
 
   notify-success:
     name: Discord release successfully notification
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       contents: none
     needs:
@@ -152,7 +152,7 @@ jobs:
 
   notify:
     name: Discord Notification
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       contents: none
     needs: # make sure the notification is sent AFTER the jobs you want included have completed
