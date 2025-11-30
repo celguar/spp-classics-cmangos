@@ -109,8 +109,8 @@ jobs:
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
-          release_name: "Classic Build (${{ steps.date.outputs.date }})"
-          tag: "release-${{env.CORE_EXPANSION}}" 
+          release_name: "SPP Classics (CMaNGOS edition)"
+          tag: "v2.0" 
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: all_snapshots/${{env.ARCHIVE_FILENAME}}
           overwrite: true
