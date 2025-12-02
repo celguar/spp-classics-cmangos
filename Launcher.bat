@@ -6,7 +6,7 @@ set mainfolder=%CD%
 set repack_version=2.3.8
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
-set /a website_version=14
+set /a website_version=15
 
 rem disable music for now
 IF NOT EXIST "%mainfolder%\music.on" (
@@ -59,15 +59,36 @@ echo.
 echo    %current_website_version% ---^> %website_version%
 ping -n 3 127.0.0.1>nul
 echo.
+echo    Updating website requires download from internet (~170MB)
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Continue with updating (Y) or skip (N)?
+set /P website_up_choice=Update (Y) or Skip (N):
+IF /I "%website_up_choice%" NEQ "Y" GOTO website_update_skip
+cls
+echo.
+echo    Downloading latest website...
+ping -n 3 127.0.0.1>nul
+echo.
 echo    Please wait...
 ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress --no-check-certificate "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/website.7z" -P "%mainfolder%\Server"
+cls
+echo.
+echo    Download complete^!
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Extracting Website...
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please wait...
 if exist "%mainfolder%\Server\website" rd /s /q "%mainfolder%\Server\website"
 cd "%mainfolder%\Server"
 mkdir website
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf -o"%mainfolder%\Server\website" website.7z > nul
 cd "%mainfolder%"
 echo.
-echo    Updating Webserver...
+echo    Updating Web Server...
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please, wait...
@@ -533,6 +554,8 @@ set /a "current_website_version=current_website_version"
 if %current_website_version% LSS 1 (set /a "current_website_version=1")
 if %current_website_version% LSS %website_version% goto update_website
 
+:website_update_skip
+
 cls
 more < "%mainfolder%\header_spp.txt"
 echo.
@@ -594,7 +617,7 @@ set /a chars_version=14
 set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=27
-set /a website_db_version=6
+set /a website_db_version=7
 set /a core_version=47
 
 goto settings
@@ -621,7 +644,7 @@ set /a chars_version=14
 set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=26
-set /a website_db_version=4
+set /a website_db_version=5
 set /a core_version=42
 
 goto settings
@@ -648,7 +671,7 @@ set /a chars_version=7
 set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=17
-set /a website_db_version=4
+set /a website_db_version=6
 set /a core_version=25
 
 goto settings
