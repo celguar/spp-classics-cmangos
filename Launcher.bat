@@ -615,13 +615,13 @@ set worldserver=mangosd.exe
 
 set spp_update=vanilla_base
 set /a maps_version=2
-set /a world_version=27
+set /a world_version=28
 set /a chars_version=14
 set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=27
 set /a website_db_version=7
-set /a core_version=47
+set /a core_version=48
 
 goto settings
 
@@ -642,13 +642,13 @@ set worldserver=mangosd.exe
 
 set spp_update=tbc_base
 set /a maps_version=2
-set /a world_version=21
+set /a world_version=22
 set /a chars_version=14
 set /a realm_version=4
 set /a logs_version=1
 set /a bots_version=26
 set /a website_db_version=5
-set /a core_version=42
+set /a core_version=43
 
 goto settings
 
@@ -739,7 +739,11 @@ start "" /min "%mainfolder%\Server\Database\start.bat"
 if not exist "%mainfolder%\Modules\%expansion%\dbc" del "%mainfolder%\%expansion%_maps_version.spp"
 if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\%worldserver%" goto missing_core
 
-if exist "%mainfolder%\%expansion%_beta.on" (
+if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\zlib.dll" (
+xcopy /y "%mainfolder%\Server\Tools\zlib.dll" "%mainfolder%\Server\Binaries\%expansion%\Bin64">nul
+)
+
+if exist "%versions%\%expansion%_beta.on" (
 set /a beta_enable=1
 set /p beta_version=<"%mainfolder%\%expansion%_beta.on"
 )
