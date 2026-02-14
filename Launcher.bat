@@ -370,6 +370,7 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Please wait...
 ping -n 5 127.0.0.1>nul
+echo.
 "%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress --no-check-certificate "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/website.7z" -P "%mainfolder%\Server"
 cls
 echo.
