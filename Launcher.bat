@@ -1034,7 +1034,7 @@ if %current_chars_version% LSS %chars_version% goto update_chars
 if %current_realm_version% LSS %realm_version% goto update_realm
 if %current_logs_version% LSS %logs_version% (if not "%logs_version%"=="0" goto update_logs)
 if %current_bots_version% LSS %bots_version% goto update_bots
-if %current_website_db_version% LSS %website_db_version% goto update_website_db
+if exist "%versions%\website.on" if %current_website_db_version% LSS %website_db_version% goto update_website_db
 if %current_core_version% LSS %core_version% goto update_core
 
 if exist "%versions%\website.on" del "%mainfolder%\Server\website\vanilla.spp"
