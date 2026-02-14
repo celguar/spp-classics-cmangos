@@ -1,0 +1,10 @@
+
+                      Launcher Update 14.02.2026
+
+ - [Launcher] Add menu for easy apply of Database mods
+ - [Launcher] Add option to make an autosave every 15 mins when server is running
+ - [Launcher] Autosaves can now save up to 100 saves
+ - [Launcher] Add option to shutdown server without closing repack launcher
+ - [Launcher] Prevent starting server twice
+ - [Launcher] Move some files to deeper folders for clean look
+ - Other fixes
