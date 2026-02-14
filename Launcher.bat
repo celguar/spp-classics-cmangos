@@ -399,7 +399,7 @@ cd "%mainfolder%"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
->"%mainfolder%\website_version.spp" echo %website_version%
+>"%versions%\website_version.spp" echo %website_version%
 goto settings
 
 :install_notepad
