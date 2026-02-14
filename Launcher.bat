@@ -25,7 +25,7 @@ if not exist "%mainfolder%/Server/Versions" (
   del "%%f">nul
  )
 )
-set repack_version=2.3.8
+set repack_version=2.4.0
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
 set /a website_version=15
@@ -318,7 +318,6 @@ IF NOT EXIST "%versions%\website.on" (
 
 cls
 if not exist "%mainfolder%\Server\Tools\Apache24" goto install_website
-if not exist "%mainfolder%\Server\website" goto extract_website
 if not exist "%mainfolder%\Server\Tools\Notepad" goto install_notepad
 if not exist "%mainfolder%\Server\Database" goto extract_database
 if exist "%mainfolder%\Server\Database" goto beginning_part2
@@ -327,7 +326,7 @@ if exist "%mainfolder%\Server\Database" goto beginning_part2
 echo.
 echo    Preparing for the first launch...
 call :PlaySound "launcher_prepare"
-ping -n 3 127.0.0.1>nul
+ping -n 5 127.0.0.1>nul
 echo.
 echo    Extracting Web Server...
 ping -n 3 127.0.0.1>nul
@@ -338,7 +337,7 @@ call :ColorText GRAY "    - PHP 7.2.26" \n
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please, wait...
-ping -n 3 127.0.0.1>nul
+ping -n 7 127.0.0.1>nul
 cd "%mainfolder%\Server\Tools"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf Apache.7z > nul
 cd "%mainfolder%"
@@ -347,29 +346,10 @@ echo    Done!
 ping -n 3 127.0.0.1>nul
 goto beginning
 
-:extract_website
-echo.
-echo    Extracting website and armory...
-ping -n 3 127.0.0.1>nul
-echo.
-call :ColorText GRAY "   Website used:" \n
-call :ColorText GRAY "    - https://github.com/celguar/mangos-website" \n
-ping -n 3 127.0.0.1>nul
-echo.
-echo    Please wait...
-ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\Server"
-mkdir website
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf -o"%mainfolder%\Server\website" website.7z > nul
-cd "%mainfolder%"
-echo.
-echo    Done!
-ping -n 3 127.0.0.1>nul
->"%versions%\website_version.spp" echo %website_version%
-goto beginning
-
 :update_website
+mode con: cols=40 lines=30
 cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
 echo    Website update required!
 ping -n 3 127.0.0.1>nul
@@ -381,7 +361,7 @@ echo    Updating website requires download from internet (~170MB)
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Continue with updating (Y) or skip (N)?
-set /P website_up_choice=Update (Y) or Skip (N):
+set /P website_up_choice=Update (Y) or Skip (N): 
 IF /I "%website_up_choice%" NEQ "Y" GOTO website_update_skip
 cls
 echo.
@@ -389,7 +369,7 @@ echo    Downloading latest website...
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please wait...
-ping -n 3 127.0.0.1>nul
+ping -n 5 127.0.0.1>nul
 "%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress --no-check-certificate "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/website.7z" -P "%mainfolder%\Server"
 cls
 echo.
@@ -410,14 +390,13 @@ echo    Updating Web Server...
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please, wait...
-ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\Server\Tools"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf Apache.7z > nul
 cd "%mainfolder%"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
->"%versions%\website_version.spp" echo %website_version%
+>"%mainfolder%\website_version.spp" echo %website_version%
 goto beginning
 
 :install_notepad
@@ -429,7 +408,7 @@ call :ColorText GRAY "   Is used to edit configs" \n
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please, wait...
-ping -n 3 127.0.0.1>nul
+ping -n 7 127.0.0.1>nul
 cd "%mainfolder%\Server\Tools"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf Notepad.7z > nul
 cd "%mainfolder%"
@@ -447,11 +426,14 @@ call :ColorText GRAY "   Version: 5.7.26" \n
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please, wait...
-ping -n 3 127.0.0.1>nul
+ping -n 7 127.0.0.1>nul
 cd "%mainfolder%\Server"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf Database.7z > nul
 REM "%mainfolder%\Server\Tools\7za.exe" e -y -spf Database_Playerbot.7z > nul
 cd "%mainfolder%"
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
 goto beginning
 
 :beginning_part2
@@ -767,14 +749,6 @@ echo %repack_version% > "%versions%\version.spp"
 goto changelog  
 )
 
-if not exist "%versions%\website_version.spp" goto update_website
-set /p current_website_version=<"%versions%\website_version.spp"
-set /a "current_website_version=current_website_version"
-if %current_website_version% LSS 1 (set /a "current_website_version=1")
-if %current_website_version% LSS %website_version% goto update_website
-
-:website_update_skip
-
 cls
 echo.
 echo    Choose expansion:                                                                                            [3mv %repack_version%[0m
@@ -1043,6 +1017,16 @@ rem echo %current_world_version% - world
 rem echo %current_chars_version% - chars
 rem echo %current_bots_version% - bots
 rem pause
+
+if not exist "%versions%\website.on" goto :website_update_skip
+
+if not exist "%versions%\website_version.spp" goto update_website
+set /p current_website_version=<"%versions%\website_version.spp"
+set /a "current_website_version=current_website_version"
+if %current_website_version% LSS 1 (set /a "current_website_version=1")
+if %current_website_version% LSS %website_version% goto update_website
+
+:website_update_skip
 
 if %current_maps_version% LSS %maps_version% goto update_maps
 if %current_world_version% LSS %world_version% goto update_world
@@ -4235,7 +4219,6 @@ echo    6 - More logs...)
 echo.
 echo    Press Enter to continue
 echo.
-for /l %%i in (1,1,15) do echo.
 call :ColorBlink WHITE "Enter your choice: "
 set /P choose_log=""
 if %choose_log% NEQ 0 (
