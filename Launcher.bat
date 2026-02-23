@@ -1829,7 +1829,7 @@ if "%website%"=="ON" (
 call :ColorText %expansion_color% "                                M - Open website" \n
 )
 if "%website%"=="OFF" (
-call :ColorText %GRAY% "                                Website disabled" \n
+call :ColorText GRAY "                                Website disabled" \n
 )
 echo.
 call :ColorText %expansion_color% "         6 - Wipe Database"
