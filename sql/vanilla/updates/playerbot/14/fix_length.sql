@@ -1,1 +1,0 @@
-ALTER TABLE `ai_playerbot_db_store`	CHANGE COLUMN `value` `value` VARCHAR(4000) NULL DEFAULT NULL COLLATE 'utf8_general_ci' AFTER `key`;

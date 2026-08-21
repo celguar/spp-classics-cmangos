@@ -1,3 +1,0 @@
-DROP DATABASE IF EXISTS `wotlklogs`;
-
-CREATE DATABASE `wotlklogs` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;

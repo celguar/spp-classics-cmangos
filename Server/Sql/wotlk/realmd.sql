@@ -1,0 +1,209 @@
+-- MySQL dump 10.13
+--
+-- Host: localhost    Database: realmd
+-- ------------------------------------------------------
+-- Server version	5.5.32
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `realmd_db_version`
+--
+
+DROP TABLE IF EXISTS `realmd_db_version`;
+CREATE TABLE `realmd_db_version` (
+  `required_14028_01_realmd_account_locale_agnostic` bit(1) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Last applied sql update to DB';
+
+--
+-- Dumping data for table `realmd_db_version`
+--
+
+LOCK TABLES `realmd_db_version` WRITE;
+/*!40000 ALTER TABLE `realmd_db_version` DISABLE KEYS */;
+INSERT INTO `realmd_db_version` VALUES
+(NULL);
+/*!40000 ALTER TABLE `realmd_db_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `account`
+--
+
+DROP TABLE IF EXISTS `account`;
+CREATE TABLE `account` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
+  `username` varchar(32) NOT NULL DEFAULT '',
+  `gmlevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `sessionkey` longtext,
+  `v` longtext,
+  `s` longtext,
+  `email` text,
+  `joindate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `lockedIp` varchar(30) NOT NULL DEFAULT '0.0.0.0',
+  `failed_logins` int(11) unsigned NOT NULL DEFAULT '0',
+  `locked` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `active_realm_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `expansion` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `mutetime` bigint(40) unsigned NOT NULL DEFAULT '0',
+  `locale` varchar(4) NOT NULL DEFAULT '',
+  `token` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_username` (`username`),
+  KEY `idx_gmlevel` (`gmlevel`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Account System';
+
+--
+-- Table structure for table `account_banned`
+--
+
+DROP TABLE IF EXISTS `account_banned`;
+CREATE TABLE `account_banned` (
+  `id` int(11) AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL DEFAULT '0' COMMENT 'Account id',
+  `banned_at` bigint(40) NOT NULL DEFAULT '0',
+  `expires_at` bigint(40) NOT NULL DEFAULT '0',
+  `banned_by` varchar(50) NOT NULL,
+  `unbanned_at` bigint(40) NOT NULL DEFAULT '0',
+  `unbanned_by` varchar(50) DEFAULT NULL,
+  `reason` varchar(255) NOT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Ban List';
+
+--
+-- Dumping data for table `account_banned`
+--
+
+LOCK TABLES `account_banned` WRITE;
+/*!40000 ALTER TABLE `account_banned` DISABLE KEYS */;
+/*!40000 ALTER TABLE `account_banned` ENABLE KEYS */;
+UNLOCK TABLES;
+
+DROP TABLE IF EXISTS `account_logons`;
+CREATE TABLE `account_logons` (
+`id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+`accountId` INT UNSIGNED NOT NULL,
+`ip` varchar(30) NOT NULL,
+`loginTime` timestamp NOT NULL,
+`loginSource` INT UNSIGNED NOT NULL
+);
+
+--
+-- Table structure for table `ip_banned`
+--
+
+DROP TABLE IF EXISTS `ip_banned`;
+CREATE TABLE `ip_banned` (
+  `ip` varchar(32) NOT NULL DEFAULT '0.0.0.0',
+  `banned_at` bigint(40) NOT NULL,
+  `expires_at` bigint(40) NOT NULL,
+  `banned_by` varchar(50) NOT NULL DEFAULT '[Console]',
+  `reason` varchar(255) NOT NULL DEFAULT 'no reason',
+  PRIMARY KEY (`ip`,`banned_at`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Banned IPs';
+
+--
+-- Dumping data for table `ip_banned`
+--
+
+LOCK TABLES `ip_banned` WRITE;
+/*!40000 ALTER TABLE `ip_banned` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ip_banned` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `realmcharacters`
+--
+
+DROP TABLE IF EXISTS `realmcharacters`;
+CREATE TABLE `realmcharacters` (
+  `realmid` int(11) unsigned NOT NULL DEFAULT '0',
+  `acctid` bigint(20) unsigned NOT NULL,
+  `numchars` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`realmid`,`acctid`),
+  KEY `acctid` (`acctid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Realm Character Tracker';
+
+--
+-- Dumping data for table `realmcharacters`
+--
+
+LOCK TABLES `realmcharacters` WRITE;
+/*!40000 ALTER TABLE `realmcharacters` DISABLE KEYS */;
+/*!40000 ALTER TABLE `realmcharacters` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `realmlist`
+--
+
+DROP TABLE IF EXISTS `realmlist`;
+CREATE TABLE `realmlist` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(32) NOT NULL DEFAULT '',
+  `address` varchar(32) NOT NULL DEFAULT '127.0.0.1',
+  `port` int(11) NOT NULL DEFAULT '8085',
+  `icon` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `realmflags` tinyint(3) unsigned NOT NULL DEFAULT '2' COMMENT 'Supported masks: 0x1 (invalid, not show in realm list), 0x2 (offline, set by mangosd), 0x4 (show version and build), 0x20 (new players), 0x40 (recommended)',
+  `timezone` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `allowedSecurityLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `population` float unsigned NOT NULL DEFAULT '0',
+  `realmbuilds` varchar(64) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_name` (`name`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Realm System';
+
+--
+-- Dumping data for table `realmlist`
+--
+
+LOCK TABLES `realmlist` WRITE;
+/*!40000 ALTER TABLE `realmlist` DISABLE KEYS */;
+INSERT INTO `realmlist` VALUES
+(1,'Wrath of the Lich King Realm','127.0.0.1',8085,1,0,1,0,0,'');
+/*!40000 ALTER TABLE `realmlist` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `uptime`
+--
+
+DROP TABLE IF EXISTS `uptime`;
+CREATE TABLE `uptime` (
+  `realmid` int(11) unsigned NOT NULL,
+  `starttime` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `startstring` varchar(64) NOT NULL DEFAULT '',
+  `uptime` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `maxplayers` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`realmid`,`starttime`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Uptime system';
+
+--
+-- Dumping data for table `uptime`
+--
+
+LOCK TABLES `uptime` WRITE;
+/*!40000 ALTER TABLE `uptime` DISABLE KEYS */;
+/*!40000 ALTER TABLE `uptime` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2013-09-10  0:00:00

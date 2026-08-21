@@ -1,49 +1,347 @@
 @echo off
 :beginning
-SET NAME=SPP - Classics Collection V2
+SET NAME=SPP Classics V2
 TITLE %NAME%
 set mainfolder=%CD%
-set repack_version=2.3.8
+set expansion=none
+set "versions=%mainfolder%/Server/Versions"
+set "modules=%mainfolder%/Server/Modules"
+if not exist "%mainfolder%/Server/Versions" (
+ cd "%mainfolder%/Server"
+ mkdir "Versions"
+ cd "%mainfolder%"
+
+ rem Move old versions
+ for /f "tokens=*" %%f in ('dir /b /o-n "%mainfolder%\*.spp"') do (
+  xcopy /y "%%f" "%versions%">nul
+  del "%%f">nul
+ )
+ for /f "tokens=*" %%f in ('dir /b /o-n "%mainfolder%\*.on"') do (
+  xcopy /y "%%f" "%versions%">nul
+  del "%%f">nul
+ )
+ for /f "tokens=*" %%f in ('dir /b /o-n "%mainfolder%\*.off"') do (
+  xcopy /y "%%f" "%versions%">nul
+  del "%%f">nul
+ )
+)
+set repack_version=2.4.0
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
 set /a website_version=15
 
-rem disable music for now
-IF NOT EXIST "%mainfolder%\music.on" (
-  IF NOT EXIST "%mainfolder%\music.off" (
-    echo music > "%mainfolder%\music.on"
-  )
-)
+set COLOR[BLACK]=00>nul
+set COLOR[GRAY]=08>nul
+set COLOR[BLUE]=01>nul
+set COLOR[CYAN]=03>nul
+set COLOR[GREEN]=02>nul
+set COLOR[PURPLE]=05>nul
+set COLOR[RED]=04>nul
+set COLOR[WHITE]=07>nul
+set COLOR[YELLOW]=06>nul
+set COLOR[BLUE_BRIGHT]=09>nul
+set COLOR[CYAN_BRIGHT]=0B>nul
+set COLOR[GREEN_BRIGHT]=0A>nul
+set COLOR[PURPLE_BRIGHT]=0D>nul
+set COLOR[RED_BRIGHT]=0C>nul
+set COLOR[WHITE_BRIGHT]=0F>nul
+set COLOR[YELLOW_BRIGHT]=0E>nul
+set COLOR[BG_BLACK]=07>nul
+set COLOR[BG_BLUE]=17>nul
+set COLOR[BG_CYAN]=37>nul
+set COLOR[BG_GREEN]=27>nul
+set COLOR[BG_PURPLE]=57>nul
+set COLOR[BG_RED]=47>nul
+set COLOR[BG_WHITE]=77>nul
+set COLOR[BG_YELLOW]=67>nul
 
-IF NOT EXIST "%mainfolder%\website.on" (
-  IF NOT EXIST "%mainfolder%\website.off" (
-    echo music > "%mainfolder%\website.on"
-  )
-)
+set COLOR_NEW[BLACK]=30>nul
+set COLOR_NEW[GRAY]=90>nul
+set COLOR_NEW[BLUE]=34>nul
+set COLOR_NEW[CYAN]=36>nul
+set COLOR_NEW[GREEN]=32>nul
+set COLOR_NEW[PURPLE]=35>nul
+set COLOR_NEW[RED]=31>nul
+set COLOR_NEW[WHITE]=37>nul
+set COLOR_NEW[YELLOW]=33>nul
+set COLOR_NEW[BLUE_BRIGHT]=94>nul
+set COLOR_NEW[CYAN_BRIGHT]=96>nul
+set COLOR_NEW[GREEN_BRIGHT]=92>nul
+set COLOR_NEW[PURPLE_BRIGHT]=95>nul
+set COLOR_NEW[RED_BRIGHT]=91>nul
+set COLOR_NEW[WHITE_BRIGHT]=97>nul
+set COLOR_NEW[YELLOW_BRIGHT]=93>nul
+set COLOR_NEW[BG_BLACK]=40>nul
+set COLOR_NEW[BG_BLUE]=44>nul
+set COLOR_NEW[BG_CYAN]=46>nul
+set COLOR_NEW[BG_GREEN]=42>nul
+set COLOR_NEW[BG_PURPLE]=45>nul
+set COLOR_NEW[BG_RED]=41>nul
+set COLOR_NEW[BG_WHITE]=47>nul
+set COLOR_NEW[BG_YELLOW]=43>nul
 
-if not exist "%mainfolder%\Server\Tools\Apache24" goto install_website
-if not exist "%mainfolder%\Server\Tools\Notepad" goto install_notepad
-if exist "%mainfolder%\Server\Database" goto beginning_part2
+goto FunctionsEnd
+
+:PlaySound
+SetLocal EnableExtensions EnableDelayedExpansion
+if not exist "%versions%\music.on" Goto :Eof
+set "sound_name=%~1"
+if not exist "%mainfolder%\Server\Tools\music\%sound_name%.mp3" Goto :Eof
+set curfolder=%CD%
+cd "%mainfolder%\Server\Tools"
+start cmdmp3win.exe music\%sound_name%.mp3
+cd "%curfolder%"
+Goto :Eof
+
+rem Remove first parameter
+:RemoveFirstParameter
+shift
+set params=%1
+:loop
+shift
+if [%1]==[] goto afterloop
+set params=%params% %1
+goto loop
+:afterloop
+Goto :Eof
+
+rem Choose based on Windows version
+:ColorText
+SetLocal EnableExtensions EnableDelayedExpansion
+if not !COLOR[%~1]!==[] set "colorCode=!COLOR[%~1]!"
+if !COLOR[%~1]!==[] set "colorCode=%~1"
+set params=%*
+Call :RemoveFirstParameter !params!
+Call :ColorOld !colorCode! !params!
+rem if not %windows_version%==10.0 (
+rem Call :ColorOld !colorCode! !params!
+rem )
+rem if %windows_version%==10.0 (
+rem Call :ColorNew !colorCode! !params!
+rem )
+EndLocal
+Goto :Eof
+
+rem Blinking text - Win8+
+:ColorBlink
+SetLocal EnableExtensions EnableDelayedExpansion
+if not !COLOR_NEW[%~1]!==[] set "colorCode=!COLOR_NEW[%~1]!"
+if !COLOR_NEW[%~1]!==[] set "colorCode=%~1"
+if not %windows_version%==10.0 (
+set params=%*
+Call :RemoveFirstParameter !params!
+Call :ColorOld !colorCode! !params!
+Goto :Eof
+)
+if "%expansion%"=="vanilla" set textafter=[93m
+if "%expansion%"=="tbc" set textafter=[92m
+if "%expansion%"=="wotlk" set textafter=[96m
+set "colorTag=[5m[!colorCode!m"
+set "text=%~2[0m[0m!textafter!"
+<nul set /p =!colorTag!!text!
+Goto :Eof
+
+rem Italic text - Win8+
+:ColorItalic
+SetLocal EnableExtensions EnableDelayedExpansion
+if not !COLOR_NEW[%~1]!==[] set "colorCode=!COLOR_NEW[%~1]!"
+if !COLOR_NEW[%~1]!==[] set "colorCode=%~1"
+if not %windows_version%==10.0 (
+set params=%*
+Call :RemoveFirstParameter !params!
+Call :ColorOld !colorCode! !params!
+Goto :Eof
+)
+set "colorTag=[3m[!colorCode!m"
+set "text=%~2[0m[0m"
+<nul set /p =!colorTag!!text!
+Goto :Eof
+
+rem Underlined text - Win8+
+:ColorUnderline
+SetLocal EnableExtensions EnableDelayedExpansion
+if not !COLOR_NEW[%~1]!==[] set "colorCode=!COLOR_NEW[%~1]!"
+if !COLOR_NEW[%~1]!==[] set "colorCode=%~1"
+if not %windows_version%==10.0 (
+set params=%*
+Call :RemoveFirstParameter !params!
+Call :ColorOld !colorCode! !params!
+Goto :Eof
+)
+set "colorTag=[4m[!colorCode!m"
+set "text=%~2[0m[0m"
+<nul set /p =!colorTag!!text!
+Goto :Eof
+
+rem Strike-through text - Win8+
+:ColorStrike
+SetLocal EnableExtensions EnableDelayedExpansion
+if not !COLOR_NEW[%~1]!==[] set "colorCode=!COLOR_NEW[%~1]!"
+if !COLOR_NEW[%~1]!==[] set "colorCode=%~1"
+if not %windows_version%==10.0 (
+set params=%*
+Call :RemoveFirstParameter !params!
+Call :ColorOld !colorCode! !params!
+Goto :Eof
+)
+set "colorTag=[9m[!colorCode!m"
+set "text=%~2[0m[0m"
+<nul set /p =!colorTag!!text!
+Goto :Eof
+
+rem Colored text - Win8+
+rem :ColorNew
+rem SetLocal EnableExtensions EnableDelayedExpansion
+rem set "colorCode=[%~1m"
+rem :__ColorNew
+rem set "text=%~2[0m"
+rem <nul set /p =!colorCode!!text!
+rem If "\n"=="%~3" (Shift
+rem Echo()
+rem Shift
+rem Shift
+rem If ""=="%~1" Goto :Eof
+rem if not !COLOR[%~1]!==[] set "colorCode=[!COLOR[%~1]!m"
+rem if !COLOR[%~1]!==[] set "colorCode=[%~1m"
+rem Goto :__ColorNew
+rem Goto :Eof
+
+rem Colored text - WinXP+
+:ColorOld
+:: v23c
+:: Arguments: hexColor text [\n] ...
+:: \n -> newline ... -> repeat
+:: Supported in windows XP, 7, 8.
+:: This version works using Cmd /U
+:: In XP extended ascii characters are printed as dots.
+:: For print quotes, use empty text.
+SetLocal EnableExtensions EnableDelayedExpansion
+Subst `: "!Temp!" >Nul &`: &Cd \
+SetLocal DisableDelayedExpansion
+Echo(|(Pause >Nul &Findstr "^" >`)
+Cmd /A /D /C Set /P "=." >>` <Nul
+For /F %%# In (
+'"Prompt $H &For %%_ In (_) Do Rem"') Do (
+Cmd /A /D /C Set /P "=%%# %%#" <Nul >`.1
+Copy /Y `.1 /B + `.1 /B + `.1 /B `.3 /B >Nul
+Copy /Y `.1 /B + `.1 /B + `.3 /B `.5 /B >Nul
+Copy /Y `.1 /B + `.1 /B + `.5 /B `.7 /B >Nul
+)
+:__Color
+Set "Text=%~2"
+If Not Defined Text (Set Text=^")
+SetLocal EnableDelayedExpansion
+For %%_ In ("&" "|" ">" "<"
+) Do Set "Text=!Text:%%~_=^%%~_!"
+Set /P "LF=" <` &Set "LF=!LF:~0,1!"
+For %%# in ("!LF!") Do For %%_ In (
+\ / :) Do Set "Text=!Text:%%_=%%~#%%_%%~#!"
+For /F delims^=^ eol^= %%# in ("!Text!") Do (
+If #==#! EndLocal
+If \==%%# (Findstr /A:%~1 . \` Nul
+Type `.3) Else If /==%%# (Findstr /A:%~1 . /.\` Nul
+Type `.5) Else (Cmd /A /D /C Echo %%#\..\`>`.dat
+Findstr /F:`.dat /A:%~1 .
+Type `.7))
+If "\n"=="%~3" (Shift
+Echo()
+Shift
+Shift
+If ""=="%~1" Del ` `.1 `.3 `.5 `.7 `.dat &Goto :Eof
+Goto :__Color
+
+:SizeOfFolder
+setlocal enableextensions disabledelayedexpansion
+
+    set "target=%~1"
+    set "varname=%~2"
+    if not defined target set "target=%cd%"
+
+    set "size=0"
+    for /f "tokens=3,5" %%a in ('
+        dir /a /s /w /-c "%target%"
+        ^| findstr /b /l /c:"  "
+    ') do if "%%b"=="" set "size=%%a"
+
+set /A GBtimes100=%size:~0,-3%/1024*100/1024
+echo as %repack_size%[%varname%]
+set foldersize=%GBtimes100:~0,-2%.%GBtimes100:~-2%
+echo fz %foldersize%
+set varname=%fz%
+set repack_size[%varname%]=%foldersize%
+echo as !repack_size[%varname%]!
+echo reals %varname%
+rem <nul set /p =%GBtimes100:~0,-2%.%GBtimes100:~-2% GB
+Goto :Eof
+
+:FunctionsEnd
+EndLocal
+
+IF NOT EXIST "%versions%\music.on" (
+IF NOT EXIST "%versions%\music.off" (
 cls
 echo.
-echo    Preparing for the first launch...
-ping -n 2 127.0.0.1>nul
-cd "%mainfolder%\Server"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf Database.7z > nul
-REM "%mainfolder%\Server\Tools\7za.exe" e -y -spf Database_Playerbot.7z > nul
-cd "%mainfolder%"
-goto beginning
+echo.
+echo.
+call :ColorBlink WHITE "                                           Enable music in Launcher (Y/[N])?"
+SetLocal EnableDelayedExpansion
+SET /P musicon=""
+IF /I "!musicon!" NEQ "Y" (
+ IF /I "!musicon!" NEQ "y" GOTO skip_music
+)
+endlocal
+goto initial_checks
+
+:skip_music
+COLOR 0F
+taskkill /f /im cmdmp3win.exe
+cls
+if exist "%versions%\music.on" del "%versions%\music.on"
+cls
+echo music > "%versions%\music.off"
+)
+)
+
+:initial_checks
+
+IF NOT EXIST "%versions%\music.on" (
+  IF NOT EXIST "%versions%\music.off" (
+    echo music > "%versions%\music.on"
+  )
+)
+
+IF NOT EXIST "%versions%\website.on" (
+  IF NOT EXIST "%versions%\website.off" (
+    echo music > "%versions%\website.on"
+  )
+)
+
+cls
+if not exist "%mainfolder%\Server\Tools\Apache24" goto install_website
+if not exist "%mainfolder%\Server\Tools\Notepad" goto install_notepad
+if not exist "%mainfolder%\Server\Database" goto extract_database
+if exist "%mainfolder%\Server\Database" goto beginning_part2
 
 :install_website
 echo.
-echo    Extracting Webserver...
+echo    Preparing for the first launch...
+call :PlaySound "launcher_prepare"
+ping -n 5 127.0.0.1>nul
 echo.
+echo    Extracting Web Server...
 ping -n 3 127.0.0.1>nul
-echo    Please, wait...
 echo.
+call :ColorText GRAY "   Included:" \n
+call :ColorText GRAY "    - Apache 2.4.25" \n
+call :ColorText GRAY "    - PHP 7.2.26" \n
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please, wait...
+ping -n 7 127.0.0.1>nul
 cd "%mainfolder%\Server\Tools"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf Apache.7z > nul
 cd "%mainfolder%"
+echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 goto beginning
@@ -51,7 +349,7 @@ goto beginning
 :update_website
 mode con: cols=40 lines=30
 cls
-more < "%mainfolder%\header_spp.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
 echo    Website update required!
 ping -n 3 127.0.0.1>nul
@@ -63,7 +361,7 @@ echo    Updating website requires download from internet (~170MB)
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Continue with updating (Y) or skip (N)?
-set /P website_up_choice=Update (Y) or Skip (N):
+set /P website_up_choice=Update (Y) or Skip (N): 
 IF /I "%website_up_choice%" NEQ "Y" GOTO website_update_skip
 cls
 echo.
@@ -71,7 +369,8 @@ echo    Downloading latest website...
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please wait...
-ping -n 3 127.0.0.1>nul
+ping -n 5 127.0.0.1>nul
+echo.
 "%mainfolder%\Server\Tools\wget.exe" -c -q --show-progress --no-check-certificate "https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/website.7z" -P "%mainfolder%\Server"
 cls
 echo.
@@ -98,156 +397,72 @@ cd "%mainfolder%"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
->"%mainfolder%\website_version.spp" echo %website_version%
-goto beginning
+>"%versions%\website_version.spp" echo %website_version%
+goto settings
 
 :install_notepad
 echo.
 echo    Extracting Notepad++...
-echo.
 ping -n 3 127.0.0.1>nul
-echo    Please, wait...
 echo.
+call :ColorText GRAY "   Is used to edit configs" \n
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please, wait...
+ping -n 7 127.0.0.1>nul
 cd "%mainfolder%\Server\Tools"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf Notepad.7z > nul
 cd "%mainfolder%"
+echo.
+echo    Done!
+ping -n 3 127.0.0.1>nul
+goto beginning
+
+:extract_database
+echo.
+echo    Extracting MySQL Database...
+ping -n 3 127.0.0.1>nul
+echo.
+call :ColorText GRAY "   Version: 5.7.26" \n
+ping -n 3 127.0.0.1>nul
+echo.
+echo    Please, wait...
+ping -n 7 127.0.0.1>nul
+cd "%mainfolder%\Server"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf Database.7z > nul
+REM "%mainfolder%\Server\Tools\7za.exe" e -y -spf Database_Playerbot.7z > nul
+cd "%mainfolder%"
+echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 goto beginning
 
 :beginning_part2
-if exist "%mainfolder%\music.on" goto new_intro
-if exist "%mainfolder%\music.off" goto launcher_intro
+if exist "%versions%\music.on" goto new_intro
+if exist "%versions%\music.off" goto launcher_intro
 
 :new_intro
-mode con: cols=40 lines=30
 rem tasklist /FI "IMAGENAME eq cmdmp3win.exe" 2>NUL | find /I /N "cmdmp3win.exe">NUL
 rem if "%ERRORLEVEL%"=="0" goto select_expansion
 rem cd "%mainfolder%\Server\Tools"
 rem start cmdmp3win.exe launcher.mp3
 rem Only show intro once
-if exist "%mainfolder%\version.spp" goto launcher_intro
-cls
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-COLOR 08
-echo         Press 1 to turn music off
-choice /t 1 /c 123456789qm /d q >nul
-if %errorlevel% EQU 1 goto skip_music
-rem ping -n 1 127.0.0.1>nul
-cls
-COLOR 0F
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo         Press 1 to turn music off
-choice /t 1 /c 123456789qm /d q >nul
-if %errorlevel% EQU 1 goto skip_music
-rem ping -n 1 127.0.0.1>nul
-cls
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-COLOR 08
-echo         Press 1 to turn music off
-choice /t 1 /c 123456789qm /d q >nul
-if %errorlevel% EQU 1 goto skip_music
-rem ping -n 1 127.0.0.1>nul
-cls
-COLOR 0F
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo         Press 1 to turn music off
-choice /t 1 /c 123456789qm /d q >nul
-if %errorlevel% EQU 1 goto skip_music
-rem ping -n 1 127.0.0.1>nul
-rem if NOT %errorlevel% EQU 5 goto new_music 
-cls
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-COLOR 08
-echo         Press 1 to turn music off
-choice /t 1 /c 123456789qm /d q >nul
-if %errorlevel% EQU 1 goto skip_music
-rem ping -n 1 127.0.0.1>nul
-cls
-COLOR 0F
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo         Press 1 to turn music off
-choice /t 1 /c 123456789qm /d q >nul
-if %errorlevel% EQU 1 goto skip_music
-rem ping -n 1 127.0.0.1>nul
-echo.
-goto launcher_intro
-
-:skip_music
-COLOR 0F
-taskkill /f /im cmdmp3win.exe
-cls
-if exist "%mainfolder%\music.on" del "%mainfolder%\music.on"
-cls
-echo music > "%mainfolder%\music.off"
-goto launcher_intro
+if exist "%versions%\version.spp" goto launcher_intro
 
 :launcher_intro
 rem Only show intro once
-if exist "%mainfolder%\version.spp" goto select_expansion
+if exist "%versions%\version.spp" goto select_expansion
 COLOR 0F
-mode con: cols=40 lines=30
 rem echo ############################################################
 rem echo # SPP - Classics Collection                                #
 rem echo # https://www.singleplayerproject.com/                     #
 rem echo ############################################################
 
-rem if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_intro.mp3
+rem if exist "%versions%\music.on" call :PlaySound "launcher_intro"
 cd "%mainfolder%\Server\Tools"
-if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_intro.mp3
+taskkill /f /im cmdmp3win.exe
+call :PlaySound "launcher_intro"
 cls
-echo #
-echo #
-echo #
-echo #
 echo.
 echo.
 echo.
@@ -257,14 +472,10 @@ echo.
 echo.
 echo.
 echo.
-echo         Starting the launcher...
-rem echo  Get ready...for something nostalgic...
+echo.
+echo                        Starting the launcher...
 ping -n 3 127.0.0.1>nul
 cls
-echo ########################################
-echo #
-echo #
-echo #
 echo.
 echo.
 echo.
@@ -274,13 +485,14 @@ echo.
 echo.
 echo.
 echo.
-echo         Starting the launcher...
+echo.
+echo                        [93mStarting the launcher...[0m
+echo.
+echo.
+echo.
+echo                                              Get ready...
 ping -n 3 127.0.0.1>nul
 cls
-echo ########################################
-echo #                                      #
-echo #                                      #
-echo #                                      #
 echo.
 echo.
 echo.
@@ -290,15 +502,18 @@ echo.
 echo.
 echo.
 echo.
-echo         Starting the launcher...
 echo.
-echo             Get ready...
+echo                        [93mStarting the launcher...[0m
+echo.
+echo.
+echo.
+echo                                              [92mGet ready...[0m
+echo.
+echo.
+echo.
+echo                                                            for something nostalgic...
 ping -n 3 127.0.0.1>nul
 cls
-echo ########################################
-echo #                                      #
-echo #                                      #
-echo ########################################
 echo.
 echo.
 echo.
@@ -308,72 +523,47 @@ echo.
 echo.
 echo.
 echo.
-echo         Starting the launcher...
 echo.
-echo             Get ready...
+echo                        [93mStarting the launcher...[0m
 echo.
-echo         for something nostalgic...
+echo.
+echo.
+echo                                              [92mGet ready...[0m
+echo.
+echo.
+echo.
+echo                                                            [96mfor something nostalgic...[0m
 ping -n 3 127.0.0.1>nul
 cls
-echo ########################################
-echo # SPP Classics Collection V2           #
-echo # https://www.singleplayerproject.com/ #
-echo ########################################
 echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo         Starting the launcher...
-echo.
-echo             Get ready...
-echo.
-echo         for something nostalgic...
-ping -n 3 127.0.0.1>nul
-cls
-echo ########################################
-echo # SPP Classics Collection V2           #
-echo # https://www.singleplayerproject.com/ #
-echo ########################################
 echo.
 echo    CREDITS:
 ping -n 3 127.0.0.1>nul
 cls
-echo ########################################
-echo # SPP Classics Collection V2           #
-echo # https://www.singleplayerproject.com/ #
-echo ########################################
+echo.
 echo.
 echo    CREDITS:
 echo.
-echo   Teams:
-echo    ------
-echo    "MaNGOS"           "CMaNGOS"
-echo    "AzerothCore"      "TrinityCore"
-echo    "WoWruRU Project"  "VMaNGOS"
-ping -n 3 127.0.0.1>nul
+echo     Teams:
+echo     ------
+echo     "MaNGOS"           "(C)ontinued MaNGOS"
+echo     "AzerothCore"      "TrinityCore"
+echo     "WoWruRU Project"  "VMaNGOS"
+ping -n 4 127.0.0.1>nul
 rem goto select_expansion
 cls
-echo ########################################
-echo # SPP Classics Collection V2           #
-echo # https://www.singleplayerproject.com/ #
-echo ########################################
+echo.
 echo.
 echo    CREDITS:
 echo.
-more < "%mainfolder%\credits.txt"
-ping -n 7 127.0.0.1>nul
-rem if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_intro.mp3
-if exist "%mainfolder%\music.on" start cmdmp3win.exe music/launcher_outro.mp3
+more < "%mainfolder%\Server\Tools\credits.txt"
+ping -n 9 127.0.0.1>nul
+rem if exist "%versions%\music.on" call :PlaySound "launcher_intro"
+call :PlaySound "launcher_outro"
 cd "%mainfolder%"
 goto select_expansion
 
 :music_start
-mode con: cols=40 lines=30
 tasklist /FI "IMAGENAME eq cmdmp3win.exe" 2>NUL | find /I /N "cmdmp3win.exe">NUL
 if "%ERRORLEVEL%"=="0" goto select_expansion
 cd "%mainfolder%\Server\Tools"
@@ -415,11 +605,10 @@ cd "%mainfolder%\Server\Tools\Apache24"
 start "" /min "apache_start.bat"
 cd "%mainfolder%"
 cls
-rem more < "%mainfolder%\header_spp.txt"
-rem echo.
+rem rem echo.
 rem echo    Updating website news!
 rem ping -n 1 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website_news.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\website_news.sql"
 rem echo.
 rem echo    Done!
 rem ping -n 1 127.0.0.1>nul
@@ -427,35 +616,37 @@ cls
 goto menu
 
 :music_switch
-if exist "%mainfolder%\music.on" goto music_off
-if exist "%mainfolder%\music.off" goto music_on
+if exist "%versions%\music.on" goto music_off
+if exist "%versions%\music.off" goto music_on
 
 :website_switch
-if exist "%mainfolder%\website.on" goto website_off
-if exist "%mainfolder%\website.off" goto website_on
+call :PlaySound "button_loud"
+if exist "%versions%\website.on" goto website_off
+if exist "%versions%\website.off" goto website_on
 
 :music_off
 taskkill /f /im cmdmp3win.exe
 cls
-del "%mainfolder%\music.on"
-echo music > "%mainfolder%\music.off"
+del "%versions%\music.on"
+echo music > "%versions%\music.off"
 goto beginning
 
 :music_on
-del "%mainfolder%\music.off"
-echo music > "%mainfolder%\music.on"
+del "%versions%\music.off"
+echo music > "%versions%\music.on"
+call :PlaySound "button_loud"
 goto beginning
 
 :website_off
 taskkill /f /im spp-httpd.exe
 cls
-del "%mainfolder%\website.on"
-echo music > "%mainfolder%\website.off"
+del "%versions%\website.on"
+echo music > "%versions%\website.off"
 goto beginning
 
 :website_on
-del "%mainfolder%\website.off"
-echo website > "%mainfolder%\website.on"
+del "%versions%\website.off"
+echo website > "%versions%\website.on"
 tasklist /FI "IMAGENAME eq spp-httpd.exe" 2>NUL | find /I /N "spp-httpd.exe">NUL
 if "%ERRORLEVEL%"=="0" goto beginning
 REM cd "%mainfolder%\Server\Tools\Apache24"
@@ -465,8 +656,7 @@ goto beginning
 
 :select_expansion
 endlocal
-mode con: cols=40 lines=30
-SET NAME=SPP - Classics Collection V2
+SET NAME=SPP Classics V2
 TITLE %NAME%
 COLOR 0F
 
@@ -480,37 +670,49 @@ if "%ERRORLEVEL%"=="0" (if %mangos_running%==false "%mainfolder%\Server\Database
 tasklist /FI "IMAGENAME eq spp-httpd.exe" 2>NUL | find /I /N "spp-httpd.exe">NUL
 if "%ERRORLEVEL%"=="0" (if %mangos_running%==false taskkill /f /im spp-httpd.exe)
 
+tasklist /FI "IMAGENAME eq mangosd.exe" 2>NUL | find /I /N "mangosd.exe">NUL
+if "%ERRORLEVEL%"=="0" set SERVER_RUNNING=1
+
 rem add message to wait for db shutdown
 tasklist /FI "IMAGENAME eq mysqld.exe" 2>NUL | find /I /N "mysqld.exe">NUL
 if "%ERRORLEVEL%"=="0" (if %mangos_running%==false (
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
-echo    Closing database...
+echo    Closing MySQL database...
 ping -n 3 127.0.0.1>nul
 )
 )
 
-if exist "%mainfolder%\music.on" set music=ON
-if exist "%mainfolder%\music.off" set music=OFF
-if exist "%mainfolder%\website.on" set website=ON
-if exist "%mainfolder%\website.off" set website=OFF
-set module_check_vanilla=Not Installed
-set module_check_tbc=Not Installed
-set module_check_wotlk=Not Installed
-set module_check_cata=Not Installed
+if exist "%versions%\music.on" set music=ON
+if exist "%versions%\music.off" set music=OFF
+if exist "%versions%\website.on" set website=ON
+if exist "%versions%\website.off" set website=OFF
+set module_check_vanilla=[Not Installed]
+set module_check_tbc=[Not Installed]
+set module_check_wotlk=[Not Installed]
+set module_check_cata=[Not Installed]
 
-set vanilla_beta=
-set tbc_beta=
-set wotlk_beta=
-if exist "%mainfolder%\vanilla_beta.on" set vanilla_beta=- [BETA]
-if exist "%mainfolder%\tbc_beta.on" set tbc_beta=- [BETA]
-if exist "%mainfolder%\wotlk_beta.on" set wotlk_beta=- [BETA]
+set vanilla_beta=      
+set tbc_beta=      
+set wotlk_beta=      
+if exist "%mainfolder%\vanilla_beta.on" set vanilla_beta=[BETA]
+if exist "%mainfolder%\tbc_beta.on" set tbc_beta=[BETA]
+if exist "%mainfolder%\wotlk_beta.on" set wotlk_beta=[BETA]
 
-if exist "%mainfolder%\Modules\vanilla\dbc" set module_check_vanilla=Installed
-if exist "%mainfolder%\Modules\tbc\dbc" set module_check_tbc=Installed
-if exist "%mainfolder%\Modules\wotlk\dbc" set module_check_wotlk=Installed
-if exist "%mainfolder%\Modules\cata\dbc" set module_check_cata=Installed
+if exist "%modules%\vanilla\dbc" set module_check_vanilla=[Installed]
+if exist "%modules%\tbc\dbc" set module_check_tbc=[Installed]
+if exist "%modules%\wotlk\dbc" set module_check_wotlk=[Installed]
+if exist "%modules%\cata\dbc" set module_check_cata=[Installed]
+
+rem Fix spacings
+if "%module_check_vanilla%"=="[Installed]" (
+    set module_check_tbc=    %module_check_tbc%
+    set module_check_wotlk=    %module_check_wotlk%
+) else if "%module_check_vanilla%"=="[Not Installed]" (
+    if "%module_check_tbc%"=="[Installed]" (
+        set module_check_wotlk=    %module_check_wotlk%
+    )
+)
 
 set vanilla_running=OFF
 set tbc_running=OFF
@@ -538,65 +740,76 @@ rem if "%%~I"=="%mainfolder%\Server\Binaries\wotlk\Bin64\mangosd.exe" goto setup
 
 cd "%mainfolder%"
 
-if not exist "%mainfolder%\version.spp" (
-echo %repack_version% > "%mainfolder%\version.spp"
+if not exist "%versions%\version.spp" (
+echo %repack_version% > "%versions%\version.spp"
 rem goto changelog
 )
-if exist "%mainfolder%\version.spp" (set /p current_version=<"%mainfolder%\version.spp")
+if exist "%versions%\version.spp" (set /p current_version=<"%versions%\version.spp")
 if %current_version% LSS %repack_version% (
-echo %repack_version% > "%mainfolder%\version.spp"
-goto changelog
+echo %repack_version% > "%versions%\version.spp"
+goto changelog  
 )
 
-if not exist "%mainfolder%\website_version.spp" goto update_website
-set /p current_website_version=<"%mainfolder%\website_version.spp"
-set /a "current_website_version=current_website_version"
-if %current_website_version% LSS 1 (set /a "current_website_version=1")
-if %current_website_version% LSS %website_version% goto update_website
-
-:website_update_skip
-
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
-echo   Choose expansion:
+echo    Choose expansion:                                                                                            [3mv %repack_version%[0m
+more < "%mainfolder%\Server\Tools\header_all.txt"
 echo.
-echo   1 - World of Warcraft
+echo          1 - [93mWorld of Warcraft[0m                 2 - [92mThe Burning Crusade[0m              3 - [96mWrath of the Lich King[0m
 echo.
-echo          [%module_check_vanilla%] %module_running_vanilla% %vanilla_beta%
-echo.
-echo.
-echo   2 - The Burning Crusade
-echo.
-echo          [%module_check_tbc%] %module_running_tbc% %tbc_beta%
-echo.
-echo.
-echo   3 - Wrath of the Lich King
-echo.
-echo          [%module_check_wotlk%] %module_running_wotlk% %wotlk_beta%
+echo              %module_check_vanilla% %module_running_vanilla%                       %module_check_tbc% %module_running_tbc%                      %module_check_wotlk% %module_running_wotlk%
+echo.                  %vanilla_beta%                                 %tbc_beta%                                 %wotlk_beta%
 REM echo 4 - World of Warcraft: Cataclysm               [%module_check_cata%]
 echo.
-echo   9 - Website [%website%]
 echo.
-echo   0 - Music [%music%]
 echo.
-echo   5 - Service menu
 echo.
-echo   6 - Changelog             Ver: %repack_version%
 echo.
-set /P choose_exp=What expansion do you want to play: 
+echo.
+if "%website%"=="ON" (
+  call :ColorText GRAY "   6 - Toggle Website "
+  call :ColorText GREEN "[%website%]"
+  )
+if "%website%"=="OFF" (
+  call :ColorText GRAY "   6 - Toggle Website "
+  call :ColorText RED "[%website%]"
+  )
+echo.
+echo.
+if "%music%"=="ON" (
+  call :ColorText GRAY "   7 - Toggle Music "
+  call :ColorText GREEN "[%music%]"
+  )
+if "%music%"=="OFF" (
+  call :ColorText GRAY "   7 - Toggle Music "
+  call :ColorText RED "[%music%]"
+  )
+echo.
+echo.
+call :ColorText GRAY "   8 - Service Menu"
+echo.
+echo.
+call :ColorText GRAY "   9 - Changelog"
+echo.
+echo.
+call :ColorText GRAY "   0 - Exit"
+echo.
+echo.
+call :ColorBlink WHITE "Enter your choice: "
+set /P choose_exp=""
 if "%choose_exp%"=="1" (if not "%tbc_running%"=="ON" if not "%wotlk_running%"=="ON" goto setup_vanilla)
 if "%choose_exp%"=="2" (if not "%vanilla_running%"=="ON" if not "%wotlk_running%"=="ON" goto setup_tbc)
 if "%choose_exp%"=="3" (if not "%tbc_running%"=="ON" if not "%vanilla_running%"=="ON" goto setup_wotlk)
 REM if "%choose_exp%"=="4" (goto setup_cata)
-if "%choose_exp%"=="9" (goto website_switch)
-if "%choose_exp%"=="0" (goto music_switch)
-if "%choose_exp%"=="5" (goto service_menu)
-if "%choose_exp%"=="6" (goto changelog)
-if "%choose_exp%"=="" (goto select_expansion)
+if "%choose_exp%"=="6" (goto website_switch)
+if "%choose_exp%"=="7" (goto music_switch)
+if "%choose_exp%"=="8" (goto service_menu)
+if "%choose_exp%"=="9" (goto changelog)
+if "%choose_exp%"=="0" (taskkill /f /im cmdmp3win.exe &exit)
+if "%choose_exp%"=="" (taskkill /f /im cmdmp3win.exe &exit)
 
 :setup_vanilla
-SET NAME=SPP - Vanilla
+SET NAME=SPP Classics - Vanilla
 TITLE %NAME%
 COLOR 0E
 set expansion=vanilla
@@ -623,7 +836,7 @@ set /a core_version=48
 goto settings
 
 :setup_tbc
-SET NAME=SPP - Burning Crusade
+SET NAME=SPP Classics - Burning Crusade
 TITLE %NAME%
 COLOR 0A
 set expansion=tbc
@@ -650,7 +863,7 @@ set /a core_version=43
 goto settings
 
 :setup_wotlk
-SET NAME=SPP - WotLK
+SET NAME=SPP Classics - WotLK
 TITLE %NAME%
 COLOR 0B
 set expansion=wotlk
@@ -680,7 +893,7 @@ cls
 REM echo.
 REM echo  This expansion is not included yet.
 REM echo  Check back later.
-REM more < "%mainfolder%\logo_%expansion%.txt"
+REM more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 REM echo.
 REM pause
 REM goto select_expansion
@@ -706,7 +919,7 @@ set spp_update=cata_base
 goto settings
 
 :settings
-REM if exist "%mainfolder%\music.on" start cmdmp3win.exe install_vanilla.mp3
+REM if exist "%versions%\music.on" start cmdmp3win.exe install_vanilla.mp3
 REM --- Settings ---
 
 set host=127.0.0.1
@@ -717,23 +930,29 @@ set pass=123456
 REM --- Settings ---
 
 :start_database
-if not exist "%mainfolder%\Saves\%expansion%\autosave" mkdir "%mainfolder%\Saves\%expansion%\autosave"
+if not exist "%mainfolder%\Saves\%expansion%\autosaves" mkdir "%mainfolder%\Saves\%expansion%\autosaves"
 
-IF NOT EXIST "%mainfolder%\autosave.on" (
-  IF NOT EXIST "%mainfolder%\autosave.off" (
-    echo autosave > "%mainfolder%\autosave.on"
+IF NOT EXIST "%versions%\autosave.on" (
+  IF NOT EXIST "%versions%\autosave.off" (
+    echo autosave > "%versions%\autosave.on"
   )
 )
 
-IF NOT EXIST "%mainfolder%\website.on" (
-  IF NOT EXIST "%mainfolder%\website.off" (
-    echo website > "%mainfolder%\website.on"
+IF NOT EXIST "%versions%\autosave_running.on" (
+  IF NOT EXIST "%versions%\autosave_running.off" (
+    echo autosave_running > "%versions%\autosave_running.off"
+  )
+)
+
+IF NOT EXIST "%versions%\website.on" (
+  IF NOT EXIST "%versions%\website.off" (
+    echo website > "%versions%\website.on"
   )
 )
 
 start "" /min "%mainfolder%\Server\Database\start.bat"
 
-if not exist "%mainfolder%\Modules\%expansion%\dbc" del "%mainfolder%\%expansion%_maps_version.spp"
+if not exist "%modules%\%expansion%\dbc" del "%versions%\%expansion%_maps_version.spp"
 if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\%worldserver%" goto missing_core
 
 if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\zlib.dll" (
@@ -742,9 +961,9 @@ xcopy /y "%mainfolder%\Server\Tools\zlib.dll" "%mainfolder%\Server\Binaries\%exp
 
 if exist "%mainfolder%\%expansion%_beta.on" (
 set /a beta_enable=1
-set /p beta_version=<"%mainfolder%\%expansion%_beta.on"
+set /p beta_version=<"%versions%\%expansion%_beta.on"
 )
-if not exist "%mainfolder%\%expansion%_beta.on" (set /a beta_enable=0)
+if not exist "%versions%\%expansion%_beta.on" (set /a beta_enable=0)
 
 set /a "current_world_version=0"
 set /a "current_chars_version=0"
@@ -756,24 +975,24 @@ set /a "current_maps_version=0"
 set /a "current_website_db_version=0"
 set /a "current_core_version=0"
 
-if not exist "%mainfolder%\%spp_update%.spp" goto update_install
-if not exist "%mainfolder%\%expansion%_maps_version.spp" goto update_maps
-if not exist "%mainfolder%\%expansion%_world_version.spp" goto update_world
-if not exist "%mainfolder%\%expansion%_chars_version.spp" goto update_chars
-if not exist "%mainfolder%\%expansion%_realm_version.spp" goto update_realm
-if not exist "%mainfolder%\%expansion%_logs_version.spp" (if not "%logs_version%"=="0" goto update_logs)
-if not exist "%mainfolder%\%expansion%_bots_version.spp" goto update_bots
-if not exist "%mainfolder%\%expansion%_website_version.spp" goto install_website_db
-if not exist "%mainfolder%\%expansion%_core_version.spp" (if not "%core_version%"=="1" goto update_core)
+if not exist "%versions%\%spp_update%.spp" goto update_install
+if not exist "%versions%\%expansion%_maps_version.spp" goto update_maps
+if not exist "%versions%\%expansion%_world_version.spp" goto update_world
+if not exist "%versions%\%expansion%_chars_version.spp" goto update_chars
+if not exist "%versions%\%expansion%_realm_version.spp" goto update_realm
+if not exist "%versions%\%expansion%_logs_version.spp" (if not "%logs_version%"=="0" goto update_logs)
+if not exist "%versions%\%expansion%_bots_version.spp" goto update_bots
+if not exist "%versions%\%expansion%_website_version.spp" goto install_website_db
+if not exist "%versions%\%expansion%_core_version.spp" (if not "%core_version%"=="1" goto update_core)
 
-set /p current_maps_version=<"%mainfolder%\%expansion%_maps_version.spp"
-set /p current_world_version=<"%mainfolder%\%expansion%_world_version.spp"
-set /p current_chars_version=<"%mainfolder%\%expansion%_chars_version.spp"
-set /p current_realm_version=<"%mainfolder%\%expansion%_realm_version.spp"
-set /p current_logs_version=<"%mainfolder%\%expansion%_logs_version.spp"
-set /p current_bots_version=<"%mainfolder%\%expansion%_bots_version.spp"
-set /p current_website_db_version=<"%mainfolder%\%expansion%_website_version.spp"
-set /p current_core_version=<"%mainfolder%\%expansion%_core_version.spp"
+set /p current_maps_version=<"%versions%\%expansion%_maps_version.spp"
+set /p current_world_version=<"%versions%\%expansion%_world_version.spp"
+set /p current_chars_version=<"%versions%\%expansion%_chars_version.spp"
+set /p current_realm_version=<"%versions%\%expansion%_realm_version.spp"
+set /p current_logs_version=<"%versions%\%expansion%_logs_version.spp"
+set /p current_bots_version=<"%versions%\%expansion%_bots_version.spp"
+set /p current_website_db_version=<"%versions%\%expansion%_website_version.spp"
+set /p current_core_version=<"%versions%\%expansion%_core_version.spp"
 
 rem convert to int
 set /a "current_maps_version=current_maps_version"
@@ -800,26 +1019,35 @@ rem echo %current_chars_version% - chars
 rem echo %current_bots_version% - bots
 rem pause
 
+if not exist "%versions%\website.on" goto :website_update_skip
+
+if not exist "%versions%\website_version.spp" goto update_website
+set /p current_website_version=<"%versions%\website_version.spp"
+set /a "current_website_version=current_website_version"
+if %current_website_version% LSS 1 (set /a "current_website_version=1")
+if %current_website_version% LSS %website_version% goto update_website
+
+:website_update_skip
+
 if %current_maps_version% LSS %maps_version% goto update_maps
 if %current_world_version% LSS %world_version% goto update_world
 if %current_chars_version% LSS %chars_version% goto update_chars
 if %current_realm_version% LSS %realm_version% goto update_realm
 if %current_logs_version% LSS %logs_version% (if not "%logs_version%"=="0" goto update_logs)
 if %current_bots_version% LSS %bots_version% goto update_bots
-if %current_website_db_version% LSS %website_db_version% goto update_website_db
+if exist "%versions%\website.on" if %current_website_db_version% LSS %website_db_version% goto update_website_db
 if %current_core_version% LSS %core_version% goto update_core
 
-if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\vanilla.spp"
-if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\tbc.spp"
-if exist "%mainfolder%\website.on" del "%mainfolder%\Server\website\wotlk.spp"
-if exist "%mainfolder%\website.on" echo %expansion% > "%mainfolder%\Server\website\%expansion%.spp"
-if exist "%mainfolder%\website.on" goto website_start
+if exist "%versions%\website.on" del "%mainfolder%\Server\website\vanilla.spp"
+if exist "%versions%\website.on" del "%mainfolder%\Server\website\tbc.spp"
+if exist "%versions%\website.on" del "%mainfolder%\Server\website\wotlk.spp"
+if exist "%versions%\website.on" echo %expansion% > "%mainfolder%\Server\website\%expansion%.spp"
+if exist "%versions%\website.on" goto website_start
 
 goto menu
 
 :module_not_found
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    The %expansion% module not found
 ping -n 2 127.0.0.1>nul
@@ -867,35 +1095,28 @@ goto check_modules
 :check_modules
 
 rem PLAY INTRO PROCESS
-if exist "%mainfolder%\music.on" (
-cd "%mainfolder%\Server\Tools"
-start cmdmp3win.exe music/%expansion%_intro_process.mp3
-cd "%mainfolder%"
-)
+call :PlaySound "%expansion%_intro_process"
 
-mode con: cols=40 lines=30
-if not exist "%mainfolder%\Modules\%expansion%\maps" (
-if not exist "%mainfolder%\Modules\%expansion%.7z" goto module_not_found
-cd "%mainfolder%\Modules"
+if not exist "%modules%\%expansion%\maps" (
+if not exist "%modules%\%expansion%.7z" goto module_not_found
+cd "%modules%"
 mkdir %expansion%
 cd %expansion%
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Extracting %expansion% module...
 ping -n 2 127.0.0.1>nul
 echo.
 echo    Please, wait...
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Modules\%expansion%.7z" > nul
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%modules%\%expansion%.7z" > nul
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\Modules\%expansion%.7z"
+del "%modules%\%expansion%.7z"
 cd "%mainfolder%"
 )
-if exist "%mainfolder%\Modules\%expansion%\maps" (
+if exist "%modules%\%expansion%\maps" (
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Existing %expansion% maps found!
 ping -n 3 127.0.0.1>nul
@@ -905,7 +1126,7 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Please, wait...
 rem check file last modified date
-FOR /F "TOKENS=2" %%A IN ('WHERE /T "%mainfolder%\Modules\%expansion%\maps:0002035.map"') do (
+FOR /F "TOKENS=2" %%A IN ('WHERE /T "%modules%\%expansion%\maps:0002035.map"') do (
 if "%%A" GEQ "%maps_date%" (
 echo.
 echo    Existing maps version: OK!
@@ -913,7 +1134,7 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Skipping download...
 ping -n 3 127.0.0.1>nul
->"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+>"%versions%\%expansion%_maps_version.spp" echo %maps_version%
 goto update_install
 )
 if "%%A" GEQ "%maps_date2%" (
@@ -923,7 +1144,7 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Skipping download...
 ping -n 3 127.0.0.1>nul
->"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+>"%versions%\%expansion%_maps_version.spp" echo %maps_version%
 goto update_install
 )
 if "%%A" LSS "%maps_date%" if "%%A" LSS "%maps_date2%" (
@@ -940,16 +1161,15 @@ rem goto module_not_found
 )
 )
 )
->"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+>"%versions%\%expansion%_maps_version.spp" echo %maps_version%
 goto update_install
 
 :extract_worlddb
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Extracting world db...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\world.7z" > nul
 echo.
 echo    Done!
 cd "%mainfolder%"
@@ -957,131 +1177,115 @@ ping -n 2 127.0.0.1>nul
 goto update_install
 
 :update_install
-mode con: cols=40 lines=30
 cls
-if not exist "%mainfolder%\%expansion%_maps_version.spp" goto check_modules
-if not exist "%mainfolder%\sql\%expansion%\world.sql" goto extract_worlddb
+if not exist "%versions%\%expansion%_maps_version.spp" goto check_modules
+if not exist "%mainfolder%\Server\sql\%expansion%\world.sql" goto extract_worlddb
 
 rem PLAY INTRO SHORT
-if exist "%mainfolder%\music.on" (
-cd "%mainfolder%\Server\Tools"
-start cmdmp3win.exe music/%expansion%_intro_long.mp3
-cd "%mainfolder%"
-)
-
-more < "%mainfolder%\header_spp.txt"
+call :PlaySound "%expansion%_intro_long"
 echo.
 echo    Installing database, please wait...
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Installing world db...
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_world.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_world.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world.sql"
 rem echo.
 echo    Installing characters db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_characters.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\characters.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_characters.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\characters.sql"
 rem echo.
 echo    Installing logs db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_logs.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\sql\%expansion%\logs.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_logs.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\Server\sql\%expansion%\logs.sql"
 rem echo.
 echo    Installing accounts db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_realmd.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmd.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_realmd.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\realmd.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\realmlist.sql"
 rem echo.
 rem echo    Installing playerbot db...
 rem ping -n 3 127.0.0.1>nul
-rem "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
-rem for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
+rem "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_playerbot.sql"
+rem for %%i in ("%mainfolder%\Server\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 rem echo.
 rem echo    Applying world db updates...
 rem ping -n 3 127.0.0.1>nul
 rem set /a "next_world_version=current_world_version+1"
 rem for /l %%x in (%next_world_version%, 1, %world_version%) do (
 rem   ping -n 2 127.0.0.1>nul
-rem   for %%i in ("%mainfolder%\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+rem   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 rem )
 echo    Applying world db mods...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+for %%i in ("%mainfolder%\Server\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 rem echo.
 echo    Applying characters db updates...
 ping -n 3 127.0.0.1>nul
 set /a "next_chars_version=current_chars_version+1"
 for /l %%x in (%next_chars_version%, 1, %chars_version%) do (
    ping -n 2 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
+   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 )
 echo    Applying characters db mods...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
+for %%i in ("%mainfolder%\Server\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 rem echo.
 echo    Applying accounts db updates...
 ping -n 3 127.0.0.1>nul
 set /a "next_realm_version=current_realm_version+1"
 for /l %%x in (%next_realm_version%, 1, %realm_version%) do (
    ping -n 2 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 )
 echo    Applying accounts db mods...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+for %%i in ("%mainfolder%\Server\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 rem echo.
 echo.
 echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
-rem cd "%mainfolder%\sql\%expansion%\playerbot"
-rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
-rem del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+rem cd "%mainfolder%\Server\sql\%expansion%\playerbot"
+rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
+rem del "%mainfolder%\Server\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 cd "%mainfolder%"
 echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_texts.sql"
-echo.
-echo    Updating bots named locations...
-ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_named_location.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_texts.sql"
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%\playerbot"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
 cd "%mainfolder%"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
 echo    Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\sql\%expansion%\world.sql"
-echo %spp_update% > "%mainfolder%\%spp_update%.spp"
->"%mainfolder%\%expansion%_world_version.spp" echo %world_version%
->"%mainfolder%\%expansion%_chars_version.spp" echo %chars_version%
->"%mainfolder%\%expansion%_realm_version.spp" echo %realm_version%
+del "%mainfolder%\Server\sql\%expansion%\world.sql"
+echo %spp_update% > "%versions%\%spp_update%.spp"
+>"%versions%\%expansion%_world_version.spp" echo %world_version%
+>"%versions%\%expansion%_chars_version.spp" echo %chars_version%
+>"%versions%\%expansion%_realm_version.spp" echo %realm_version%
 if not "%logs_version%"=="0" (
->"%mainfolder%\%expansion%_logs_version.spp" echo %logs_version%
+>"%versions%\%expansion%_logs_version.spp" echo %logs_version%
 )
->"%mainfolder%\%expansion%_bots_version.spp" echo %bots_version%
+>"%versions%\%expansion%_bots_version.spp" echo %bots_version%
+call :PlaySound "%expansion%_intro_ready"
 goto start_database
 
 :update_maps
 
 rem PLAY INTRO PROCESS
-if exist "%mainfolder%\music.on" (
-cd "%mainfolder%\Server\Tools"
-start cmdmp3win.exe music/%expansion%_intro_process.mp3
-cd "%mainfolder%"
-)
-
-mode con: cols=40 lines=30
+call :PlaySound "%expansion%_intro_process"
 cls
-more < "%mainfolder%\header_spp.txt"
+if exist "%mainfolder%/Modules/%expansion%/dbc" goto move_maps
 echo.
 echo    Maps update required!
 ping -n 3 127.0.0.1>nul
@@ -1097,9 +1301,8 @@ echo    Downloading %expansion% files...
 echo.
 echo    Download complete. Checking file...
 ping -n 3 127.0.0.1>nul
-if not exist "%mainfolder%\Modules\%expansion%.7z" (
+if not exist "%modules%\%expansion%.7z" (
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Module download error
 ping -n 3 127.0.0.1>nul
@@ -1108,30 +1311,46 @@ echo    Please try again...
 ping -n 3 127.0.0.1>nul
 goto select_expansion
 )
-rd /s /q "%mainfolder%\Modules\%expansion%"
-cd "%mainfolder%\Modules"
+rd /s /q "%modules%\%expansion%"
+cd "%modules%"
 mkdir %expansion%
 cd %expansion%
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Extracting %expansion% module...
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please, wait...
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Modules\%expansion%.7z" > nul
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%modules%\%expansion%.7z" > nul
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\Modules\%expansion%.7z"
+del "%modules%\%expansion%.7z"
 cd "%mainfolder%"
->"%mainfolder%\%expansion%_maps_version.spp" echo %maps_version%
+>"%versions%\%expansion%_maps_version.spp" echo %maps_version%
+goto start_database
+
+:move_maps
+echo.
+echo    Modules are now moved to Server folder!
+ping -n 3 127.0.0.1>nul
+echo    Please, wait...
+if not exist "%mainfolder%\Server\Modules" mkdir "%mainfolder%\Server\Modules"
+xcopy "%mainfolder%\Modules\*" "%mainfolder%\Server\Modules" /s /e /y>nul
+if not exist "%mainfolder%\Server\Modules\%expansion%\dbc" (
+echo    Failed to move Modules folder!
+ping -n 3 127.0.0.1>nul
+goto select_expansion
+)
+rmdir /S /Q "%mainfolder%\Modules">nul
+echo    Done!
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%"
+>"%versions%\%expansion%_maps_version.spp" echo %maps_version%
 goto start_database
 
 :update_core
-mode con: cols=40 lines=30
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Core update required!
 ping -n 3 127.0.0.1>nul
@@ -1156,27 +1375,21 @@ echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%"
->"%mainfolder%\%expansion%_core_version.spp" echo %core_version%
+>"%versions%\%expansion%_core_version.spp" echo %core_version%
 
 rem Disable Beta tag
-if exist "%mainfolder%\%expansion%_beta.on" del "%mainfolder%\%expansion%_beta.on"
+if exist "%versions%\%expansion%_beta.on" del "%versions%\%expansion%_beta.on"
 set /a beta_enable=0
 
 rem PLAY INTRO READY
-if exist "%mainfolder%\music.on" (
-cd "%mainfolder%\Server\Tools"
-start cmdmp3win.exe music/%expansion%_intro_ready.mp3
-cd "%mainfolder%"
-)
+call :PlaySound "%expansion%_intro_ready"
 
 goto start_database
 
 :missing_core
-mode con: cols=40 lines=30
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
-echo    %expansion% binaries missing!
+echo    Missing %expansion% binaries!
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please wait...
@@ -1196,39 +1409,34 @@ echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%"
->"%mainfolder%\%expansion%_core_version.spp" echo %core_version%
+>"%versions%\%expansion%_core_version.spp" echo %core_version%
 goto start_database
 
 :update_world
 
 rem PLAY INTRO PROCESS
-if exist "%mainfolder%\music.on" (
-cd "%mainfolder%\Server\Tools"
-start cmdmp3win.exe music/%expansion%_intro_process.mp3
+call :PlaySound "%expansion%_intro_process"
 cd "%mainfolder%"
-)
 
 rem setlocal enableDelayedExpansion
-mode con: cols=40 lines=30
 REM if "%choose_exp%"=="4" goto menu
-del "%mainfolder%\%expansion%_fr.spp"
-del "%mainfolder%\%expansion%_de.spp"
-del "%mainfolder%\%expansion%_ko.spp"
-del "%mainfolder%\%expansion%_ch.spp"
-del "%mainfolder%\%expansion%_mx.spp"
-del "%mainfolder%\%expansion%_ru.spp"
-del "%mainfolder%\%expansion%_tw.spp"
-del "%mainfolder%\%expansion%_es.spp"
-del "%mainfolder%\%expansion%_fr_re.spp"
-del "%mainfolder%\%expansion%_de_re.spp"
-del "%mainfolder%\%expansion%_ko_re.spp"
-del "%mainfolder%\%expansion%_ch_re.spp"
-del "%mainfolder%\%expansion%_mx_re.spp"
-del "%mainfolder%\%expansion%_ru_re.spp"
-del "%mainfolder%\%expansion%_tw_re.spp"
-del "%mainfolder%\%expansion%_es_re.spp"
+del "%versions%\%expansion%_fr.spp"
+del "%versions%\%expansion%_de.spp"
+del "%versions%\%expansion%_ko.spp"
+del "%versions%\%expansion%_ch.spp"
+del "%versions%\%expansion%_mx.spp"
+del "%versions%\%expansion%_ru.spp"
+del "%versions%\%expansion%_tw.spp"
+del "%versions%\%expansion%_es.spp"
+del "%versions%\%expansion%_fr_re.spp"
+del "%versions%\%expansion%_de_re.spp"
+del "%versions%\%expansion%_ko_re.spp"
+del "%versions%\%expansion%_ch_re.spp"
+del "%versions%\%expansion%_mx_re.spp"
+del "%versions%\%expansion%_ru_re.spp"
+del "%versions%\%expansion%_tw_re.spp"
+del "%versions%\%expansion%_es_re.spp"
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    World db update required!
 ping -n 3 127.0.0.1>nul
@@ -1241,29 +1449,29 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Extracting world db...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\world.7z" > nul
 cd "%mainfolder%"
 echo.
 echo    Wiping old world db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_world.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_world.sql"
 echo.
 echo    Installing new world db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world.sql"
 rem echo    Applying world db updates...
 rem ping -n 3 127.0.0.1>nul
 rem set /a next_world_version=%current_world_version%+1
 rem for /l %%x in (%next_world_version%, 1, %world_version%) do (
 rem    ping -n 2 127.0.0.1>nul
-rem    for %%i in ("%mainfolder%\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+rem    for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 rem )
-rem for %%i in ("%mainfolder%\sql\%expansion%\updates\world\common\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+rem for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\world\common\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\common\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
 echo    Applying world db mods...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+for %%i in ("%mainfolder%\Server\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -1272,42 +1480,36 @@ rem echo    Locales are removed in this process!
 rem ping -n 3 127.0.0.1>nul
 rem echo    To reinstall use locales menu.
 rem ping -n 5 127.0.0.1>nul
-del "%mainfolder%\sql\%expansion%\world.sql"
->"%mainfolder%\%expansion%_world_version.spp" echo %world_version%
+del "%mainfolder%\Server\sql\%expansion%\world.sql"
+>"%versions%\%expansion%_world_version.spp" echo %world_version%
 goto start_database
 
 :reinstall_world_do
 
 rem PLAY INTRO PROCESS
-if exist "%mainfolder%\music.on" (
-cd "%mainfolder%\Server\Tools"
-start cmdmp3win.exe music/%expansion%_intro_process.mp3
-cd "%mainfolder%"
-)
+call :PlaySound "%expansion%_intro_process"
 
-mode con: cols=40 lines=30
 REM if "%choose_exp%"=="4" goto menu
-del "%mainfolder%\%expansion%_fr.spp"
-del "%mainfolder%\%expansion%_de.spp"
-del "%mainfolder%\%expansion%_ko.spp"
-del "%mainfolder%\%expansion%_ch.spp"
-del "%mainfolder%\%expansion%_mx.spp"
-del "%mainfolder%\%expansion%_ru.spp"
-del "%mainfolder%\%expansion%_tw.spp"
-del "%mainfolder%\%expansion%_es.spp"
-del "%mainfolder%\%expansion%_fr_re.spp"
-del "%mainfolder%\%expansion%_de_re.spp"
-del "%mainfolder%\%expansion%_ko_re.spp"
-del "%mainfolder%\%expansion%_ch_re.spp"
-del "%mainfolder%\%expansion%_mx_re.spp"
-del "%mainfolder%\%expansion%_ru_re.spp"
-del "%mainfolder%\%expansion%_tw_re.spp"
-del "%mainfolder%\%expansion%_es_re.spp"
-del "%mainfolder%\%expansion%_world_version.spp"
-del "%mainfolder%\%expansion%_logs_version.spp"
+del "%versions%\%expansion%_fr.spp"
+del "%versions%\%expansion%_de.spp"
+del "%versions%\%expansion%_ko.spp"
+del "%versions%\%expansion%_ch.spp"
+del "%versions%\%expansion%_mx.spp"
+del "%versions%\%expansion%_ru.spp"
+del "%versions%\%expansion%_tw.spp"
+del "%versions%\%expansion%_es.spp"
+del "%versions%\%expansion%_fr_re.spp"
+del "%versions%\%expansion%_de_re.spp"
+del "%versions%\%expansion%_ko_re.spp"
+del "%versions%\%expansion%_ch_re.spp"
+del "%versions%\%expansion%_mx_re.spp"
+del "%versions%\%expansion%_ru_re.spp"
+del "%versions%\%expansion%_tw_re.spp"
+del "%versions%\%expansion%_es_re.spp"
+del "%versions%\%expansion%_world_version.spp"
+del "%versions%\%expansion%_logs_version.spp"
 set current_world_version=0
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Reinstalling world db!
 ping -n 3 127.0.0.1>nul
@@ -1317,30 +1519,30 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Extracting world db...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\world.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\world.7z" > nul
 cd "%mainfolder%"
 echo.
 echo    Wiping old world db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_world.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_world.sql"
 echo.
 echo    Installing new world db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world.sql"
 rem echo.
 rem echo    Applying world db updates...
 rem ping -n 3 127.0.0.1>nul
 rem set /a next_world_version=%current_world_version%+1
 rem for /l %%x in (%next_world_version%, 1, %world_version%) do (
 rem    ping -n 2 127.0.0.1>nul
-rem    for %%i in ("%mainfolder%\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+rem    for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 rem )
-rem for %%i in ("%mainfolder%\sql\%expansion%\updates\world\common\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\world\common\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+rem for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\world\common\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\common\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\world\common\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
 echo    Applying world db mods...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+for %%i in ("%mainfolder%\Server\sql\%expansion%\world\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\world\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\world\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -1349,16 +1551,14 @@ rem echo    Locales are removed in this process!
 rem ping -n 3 127.0.0.1>nul
 rem echo    To reinstall use locales menu.
 rem ping -n 5 127.0.0.1>nul
-del "%mainfolder%\sql\%expansion%\world.sql"
->"%mainfolder%\%expansion%_world_version.spp" echo %world_version%
+del "%mainfolder%\Server\sql\%expansion%\world.sql"
+>"%versions%\%expansion%_world_version.spp" echo %world_version%
 goto start_database
 
 :update_chars
-mode con: cols=40 lines=30
 REM if "%choose_exp%"=="4" goto menu
-rem set /a current_chars_version=<"%mainfolder%\%expansion%_chars_version.spp"
+rem set /a current_chars_version=<"%versions%\%expansion%_chars_version.spp"
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Character db update required!
 ping -n 3 127.0.0.1>nul
@@ -1374,18 +1574,16 @@ ping -n 3 127.0.0.1>nul
 set /a "next_chars_version=current_chars_version+1"
 for /l %%x in (%next_chars_version%, 1, %chars_version%) do (
    ping -n 1 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
+   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 )
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
->"%mainfolder%\%expansion%_chars_version.spp" echo %chars_version%
+>"%versions%\%expansion%_chars_version.spp" echo %chars_version%
 goto start_database
 
 :update_realm
-mode con: cols=40 lines=30
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Accounts db update required!
 ping -n 3 127.0.0.1>nul
@@ -1401,18 +1599,16 @@ ping -n 3 127.0.0.1>nul
 set /a "next_realm_version=current_realm_version+1"
 for /l %%x in (%next_realm_version%, 1, %realm_version%) do (
    ping -n 1 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 )
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
->"%mainfolder%\%expansion%_realm_version.spp" echo %realm_version%
+>"%versions%\%expansion%_realm_version.spp" echo %realm_version%
 goto start_database
 
 :update_logs
-mode con: cols=40 lines=30
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Logs db update required!
 ping -n 3 127.0.0.1>nul
@@ -1425,23 +1621,21 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Reinstalling logs database...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_logs.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\sql\%expansion%\logs.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_logs.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\Server\sql\%expansion%\logs.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 if not "%logs_version%"=="0" (
->"%mainfolder%\%expansion%_logs_version.spp" echo %logs_version%
+>"%versions%\%expansion%_logs_version.spp" echo %logs_version%
 )
 goto start_database
 
 :update_bots
-mode con: cols=40 lines=30
 REM if "%choose_exp%"=="4" goto menu
-rem set /a current_bots_version=<"%mainfolder%\%expansion%_bots_version.spp"
-rem if not exist "%mainfolder%\%expansion%_bots_version.spp" (set /a current_bots_version=0)
+rem set /a current_bots_version=<"%versions%\%expansion%_bots_version.spp"
+rem if not exist "%versions%\%expansion%_bots_version.spp" (set /a current_bots_version=0)
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Playerbot db update required!
 ping -n 3 127.0.0.1>nul
@@ -1457,55 +1651,50 @@ ping -n 3 127.0.0.1>nul
 set /a "next_bots_version=current_bots_version+1"
 for /l %%x in (%next_bots_version%, 1, %bots_version%) do (
    ping -n 1 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\playerbot\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
+   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\playerbot\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\playerbot\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\playerbot\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 )
 echo.
 echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
-rem cd "%mainfolder%\sql\%expansion%\playerbot"
-rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
+rem cd "%mainfolder%\Server\sql\%expansion%\playerbot"
+rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
 echo.
 echo    Clearing teleport cache...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%\playerbot"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
 cd "%mainfolder%"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
 echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_texts.sql"
-echo    Updating bots named locations...
-ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_named_location.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_texts.sql"
 echo    Updating bots stat weights...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_weightscales.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_weightscales.sql"
 echo    Updating bots enchants...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_enchants.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_enchants.sql"
 echo    Updating bots names...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\characters\ai_playerbot_names.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\characters\ai_playerbot_names.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+del "%mainfolder%\Server\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 cd "%mainfolder%"
->"%mainfolder%\%expansion%_bots_version.spp" echo %bots_version%
+>"%versions%\%expansion%_bots_version.spp" echo %bots_version%
 goto start_database
 
 :install_website_db
-mode con: cols=40 lines=30
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Installing Website db!
 ping -n 3 127.0.0.1>nul
@@ -1518,29 +1707,27 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Please wait...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\armory.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\armory.7z" > nul
 cd "%mainfolder%"
 echo.
 echo    Installing Armory db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\armory.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\armory.sql"
 echo.
 echo    Installing website tables...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\website.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\sql\%expansion%\armory.sql"
+del "%mainfolder%\Server\sql\%expansion%\armory.sql"
 cls
->"%mainfolder%\%expansion%_website_version.spp" echo %website_db_version%
+>"%versions%\%expansion%_website_version.spp" echo %website_db_version%
 goto start_database
 
 :update_website_db
-mode con: cols=40 lines=30
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Website db update required!
 ping -n 3 127.0.0.1>nul
@@ -1553,36 +1740,40 @@ ping -n 3 127.0.0.1>nul
 echo.
 echo    Extracting Armory db...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\armory.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\armory.7z" > nul
 echo.
 cd "%mainfolder%"
 echo    Installing Armory db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\armory.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\armory.sql"
 echo.
 echo    Installing Website updates...
 ping -n 3 127.0.0.1>nul
 set /a "next_website_db_version=current_website_db_version+1"
 for /l %%x in (%next_website_db_version%, 1, %website_db_version%) do (
    ping -n 1 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\website\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\website\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\website\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\website\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\website\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\website\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\website\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\website\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 )
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\sql\%expansion%\armory.sql"
->"%mainfolder%\%expansion%_website_version.spp" echo %website_db_version%
+del "%mainfolder%\Server\sql\%expansion%\armory.sql"
+>"%versions%\%expansion%_website_version.spp" echo %website_db_version%
 goto start_database
 
 :menu
-endlocal
-mode con: cols=40 lines=30
+call :PlaySound "enter_world"
 if "%choose_exp%"=="1" (COLOR 0E)
 if "%choose_exp%"=="2" (COLOR 0A)
 if "%choose_exp%"=="3" (COLOR 0B)
-if exist "%mainfolder%\autosave.on" set autosave=ON
-if exist "%mainfolder%\autosave.off" set autosave=OFF
+if "%choose_exp%"=="1" (set expansion_color=YELLOW_BRIGHT)
+if "%choose_exp%"=="2" (set expansion_color=GREEN_BRIGHT)
+if "%choose_exp%"=="3" (set expansion_color=CYAN_BRIGHT)
+if exist "%versions%\autosave.on" set autosave=ON
+if exist "%versions%\autosave.off" set autosave=OFF
+if exist "%versions%\autosave_running.on" set autosave_running=ON
+if exist "%versions%\autosave_running.off" set autosave_running=OFF
 if not exist "%mainfolder%\Saves" mkdir "%mainfolder%\Saves"
 if not exist "%mainfolder%\Saves\%expansion%" mkdir "%mainfolder%\Saves\%expansion%"
 if not exist "%mainfolder%\Saves\%expansion%\1" mkdir "%mainfolder%\Saves\%expansion%\1"
@@ -1596,58 +1787,73 @@ if not exist "%mainfolder%\Saves\%expansion%\8" mkdir "%mainfolder%\Saves\%expan
 if not exist "%mainfolder%\Saves\%expansion%\9" mkdir "%mainfolder%\Saves\%expansion%\9"
 if not exist "%mainfolder%\Saves\%expansion%\old" mkdir "%mainfolder%\Saves\%expansion%\old"
 if not "%choose_exp%"=="1" (if not exist "%mainfolder%\Saves\%expansion%\transfer" mkdir "%mainfolder%\Saves\%expansion%\transfer")
-if exist "%mainfolder%\%expansion%_beta.on" (
+if exist "%versions%\%expansion%_beta.on" (
 set /a beta_enable=1
-set /p beta_version=<"%mainfolder%\%expansion%_beta.on"
+set /p beta_version=<"%versions%\%expansion%_beta.on"
 )
-if not exist "%mainfolder%\%expansion%_beta.on" (set /a beta_enable=0)
+if not exist "%versions%\%expansion%_beta.on" (set /a beta_enable=0)
+set DBTOMOD=0
+set RETURNTOMENU=1
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if not "%ERRORLEVEL%"=="0" set serverranonce=0
 cls
-echo ########################################
-echo # %NAME%
-echo # https://www.singleplayerproject.com/
-echo ########################################
-more < "%mainfolder%\logo_%expansion%.txt"
-if "%beta_enable%"=="1" echo                             -=[BETA]=-
-rem if "%beta_enable"=="2" echo                         -=[RELEASE]=-
-if not "%beta_enable%"=="1" echo.
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                       Repack: %repack_version% Core: %core_version% DB: %current_world_version% Web: %current_website_version%"
+:: echo.
+:: echo.
+if "%beta_enable%"=="1" call :ColorText GRAY "                                                         -=[BETA]=-"
+if "%beta_enable%"=="0" call :ColorText GRAY "                                                         -=[RELEASE]=-"
+echo.
+echo.
+echo.
+call :ColorText %expansion_color% "         2 - "
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if "%ERRORLEVEL%"=="0" call :ColorText RED "Stop Server" \n
+if not "%ERRORLEVEL%"=="0" call :ColorText GREEN "Start Server" \n
+echo.
 REM echo 1 - Start servers (Win32)
-echo   2 - Start Server (x64)
+call :ColorText %expansion_color% "         3 - Help"
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-if "%ERRORLEVEL%"=="0" echo   T - Restarter Mode
+if "%ERRORLEVEL%"=="0" call :ColorText %expansion_color% "                                      T - Restarter Mode" \n
 if NOT "%ERRORLEVEL%"=="0" echo.
-echo   3 - Create Account
-echo   4 - Server Info
-echo   R - Reset RandomBots
-if "%website%"=="ON" echo   M - Open website
-echo   E - Open SPP Extras
 echo.
-echo   5 - Save Manager
-echo   6 - Wipe Database
-tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-echo   7 - Install Translations
+call :ColorText %expansion_color% "         4 - Server Settings"
+call :ColorText %expansion_color% "                           R - Reset RandomBots" \n
 echo.
-tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-if NOT "%ERRORLEVEL%"=="0" (
-if "%beta_enable%"=="1" echo   8 - Beta Build Menu
-if not "%beta_enable%"=="1" echo   8 - Switch to Beta Build
-echo.
+rem echo          E - Open SPP Extras
+call :ColorText %expansion_color% "         5 - Saves Menu"
+if "%website%"=="ON" (
+call :ColorText %expansion_color% "                                M - Open website" \n
 )
-if "%ERRORLEVEL%"=="0" echo.
-rem tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
-rem if NOT "%ERRORLEVEL%"=="0" echo   9 - Back to expansion selector
-echo   9 - Main Menu
-echo   0 - Shutdown Repack
+if "%website%"=="OFF" (
+call :ColorText GRAY "                                Website disabled" \n
+)
 echo.
-if "%beta_enable%"=="1" echo    Ver: %repack_version% Core: Beta DB: %current_world_version% Web: %current_website_version%
-if not "%beta_enable%"=="1" echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version% Web: %current_website_version%
+call :ColorText %expansion_color% "         6 - Wipe Database"
+call :ColorText %expansion_color% "                             E - Open SPP Extras" \n
 echo.
-set /P menu_option=Enter your choice: 
+call :ColorText %expansion_color% "         7 - Install Translations"
+call :ColorText %expansion_color% "                      D - Modify DB" \n
+echo.
+if "%beta_enable%"=="1" echo          8 - Beta Build Menu
+if not "%beta_enable%"=="1" echo          8 - Switch to Beta Build
+echo.
+echo          9 - Main Menu
+echo.
+echo          0 - Shutdown Repack
+rem if "%beta_enable%"=="1" echo    Ver: %repack_version% Core: Beta DB: %current_world_version% Web: %current_website_version%
+rem if not "%beta_enable%"=="1" echo    Ver: %repack_version% Core: %core_version% DB: %current_world_version% Web: %current_website_version%
+for /l %%i in (1,1,3) do echo.
+call :ColorBlink WHITE "Enter your choice: "
+set /P menu_option=""
 REM if "%menu_option%"=="1" (goto quick_start_servers_x86)
 rem if "%menu_option%"=="1" (goto menu)
-if "%menu_option%"=="2" (goto quick_start_servers_x64)
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if not "%ERRORLEVEL%"=="0" if "%menu_option%"=="2" (goto quick_start_servers_x64)
+if "%ERRORLEVEL%"=="0" if "%menu_option%"=="2" (goto quick_stop_servers_x64)
 if "%menu_option%"=="T" (goto server_restart_x64)
 if "%menu_option%"=="t" (goto server_restart_x64)
-if "%menu_option%"=="3" (goto account_tool)
+if "%menu_option%"=="3" (goto help_menu)
 if "%menu_option%"=="4" (goto server_settings)
 if "%menu_option%"=="r" (goto bots_menu)
 if "%menu_option%"=="R" (goto bots_menu)
@@ -1656,9 +1862,11 @@ if "%menu_option%"=="E" (goto open_spp_extras)
 if "%menu_option%"=="5" (goto save_menu)
 if "%menu_option%"=="6" (goto wipe_db)
 if "%menu_option%"=="7" (goto install_locales_pre)
+if "%menu_option%"=="D" (goto mod_db)
+if "%menu_option%"=="d" (goto mod_db)
 if not "%beta_enable%"=="1" if "%menu_option%"=="8" (goto beta_on)
 if "%beta_enable%"=="1" if "%menu_option%"=="8" (goto beta_menu)
-if "%menu_option%"=="9" (goto select_expansion)
+if "%menu_option%"=="9" (goto check_autosave_menu)
 if "%menu_option%"=="0" (goto shutdown_servers)
 if "%menu_option%"=="m" (goto open_map)
 if "%menu_option%"=="M" (goto open_map)
@@ -1666,100 +1874,102 @@ if "%menu_option%"=="" (goto menu)
 goto menu
 
 :beta_on
-COLOR 09
 cls
-echo ########################################
-echo # WARNING!                             #
-echo # You are about to download Beta Build #
-echo # It has latest features, but may be   #
-echo # buggy. You can revert it later.      #
-echo ########################################
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
-setlocal
-:PROMPT
-SET /P AREYOUSURE=Are you sure (Y/[N])?
+call :ColorText BLUE_BRIGHT "                                      ########################################" \n
+call :ColorText BLUE_BRIGHT "                                      # You are about to download Beta Build #" \n
+call :ColorText BLUE_BRIGHT "                                      # It has latest features, but may be   #" \n
+call :ColorText BLUE_BRIGHT "                                      # buggy. You can revert it later.      #" \n
+call :ColorText BLUE_BRIGHT "                                      ########################################" \n
+echo.
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
 set "filename=cmangos-%expansion%.zip"
 if "%expansion%"=="vanilla" set "filename=cmangos-classic.zip"
 cls
-more < "%mainfolder%\header_spp.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
 if exist "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%" (
-echo    Beta Build archive found!
+echo          Beta Build archive found!
 ping -n 3 127.0.0.1>nul
+FOR /F "TOKENS=2" %%A IN ('WHERE /T "%mainfolder%\Server\Binaries\%expansion%\Bin64:%filename%"') do (
+echo.
+echo          Version: %%A
+)
 echo.
 )
 if not exist "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%" (
-echo    Downloading Beta Build...
+echo          Downloading Beta Build...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Tools\wget.exe" -q --show-progress --no-check-certificate "https://github.com/celguar/mangosbot-bots/releases/latest/download/%filename%" -O "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%"
 cls
-more < "%mainfolder%\header_spp.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
 )
-echo    Checking File...
+echo          Checking File...
 ping -n 3 127.0.0.1>nul
 if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" (
 echo.
-echo    Failed to download Beta Build!
+echo          Failed to download Beta Build!
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Try again later...
+echo          Try again later...
 ping -n 3 127.0.0.1>nul
 goto settings
 )
 echo.
-echo    Extracting Beta Build...
+echo          Extracting Beta Build...
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" > nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.exe" "%mainfolder%\Server\Binaries\%expansion%\Bin64">nul
 echo.
-echo    Copying debug info...
+echo          Copying debug info...
 ping -n 3 127.0.0.1>nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
 "%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 rd /s /q "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo"
 echo.
-echo    Done!
+echo          Done!
 ping -n 3 127.0.0.1>nul
 rem del "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%"
 set "beta_version=%date%"
-echo %date% > "%mainfolder%\%expansion%_beta.on"
+echo %date% > "%versions%\%expansion%_beta.on"
 set /a beta_enable=1
 cd "%mainfolder%"
 goto settings
 
 :beta_off
-COLOR 09
 cls
-echo ########################################
-echo # WARNING!                             #
-echo # You are about to restore original    #
-echo # Server Binary (mangosd.exe)          #
-echo ########################################
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
-setlocal
-:PROMPT
-SET /P AREYOUSURE=Are you sure (Y/[N])?
+call :ColorText BLUE_BRIGHT "                                      ########################################" \n
+call :ColorText BLUE_BRIGHT "                                      # You are about to restore original    #" \n
+call :ColorText BLUE_BRIGHT "                                      # Server Binary (mangosd.exe)          #" \n
+call :ColorText BLUE_BRIGHT "                                      ########################################" \n
+echo.
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
 cls
-more < "%mainfolder%\header_spp.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
-echo    Extracting %expansion% binaries...
+echo          Extracting original %expansion% binaries...
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\Bin64.7z" > nul
 echo.
-echo    Copying debug info...
+echo          Copying debug info...
 ping -n 3 127.0.0.1>nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
 "%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 del "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.pdb"
 echo.
-echo    Done!
+echo          Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\%expansion%_beta.on"
+del "%versions%\%expansion%_beta.on"
 set /a beta_enable=0
 cd "%mainfolder%"
 goto settings
@@ -1769,63 +1979,62 @@ COLOR 09
 set "filename=cmangos-%expansion%.zip"
 if "%expansion%"=="vanilla" set "filename=cmangos-classic.zip"
 cls
-more < "%mainfolder%\header_spp.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
-echo    Downloading Beta Build...
+echo          Downloading Beta Build...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Tools\wget.exe" -q --show-progress --no-check-certificate "https://github.com/celguar/mangosbot-bots/releases/latest/download/%filename%" -O "%mainfolder%/Server/Binaries/%expansion%/Bin64/%filename%"
 cls
-more < "%mainfolder%\header_spp.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
-echo    Checking File...
+echo          Checking File...
 ping -n 3 127.0.0.1>nul
 if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" (
 echo.
-echo    Failed to download Beta Build!
+echo          Failed to download Beta Build!
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Try again later...
+echo          Try again later...
 ping -n 3 127.0.0.1>nul
 goto settings
 )
 echo.
-echo    Extracting Beta Build...
+echo          Extracting Beta Build...
 ping -n 3 127.0.0.1>nul
 cd "%mainfolder%\Server\Binaries\%expansion%\Bin64\"
 "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%" > nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.exe" "%mainfolder%\Server\Binaries\%expansion%\Bin64">nul
 echo.
-echo    Copying debug info...
+echo          Copying debug info...
 ping -n 3 127.0.0.1>nul
 xcopy /y "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo\mangosd.pdb" "%mainfolder%\Settings\%expansion%">nul
 "%mainfolder%\Server\Tools\peupdate.exe" -k "%mainfolder%\Server\Binaries\%expansion%\Bin64\mangosd.exe">nul
 rd /s /q "%mainfolder%\Server\Binaries\%expansion%\Bin64\x64_RelWithDebInfo"
 echo.
-echo    Done!
+echo          Done!
 ping -n 3 127.0.0.1>nul
 rem del "%mainfolder%\Server\Binaries\%expansion%\Bin64\%filename%"
-echo %date% > "%mainfolder%\%expansion%_beta.on"
+echo %date% > "%versions%\%expansion%_beta.on"
 set "beta_version=%date%"
 cd "%mainfolder%"
 goto beta_menu
 
 :beta_menu
 cls
-COLOR 09
-more < "%mainfolder%\header_spp.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
-echo      -------- Beta Menu --------
+call :ColorText BLUE_BRIGHT "                                             -------- Beta Menu --------" \n
 echo.
 FOR /F "TOKENS=2" %%A IN ('WHERE /T "%mainfolder%\Server\Binaries\%expansion%\Bin64:mangosd.exe"') do (
-echo         Version: %%A
+echo          Version: %%A
 )
 rem echo         Version: %beta_version%
 echo.
-echo    1 - Update Beta Build
+echo          1 - Update Beta Build
 echo.
-echo    2 - Switch back to Release
+echo          2 - Switch back to Release
 echo.
-echo    0 - Go back
+echo          0 - Go back
 echo.
 set /P choose_service=Enter your choice: 
 if "%choose_service%"=="1" (goto beta_update)
@@ -1833,84 +2042,114 @@ if "%choose_service%"=="2" (goto beta_off)
 if "%choose_service%"=="0" (goto settings)
 goto beta_menu
 
-:music_on
-del "%mainfolder%\music.off"
-echo music > "%mainfolder%\music.on"
-goto beginning
-
 :server_settings
 cls
-more < "%mainfolder%\header_spp.txt"
-more < "%mainfolder%\logo_%expansion%.txt"
-echo    -------- Server Info --------
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                         -------- Server Settings --------" \n
 echo.
-echo   MySQL Host: %host%  Port: %port%
-echo         User: %user%  Pass: %pass%
+call :ColorItalic WHITE "                                         MySQL Host: "
+call :ColorText WHITE_BRIGHT "%host%  "
+call :ColorItalic WHITE "Port: "
+call :ColorText WHITE_BRIGHT "%port%"
 echo.
-echo   1 - World settings
 echo.
-echo   2 - Bots settings
+call :ColorItalic WHITE "                                            User: "
+call :ColorText WHITE_BRIGHT "%user%  "
+call :ColorItalic WHITE "Password: "
+call :ColorText WHITE_BRIGHT "%pass%"
 echo.
-echo   3 - Change server address
 echo.
-echo   4 - Change realm name
+call :ColorText WHITE "         1 - World settings"
+call :ColorText GRAY " - Open mangosd.conf" \n
 echo.
-echo   5 - Server Logs
+call :ColorText WHITE "         2 - Bots settings"
+call :ColorText GRAY " - Open aiplayerbot.conf" \n
 echo.
-if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes" echo   6 - Crash Logs [No logs]
-if exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes" echo   6 - Crash Logs
+call :ColorText WHITE "         3 - Auction Bot settings"
+call :ColorText GRAY " - Open ahbot.conf" \n
 echo.
-echo   0 - Go back
+call :ColorText WHITE "         4 - Other settings"
+call :ColorText GRAY " - Open Settings folder" \n
 echo.
-set /P choose_setting=Enter your choice: 
+call :ColorText WHITE "         5 - Change server address"
+call :ColorText GRAY " - Is required to play with other people" \n
+echo.
+call :ColorText WHITE "         6 - Change realm name"
+call :ColorText GRAY " - Change default realm name" \n
+echo.
+call :ColorText WHITE "         7 - Server Logs"
+call :ColorText GRAY " - Open folder with logs" \n
+echo.
+if not exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes" call :ColorText WHITE "         8 - Crash Logs [No logs]" \n
+if exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes" call :ColorText WHITE "         8 - Crash Logs" \n
+echo.
+echo          0 - Go back
+echo.
+call :ColorBlink WHITE "Enter your choice: "
+set /P choose_setting=
 if "%choose_setting%"=="1" (goto world_settings)
 if "%choose_setting%"=="2" (goto bots_settings)
-if "%choose_setting%"=="3" (goto ip_changer)
-if "%choose_setting%"=="4" (goto rename_realm)
-if "%choose_setting%"=="5" (explorer.exe "%mainfolder%\Settings\%expansion%\logs")
-if "%choose_setting%"=="6" (if exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes" explorer.exe "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes")
+if "%choose_setting%"=="3" (goto ahbot_settings)
+if "%choose_setting%"=="4" (explorer.exe "%mainfolder%\Settings\%expansion%")
+if "%choose_setting%"=="5" (goto ip_changer)
+if "%choose_setting%"=="6" (goto rename_realm)
+if "%choose_setting%"=="7" (explorer.exe "%mainfolder%\Settings\%expansion%\logs")
+if "%choose_setting%"=="8" (if exist "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes" explorer.exe "%mainfolder%\Server\Binaries\%expansion%\Bin64\Crashes")
 if "%choose_setting%"=="0" (goto menu)
 if "%choose_setting%"=="" (goto server_settings)
 goto server_settings
 
 :world_settings
 cls
-more < "%mainfolder%\header_spp.txt"
-more < "%mainfolder%\logo_%expansion%.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
-echo    Opening world settings...
+echo         Opening world settings...
 ping -n 2 127.0.0.1>nul
 echo.
-echo    Edit carefully!
+echo         Edit carefully!
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Tools\Notepad\notepad++.exe" "%mainfolder%\Settings\%expansion%\mangosd.conf"
 goto menu
 
 :bots_settings
 cls
-more < "%mainfolder%\header_spp.txt"
-more < "%mainfolder%\logo_%expansion%.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
-echo    Opening bots settings...
+echo         Opening bots settings...
 ping -n 2 127.0.0.1>nul
 echo.
-echo    Edit carefully!
+echo         Edit carefully!
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Tools\Notepad\notepad++.exe" "%mainfolder%\Settings\%expansion%\aiplayerbot.conf"
 goto menu
 
-:reinstall_world
-COLOR 0C
+:ahbot_settings
 cls
-echo ########################################
-echo # WARNING!                             #
-echo # World Database will be reinstalled!  #
-echo # Any custom things will be removed!   #
-echo ########################################
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
+echo         Opening Auction Bot settings...
+ping -n 2 127.0.0.1>nul
+echo.
+echo         Edit carefully!
+ping -n 2 127.0.0.1>nul
+"%mainfolder%\Server\Tools\Notepad\notepad++.exe" "%mainfolder%\Settings\%expansion%\ahbot.conf"
+goto menu
+
+:reinstall_world
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo                                            -------- Wipe World DB --------
+echo.
+call :ColorText RED "                                       ########################################" \n
+call :ColorText RED "                                       # WARNING                              #" \n
+call :ColorText RED "                                       # World Database will be reinstalled   #" \n
+call :ColorText RED "                                       # Any custom things will be removed    #" \n
+call :ColorText RED "                                       ########################################" \n
 echo.
 setlocal
-:PROMPT
-SET /P AREYOUSURE=Are you sure (Y/[N])?
+:PROMPTecho.
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
 tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
@@ -1921,11 +2160,11 @@ goto reinstall_world_do
 :open_map
 cls
 if "%website%"=="OFF" (goto menu)
-more < "%mainfolder%\header_spp.txt"
-more < "%mainfolder%\logo_%expansion%.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
-echo    Opening website
-echo    in default browser...
+echo         Opening website
+echo.
+echo         in default browser...
 ping -n 3 127.0.0.1>nul
 start http://127.0.0.1
 goto menu
@@ -1942,25 +2181,27 @@ goto menu
 
 :bots_menu
 cls
-more < "%mainfolder%\header_spp.txt"
-more < "%mainfolder%\logo_%expansion%.txt"
-echo    -------- Bots Reset --------
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                           -------- Bots Reset --------" \n
 echo.
-echo   1 - Reset Random Bots
-echo       - randomise timer
-echo       - online bot number
+echo          1 - Reset Bots settings
+echo              - randomise timer
+echo              - online bot number
+echo              - rtsc settings
+echo              - changed strategies
 echo.
-echo   2 - Delete Random Bots
-echo       - Delete all random bots
-echo         except for bots who are:
-echo         in friends or guild
+echo          2 - Delete Random Bots
+echo              - Delete all random bots
+echo                except for bots who are:
+echo                in friends or guild
 echo.
-echo   3 - Delete ALL Random Bots
-echo       - Delete all random bots
+echo          3 - Delete ALL Random Bots
+echo              - Delete all random bots
 echo.
-echo   0 - Go back
-echo.
-set /P bots_option=Enter your choice: 
+echo          0 - Go back
+for /l %%i in (1,1,7) do echo.
+call :ColorBlink WHITE "Enter your choice: "
+set /P bots_option=
 if "%bots_option%"=="1" (goto reset_bots)
 if "%bots_option%"=="2" (goto delete_bots)
 if "%bots_option%"=="3" (goto delete_all_bots)
@@ -1969,59 +2210,61 @@ if "%bots_option%"=="" (goto bots_menu)
 goto menu
 
 :reset_bots
-mode con: cols=40 lines=30
-COLOR 0C
 cls
-echo ########################################
-echo # WARNING!                             #
-echo # All random bots will be reset!       #
-echo ########################################
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                           -------- Bots Reset --------" \n
+echo.
+call :ColorText RED "                                      ######################################" \n
+call :ColorText RED "                                      # WARNING                            #" \n
+call :ColorText RED "                                      # All bots settings will be reset    #" \n
+call :ColorText RED "                                      ######################################" \n
 echo.
 setlocal
 :PROMPT
-SET /P AREYOUSURE=Are you sure (Y/[N])?
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
 tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
-echo    Reseting random bots...
+echo    Reseting random bots settings...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\reset_randombots.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 goto menu
 
 :delete_bots
-mode con: cols=40 lines=30
-COLOR 0C
 cls
-echo ########################################
-echo # WARNING!                             #
-echo # All random bots will be removed!     #
-echo #                                      #
-echo # Bots in friend/guild will stay!      #
-echo ########################################
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                           -------- Bots Delete --------" \n
+echo.
+call :ColorText RED "                                      ########################################" \n
+call :ColorText RED "                                      # WARNING                              #" \n
+call :ColorText RED "                                      # All random bots will be removed      #" \n
+call :ColorText RED "                                      #                                      #" \n
+call :ColorText RED "                                      # Bots in friend/guild will stay       #" \n
+call :ColorText RED "                                      ########################################" \n
 echo.
 setlocal
 :PROMPT
-SET /P AREYOUSURE=Are you sure (Y/[N])?
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
 tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Scheduling deleting random bots...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\delete_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\reset_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\delete_randombots.sql"
 echo.
 echo    Done!
 ping -n 2 127.0.0.1>nul
@@ -2032,31 +2275,32 @@ ping -n 5 127.0.0.1>nul
 goto menu
 
 :delete_all_bots
-mode con: cols=40 lines=30
-COLOR 0C
 cls
-echo ########################################
-echo # WARNING!                             #
-echo # All random bots will be removed!     #
-echo #                                      #
-echo # Including those in guilds/friends!   #
-echo ########################################
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                           -------- Bots Delete --------" \n
+echo.
+call :ColorText RED "                                      ########################################" \n
+call :ColorText RED "                                      # WARNING                              #" \n
+call :ColorText RED "                                      # All random bots will be removed      #" \n
+call :ColorText RED "                                      #                                      #" \n
+call :ColorText RED "                                      # Including those in guilds/friends    #" \n
+call :ColorText RED "                                      ########################################" \n
 echo.
 setlocal
 :PROMPT
-SET /P AREYOUSURE=Are you sure (Y/[N])?
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
 tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Scheduling deleting random bots...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\delete_all_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\reset_randombots.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\delete_all_randombots.sql"
 echo.
 echo    Done!
 ping -n 2 127.0.0.1>nul
@@ -2066,28 +2310,298 @@ echo    and new bots will be created
 ping -n 5 127.0.0.1>nul
 goto menu
 
+:mod_db
+set DBTOMOD=0
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText BLUE_BRIGHT "                                        -------- Modify Database --------" \n
+echo.
+call :ColorItalic WHITE "                                         MySQL Host: "
+call :ColorText WHITE_BRIGHT "%host%  "
+call :ColorItalic WHITE "Port: "
+call :ColorText WHITE_BRIGHT "%port%"
+echo.
+echo.
+call :ColorItalic WHITE "                                            User: "
+call :ColorText WHITE_BRIGHT "%user%  "
+call :ColorItalic WHITE "Password: "
+call :ColorText WHITE_BRIGHT "%pass%"
+echo.
+echo.
+call :ColorText %expansion_color% "            Choose Database to modify:"
+echo.
+echo.
+call :ColorText WHITE "            1 - World DB"
+call :ColorItalic GRAY "       - contains items, NPCs, objects, scripts & other content" \n
+echo.
+echo.
+call :ColorText WHITE "            2 - Characters DB"
+call :ColorItalic GRAY "  - contains characters & their inventory, auction" \n
+echo.
+echo.
+call :ColorText WHITE "            3 - Accounts DB"
+call :ColorItalic GRAY "    - contains accounts" \n
+echo.
+echo.
+echo             0 - Go back
+for /l %%i in (1,1,9) do echo.
+call :ColorBlink %expansion_color% "Choose Database: "
+set /P DBTOMOD=
+if "%DBTOMOD%"=="" (goto menu)
+if "%DBTOMOD%"=="0" (goto menu)
+if %DBTOMOD% LSS 1 (goto menu)
+if %DBTOMOD% GTR 3 (goto menu)
+goto mod_db_apply
+
+:mod_db_apply
+set DBMODOPTION=0
+if "%DBTOMOD%"=="1" (
+ set dbtomodname=World
+ set dbtomodrealname=%world%
+ )
+if "%DBTOMOD%"=="2" (
+ set dbtomodname=Characters
+ set dbtomodrealname=%characters%
+ )
+if "%DBTOMOD%"=="3" (
+ set dbtomodname=Accounts
+ set dbtomodrealname=%realmd%
+ )
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText BLUE_BRIGHT "                                        -------- Modify Database --------" \n
+echo.
+call :ColorItalic WHITE "                                         MySQL Host: "
+call :ColorText WHITE_BRIGHT "%host%  "
+call :ColorItalic WHITE "Port: "
+call :ColorText WHITE_BRIGHT "%port%"
+echo.
+echo.
+call :ColorItalic WHITE "                                            User: "
+call :ColorText WHITE_BRIGHT "%user%  "
+call :ColorItalic WHITE "Password: "
+call :ColorText WHITE_BRIGHT "%pass%"
+echo.
+echo.
+call :ColorText %expansion_color% "            Editing %dbtomodname% DB:"
+echo.
+echo.
+call :ColorText WHITE "            1 - Edit Manual SQL file"
+call :ColorItalic GRAY "        - open SQL file to edit sql commands" \n
+echo.
+echo.
+call :ColorText WHITE "            2 - Apply Manual SQL file"
+call :ColorItalic GRAY "       - apply SQL file to %dbtomodname% DB" \n
+echo.
+echo.
+call :ColorText WHITE "            3 - Apply ALL SQL files"
+call :ColorItalic GRAY "         - except Manual SQL File" \n
+echo.
+echo.
+call :ColorText WHITE "            4 - Open Custom SQL folder"
+call :ColorItalic GRAY "      - open folder with custom SQL files" \n
+echo.
+echo.
+call :ColorText WHITE "            5 - Make Backup (MYI)"
+call :ColorItalic GRAY "           - backup %dbtomodname% DB" \n
+echo.
+echo.
+echo             0 - Go back
+for /l %%i in (1,1,5) do echo.
+call :ColorBlink %expansion_color% "Enter your choice: "
+set /P DBMODOPTION=
+if "%DBMODOPTION%"=="" (goto menu)
+if "%DBMODOPTION%"=="0" (goto mod_db)
+if %DBMODOPTION% LSS 1 (goto mod_db)
+if %DBMODOPTION% GTR 4 (goto menu)
+if "%DBMODOPTION%"=="1" (goto mod_db_edit_file)
+if "%DBMODOPTION%"=="2" (goto mod_db_apply_file)
+if "%DBMODOPTION%"=="3" (goto mod_db_apply_file)
+if "%DBMODOPTION%"=="4" (
+  if not exist "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\manual_sql_file.sql" (
+  cls
+  more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+  echo.
+  echo             Creating Custom SQL for %dbtomodname% DB...
+  ping -n 3 127.0.0.1>nul
+  echo.
+  if not exist "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%" mkdir "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%"
+  >"%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\manual_sql_file.sql" (
+    echo -- ============================================
+    echo -- If ANY command fails, ALL changes are rolled back!
+    echo -- ============================================
+    echo.
+    echo START TRANSACTION;
+    echo.
+    echo -- ▼▼▼ PUT YOUR SQL CODE BELOW ▼▼▼
+    echo.
+    echo.
+    echo.
+    echo -- ▲▲▲ PUT YOUR SQL CODE ABOVE ▲▲▲
+    echo.
+    echo COMMIT;
+    )
+  )
+  explorer.exe "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%"
+  goto mod_db_apply
+)
+goto menu
+
+:mod_db_edit_file
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
+if not exist "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\manual_sql_file.sql" (
+echo             Creating Custom SQL for %dbtomodname% DB...
+ping -n 3 127.0.0.1>nul
+echo.
+if not exist "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%" mkdir "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%"
+>"%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\manual_sql_file.sql" (
+  echo -- ============================================
+  echo -- If ANY command fails, ALL changes are rolled back!
+  echo -- ============================================
+  echo.
+  echo START TRANSACTION;
+  echo.
+  echo -- ▼▼▼ PUT YOUR SQL CODE BELOW ▼▼▼
+  echo.
+  echo.
+  echo.
+  echo -- ▲▲▲ PUT YOUR SQL CODE ABOVE ▲▲▲
+  echo.
+  echo COMMIT;
+  )
+)
+echo             Opening Custom SQL for %dbtomodname% DB...
+ping -n 1 127.0.0.1>nul
+start "" "%mainfolder%\Server\Tools\Notepad\notepad++.exe" "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\manual_sql_file.sql"
+goto mod_db_apply
+
+:mod_db_apply_file
+if not exist "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\manual_sql_file.sql" (
+  cls
+  more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+  echo.
+  echo             Custom SQL for %dbtomodname% DB does not exist!...
+  ping -n 3 127.0.0.1>nul
+  echo.
+  echo             Creating Custom SQL for %dbtomodname% DB...
+  ping -n 3 127.0.0.1>nul
+  echo.
+  if not exist "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%" mkdir "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%"
+  >"%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\manual_sql_file.sql" (
+    echo -- ============================================
+    echo -- If ANY command fails, ALL changes are rolled back!
+    echo -- ============================================
+    echo.
+    echo START TRANSACTION;
+    echo.
+    echo -- ▼▼▼ PUT YOUR SQL CODE BELOW ▼▼▼
+    echo.
+    echo.
+    echo.
+    echo -- ▲▲▲ PUT YOUR SQL CODE ABOVE ▲▲▲
+    echo.
+    echo COMMIT;
+    )
+  echo             Opening Custom SQL for %dbtomodname% DB...
+  ping -n 1 127.0.0.1>nul
+  start "" "%mainfolder%\Server\Tools\Notepad\notepad++.exe" "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\manual_sql_file.sql"
+  goto mod_db_apply
+  )
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
+if "%dbtomodname%"=="World" (
+call :ColorText RED "                                      ########################################" \n
+call :ColorText RED "                                      # WARNING                              #" \n
+call :ColorText RED "                                      # Changes you are going to apply are   #" \n
+call :ColorText RED "                                      # PERMANENT                            #" \n
+call :ColorText RED "                                      #                                      #" \n
+call :ColorText RED "                                      # To revert custom changes in World DB #" \n
+call :ColorText RED "                                      # you will have to do                  #" \n
+call :ColorText RED "                                      # Wipe Database - Wipe World DB        #" \n
+call :ColorText RED "                                      ########################################" \n
+) else (
+call :ColorText RED "                                      ########################################" \n
+call :ColorText RED "                                      # WARNING                              #" \n
+call :ColorText RED "                                      # Changes you are going to apply are   #" \n
+call :ColorText RED "                                      # PERMANENT                            #" \n
+call :ColorText RED "                                      #                                      #" \n
+call :ColorText RED "                                      # To revert custom changes in this DB  #" \n
+call :ColorText RED "                                      # you will have to connect to it       #" \n
+call :ColorText RED "                                      # and undo your changes manually       #" \n
+call :ColorText RED "                                      ########################################" \n
+)
+echo.
+setlocal
+:PROMPT
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
+IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
+if "%DBMODOPTION%"=="3" goto mod_db_apply_all
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
+echo             Applying Custom SQL to %dbtomodname% DB...
+ping -n 3 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%dbtomodrealname% < "%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\manual_sql_file.sql"
+echo.
+echo             Done!
+ping -n 3 127.0.0.1>nul
+echo.
+pause
+goto mod_db_apply
+
+:mod_db_apply_all
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
+echo             Applying All SQL files to %dbtomodname% DB...
+ping -n 3 127.0.0.1>nul
+for %%i in ("%mainfolder%\Server\sql\%expansion%\custom\%dbtomodrealname%\*.sql") do (
+    if /i not "%%~nxi"=="manual_sql_file.sql" (
+        if exist "%%i" (
+            echo.
+            echo             Processing: %%~nxi
+            ping -n 3 127.0.0.1>nul
+            "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%dbtomodrealname% < "%%i"
+        )
+    ) else (
+        rem echo             Skipping manual file: %%~nxi
+    )
+)
+echo.
+echo             Done!
+ping -n 3 127.0.0.1>nul
+echo.
+pause
+goto mod_db_apply
+
 :wipe_db
 cls
-more < "%mainfolder%\header_spp.txt"
-more < "%mainfolder%\logo_%expansion%.txt"
-echo    -------- Wipe Database --------
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo                                            -------- Wipe Database --------
 echo.
-echo   1 - Wipe World DB
-echo     - Reinstall world DB
-echo     - Custom spawns or items
-echo       will be removed
+echo             1 - Wipe World DB
+echo               - Reinstall world DB
+echo               - Custom content added by you (items, NPCs, spawns)
+echo                 will be removed
 echo.
-echo   2 - Wipe Characters DB
-echo     - Wipe all characters
-echo       including bot chars
+echo             2 - Wipe Characters DB
+echo               - Delete all characters
+echo                 including bot characters
 echo.
-echo   3 - Wipe Chars and Accs
-echo     - Wipe all characters
-echo       and accounts
+echo             3 - Wipe Chars and Accs
+echo               - Delete all characters
+echo                 and accounts
+echo                 including bot accounts and characters
 echo.
-echo   0 - Go back
+echo             0 - Go back
 echo.
-set /P choose_setting=Enter your choice: 
+for /l %%i in (1,1,2) do echo.
+call :ColorBlink %expansion_color% "                                                 Enter your choice: "
+set /P choose_setting=
 if "%choose_setting%"=="1" (goto reinstall_world)
 if "%choose_setting%"=="2" (goto clear_characters)
 if "%choose_setting%"=="3" (goto clear_characcs)
@@ -2096,179 +2610,176 @@ if "%choose_setting%"=="" (goto menu)
 goto menu
 
 :clear_characters
-mode con: cols=40 lines=30
-COLOR 0C
 cls
-echo ########################################
-echo # WARNING!                             #
-echo # All characters and bots              #
-echo # will be removed !!!                  #
-echo ########################################
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo                                            -------- Wipe Characters --------
+echo.
+call :ColorText RED "                                      ########################################" \n
+call :ColorText RED "                                      # WARNING                              #" \n
+call :ColorText RED "                                      # All characters AND bots              #" \n
+call :ColorText RED "                                      # will be removed (FOREVER)            #" \n
+call :ColorText RED "                                      ########################################" \n
 echo.
 setlocal
 :PROMPT
-SET /P AREYOUSURE=Are you sure (Y/[N])?
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
 tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Wiping characters and bots...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_characters.sql"
-rem "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_logs.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_characters.sql"
+rem "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_playerbot.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_logs.sql"
 echo.
 echo    Reinstalling characters db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\characters.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\characters.sql"
 echo.
 echo    Reinstalling logs db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\sql\%expansion%\logs.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_logs.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\Server\sql\%expansion%\logs.sql"
 rem echo.
 rem echo    Reinstalling bots db...
 rem ping -n 3 127.0.0.1>nul
-rem for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
+rem for %%i in ("%mainfolder%\Server\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 echo.
 echo    Applying characters db updates...
 ping -n 3 127.0.0.1>nul
 set /a "next_chars_version=1"
 for /l %%x in (%next_chars_version%, 1, %chars_version%) do (
    ping -n 2 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
+   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 )
 echo    Applying characters db mods...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
+for %%i in ("%mainfolder%\Server\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 rem echo.
 echo.
 echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
-rem cd "%mainfolder%\sql\%expansion%\playerbot"
-rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
-rem del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
-del "%mainfolder%\%expansion%_logs_version.spp"
+rem cd "%mainfolder%\Server\sql\%expansion%\playerbot"
+rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
+rem del "%mainfolder%\Server\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+del "%versions%\%expansion%_logs_version.spp"
 cd "%mainfolder%"
 echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_texts.sql"
-echo.
-echo    Updating bots named locations...
-ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_named_location.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_texts.sql"
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%\playerbot"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
 cd "%mainfolder%"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
+echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
 goto menu
 
 :clear_characcs
-mode con: cols=40 lines=30
-COLOR 0C
 cls
-echo ########################################
-echo # WARNING!                             #
-echo # All characters and accounts          #
-echo # will be removed !!!                  #
-echo ########################################
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo                                            -------- Wipe Chars ^& Accs --------
+echo.
+call :ColorText RED "                                        ########################################" \n
+call :ColorText RED "                                        # WARNING                              #" \n
+call :ColorText RED "                                        # All characters AND accounts          #" \n
+call :ColorText RED "                                        # will be removed (FOREVER)            #" \n
+call :ColorText RED "                                        ########################################" \n
 echo.
 setlocal
 :PROMPT
-SET /P AREYOUSURE=Are you sure (Y/[N])?
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
 tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Wiping characters and bots...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_characters.sql"
-rem "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_playerbot.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\sql\%expansion%\drop_realmd.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_characters.sql"
+rem "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_playerbot.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_realmd.sql"
 echo.
 echo    Reinstalling characters db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\characters.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\characters.sql"
 echo.
 echo    Reinstalling accounts db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmd.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\realmd.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\realmlist.sql"
 echo.
 echo    Reinstalling logs db...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\sql\%expansion%\logs.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 < "%mainfolder%\Server\sql\%expansion%\drop_logs.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%logsdb% < "%mainfolder%\Server\sql\%expansion%\logs.sql"
 rem echo.
 rem echo    Reinstalling bots db...
 rem ping -n 3 127.0.0.1>nul
-rem for %%i in ("%mainfolder%\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
+rem for %%i in ("%mainfolder%\Server\sql\%expansion%\playerbot\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 echo.
 echo    Applying characters db updates...
 ping -n 3 127.0.0.1>nul
 set /a "next_chars_version=1"
 for /l %%x in (%next_chars_version%, 1, %chars_version%) do (
    ping -n 2 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
+   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\characters\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 )
 echo    Applying characters db mods...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
+for %%i in ("%mainfolder%\Server\sql\%expansion%\characters\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\characters\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\characters\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 echo    Applying accounts db updates...
 ping -n 3 127.0.0.1>nul
 set /a "next_realm_version=1"
 for /l %%x in (%next_realm_version%, 1, %realm_version%) do (
    ping -n 2 127.0.0.1>nul
-   for %%i in ("%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\sql\%expansion%\updates\realmd\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+   for %%i in ("%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\updates\realmd\%%x\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 )
 echo    Applying accounts db mods...
 ping -n 3 127.0.0.1>nul
-for %%i in ("%mainfolder%\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+for %%i in ("%mainfolder%\Server\sql\%expansion%\realmd\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\realmd\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\realmd\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 echo.
 echo    Updating bots travel paths...
 ping -n 3 127.0.0.1>nul
-rem cd "%mainfolder%\sql\%expansion%\playerbot"
-rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
-rem del "%mainfolder%\sql\%expansion%\playerbot\nodes_%expansion%.sql"
+rem cd "%mainfolder%\Server\sql\%expansion%\playerbot"
+rem "%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\playerbot\nodes_%expansion%.7z" > nul
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_travel_nodes.sql"
+rem del "%mainfolder%\Server\sql\%expansion%\playerbot\nodes_%expansion%.sql"
 cd "%mainfolder%"
 echo.
 echo    Updating bots texts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_texts.sql"
-echo.
-echo    Updating bots named locations...
-ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\world\ai_playerbot_named_location.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\world\ai_playerbot_texts.sql"
 echo.
 echo    Updating bots equip cache...
 ping -n 3 127.0.0.1>nul
-cd "%mainfolder%\sql\%expansion%\playerbot"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%\playerbot"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.7z" > nul
 cd "%mainfolder%"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
 echo.
 echo    Installing website tables...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
-del "%mainfolder%\%expansion%_logs_version.spp"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\website.sql"
+>"%versions%\%expansion%_logs_version.spp" echo %logs_version%
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
@@ -2279,7 +2790,6 @@ set /p current_ip=<"%mainfolder%\Settings\%expansion%\address.txt"
 set /p current_name=<"%mainfolder%\Settings\%expansion%\name.txt"
 cls
 if "%current_ip%"=="" set current_ip=127.0.0.1
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Current address:
 echo    %current_ip%
@@ -2293,11 +2803,11 @@ set realmlist_address=UPDATE `realmlist` SET `address`='%setip%' WHERE  `id`=1;U
 echo.
 echo    Saving new address...
 ping -n 3 127.0.0.1>nul
-echo %realmlist_address%>"%mainfolder%\sql\%expansion%\realmlist.sql"
+echo %realmlist_address%>"%mainfolder%\Server\sql\%expansion%\realmlist.sql"
 echo.
 echo    Applying new address...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\realmlist.sql"
 echo.
 echo    Address changed to:
 echo    %setip%
@@ -2310,7 +2820,6 @@ set /p current_ip=<"%mainfolder%\Settings\%expansion%\address.txt"
 set /p current_name=<"%mainfolder%\Settings\%expansion%\name.txt"
 if "%current_ip%"=="" set current_ip=127.0.0.1
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Current name:
 echo    %current_name%
@@ -2324,11 +2833,11 @@ set realmlist_address=UPDATE `realmlist` SET `address`='%current_ip%' WHERE  `id
 echo.
 echo    Saving new realm name...
 ping -n 3 127.0.0.1>nul
-echo %realmlist_address%>"%mainfolder%\sql\%expansion%\realmlist.sql"
+echo %realmlist_address%>"%mainfolder%\Server\sql\%expansion%\realmlist.sql"
 echo.
 echo    Applying new realm name...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\realmlist.sql"
 echo.
 echo    Realm name changed to:
 echo    %setname%
@@ -2360,58 +2869,58 @@ set lo_tw=Not Installed
 set lo_ru=Not Installed
 set lo_mx=Not Installed
 
-if exist "%mainfolder%\%expansion%_locale_fields.spp" set lo_fields=YES
+if exist "%versions%\%expansion%_locale_fields.spp" set lo_fields=YES
 
-if exist "%mainfolder%\%expansion%_fr.spp" set lo_fr=Installed
-if exist "%mainfolder%\%expansion%_es.spp" set lo_es=Installed
-if exist "%mainfolder%\%expansion%_de.spp" set lo_de=Installed
-if exist "%mainfolder%\%expansion%_ko.spp" set lo_ko=Installed
-if exist "%mainfolder%\%expansion%_ch.spp" set lo_ch=Installed
-if exist "%mainfolder%\%expansion%_tw.spp" set lo_tw=Installed
-if exist "%mainfolder%\%expansion%_ru.spp" set lo_ru=Installed
-if exist "%mainfolder%\%expansion%_mx.spp" set lo_mx=Installed
+if exist "%versions%\%expansion%_fr.spp" set lo_fr=Installed
+if exist "%versions%\%expansion%_es.spp" set lo_es=Installed
+if exist "%versions%\%expansion%_de.spp" set lo_de=Installed
+if exist "%versions%\%expansion%_ko.spp" set lo_ko=Installed
+if exist "%versions%\%expansion%_ch.spp" set lo_ch=Installed
+if exist "%versions%\%expansion%_tw.spp" set lo_tw=Installed
+if exist "%versions%\%expansion%_ru.spp" set lo_ru=Installed
+if exist "%versions%\%expansion%_mx.spp" set lo_mx=Installed
 
-if exist "%mainfolder%\%expansion%_fr_re.spp" set lo_fr=ENG replaced
-if exist "%mainfolder%\%expansion%_es_re.spp" set lo_es=ENG replaced
-if exist "%mainfolder%\%expansion%_de_re.spp" set lo_de=ENG replaced
-if exist "%mainfolder%\%expansion%_ko_re.spp" set lo_ko=ENG replaced
-if exist "%mainfolder%\%expansion%_ch_re.spp" set lo_ch=ENG replaced
-if exist "%mainfolder%\%expansion%_tw_re.spp" set lo_tw=ENG replaced
-if exist "%mainfolder%\%expansion%_ru_re.spp" set lo_ru=ENG replaced
-if exist "%mainfolder%\%expansion%_mx_re.spp" set lo_mx=ENG replaced
+if exist "%versions%\%expansion%_fr_re.spp" set lo_fr=ENG replaced
+if exist "%versions%\%expansion%_es_re.spp" set lo_es=ENG replaced
+if exist "%versions%\%expansion%_de_re.spp" set lo_de=ENG replaced
+if exist "%versions%\%expansion%_ko_re.spp" set lo_ko=ENG replaced
+if exist "%versions%\%expansion%_ch_re.spp" set lo_ch=ENG replaced
+if exist "%versions%\%expansion%_tw_re.spp" set lo_tw=ENG replaced
+if exist "%versions%\%expansion%_ru_re.spp" set lo_ru=ENG replaced
+if exist "%versions%\%expansion%_mx_re.spp" set lo_mx=ENG replaced
 
 set loc_already_replaced=NO
-if exist "%mainfolder%\%expansion%_fr_re.spp" set loc_already_replaced=YES
-if exist "%mainfolder%\%expansion%_es_re.spp" set loc_already_replaced=YES
-if exist "%mainfolder%\%expansion%_de_re.spp" set loc_already_replaced=YES
-if exist "%mainfolder%\%expansion%_ko_re.spp" set loc_already_replaced=YES
-if exist "%mainfolder%\%expansion%_ch_re.spp" set loc_already_replaced=YES
-if exist "%mainfolder%\%expansion%_tw_re.spp" set loc_already_replaced=YES
-if exist "%mainfolder%\%expansion%_ru_re.spp" set loc_already_replaced=YES
-if exist "%mainfolder%\%expansion%_mx_re.spp" set loc_already_replaced=YES
+if exist "%versions%\%expansion%_fr_re.spp" set loc_already_replaced=YES
+if exist "%versions%\%expansion%_es_re.spp" set loc_already_replaced=YES
+if exist "%versions%\%expansion%_de_re.spp" set loc_already_replaced=YES
+if exist "%versions%\%expansion%_ko_re.spp" set loc_already_replaced=YES
+if exist "%versions%\%expansion%_ch_re.spp" set loc_already_replaced=YES
+if exist "%versions%\%expansion%_tw_re.spp" set loc_already_replaced=YES
+if exist "%versions%\%expansion%_ru_re.spp" set loc_already_replaced=YES
+if exist "%versions%\%expansion%_mx_re.spp" set loc_already_replaced=YES
 
-more < "%mainfolder%\header_locale.txt"
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                         -------- Translations Menu --------" \n
 echo.
-echo    Choose locales :
+echo             Choose locales :
 echo.
-echo    F - French       (%locFR%) [%lo_fr%]
-echo    G - German       (%locDE%) [%lo_de%]
-echo    R - Russian      (%locRU%) [%lo_ru%]
-echo    C - Chinese      (%locCH%) [%lo_ch%]
-echo    T - Taiwanese    (%locTW%) [%lo_tw%]
-echo    S - Spanish      (%locES%) [%lo_es%]
-echo    M - Spanish (SA) (%locMX%) [%lo_mx%]
-echo    K - Korean       (%locKO%) [%lo_ko%]
+echo             F - French       (%locFR%) [%lo_fr%]
+echo             G - German       (%locDE%) [%lo_de%]
+echo             R - Russian      (%locRU%) [%lo_ru%]
+echo             C - Chinese      (%locCH%) [%lo_ch%]
+echo             T - Taiwanese    (%locTW%) [%lo_tw%]
+echo             S - Spanish      (%locES%) [%lo_es%]
+echo             M - Spanish (SA) (%locMX%) [%lo_mx%]
+echo             K - Korean       (%locKO%) [%lo_ko%]
 echo.
-echo    P - Replace English        [%loc_replace%]
-echo    Note: Only one can replace english!
+echo             N - Install selected
 echo.
-if %loc_already_replaced% == YES echo    O - Restore English
-if %loc_already_replaced% == YES echo.
-echo        N - Install selected
-echo        X - Go back
+echo             0 - Go back
 echo.
-set /p activity=Select locales to install:
+for /l %%i in (1,1,7) do echo.
+call :ColorBlink %expansion_color% "Select locales to install: "
+set /P activity=
 if %activity% == F goto ToggleLocFR:
 if %activity% == f goto ToggleLocFR:
 if %activity% == G goto ToggleLocDE:
@@ -2428,27 +2937,11 @@ if %activity% == S goto ToggleLocES:
 if %activity% == s goto ToggleLocES:
 if %activity% == K goto ToggleLocKO:
 if %activity% == k goto ToggleLocKO:
-if %activity% == P goto ToggleRe:
-if %activity% == p goto ToggleRe:
-if %activity% == o goto restore_locale:
-if %activity% == O goto restore_locale:
 if %activity% == N goto install_locales_go
 if %activity% == n goto install_locales_go
 if %activity% == X goto menu
 if %activity% == x goto menu
-goto install_locales
-
-:ToggleRe
-if %loc_replace% == NO goto ToggleReNo:
-if %loc_replace% == YES goto ToggleReYes:
-goto install_locales
-
-:ToggleReNo
-set loc_replace=YES
-goto install_locales
-
-:ToggleReYes
-set loc_replace=NO
+if %activity% == 0 goto menu
 goto install_locales
 
 :ToggleLocFR
@@ -2556,27 +3049,25 @@ goto install_locales
 
 :install_locales_go
 cls
-more < "%mainfolder%\header_locale.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                         -------- Translations Menu --------" \n
 echo.
-echo    Extracting locales...
+echo             Extracting locales...
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Please wait...
-cd "%mainfolder%\sql\%expansion%"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\locales.7z" > nul
+echo             Please wait...
+cd "%mainfolder%\Server\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\locales.7z" > nul
 cd "%mainfolder%"
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Preparing %expansion% DB...
+echo             Preparing %expansion% DB...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\prepare.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\locales\prepare.sql"
 echo.
-echo    Installing text locales...
+echo             Installing text locales...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\broadcast_text_locale.sql"
-
-ping -n 3 127.0.0.1>nul
-if %loc_replace% == YES goto locales_replace_1
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\locales\broadcast_text_locale.sql"
 
 :locales_continue
 
@@ -2606,20 +3097,21 @@ if "%locRU%"== "X" goto LoadRU:
 
 :locales_end
 echo.
-echo    Updating quest locales...
+echo             Updating quest locales...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\quest_locale_all.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\locales\quest_locale_all.sql"
 cls
-more < "%mainfolder%\header_locale.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                         -------- Translations Menu --------" \n
 echo.
-echo    Locales installed!
+echo             Locales installed!
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Removing temp files...
-rd /s /q "%mainfolder%\sql\%expansion%\locales"
+echo             Removing temporary files...
+rd /s /q "%mainfolder%\Server\sql\%expansion%\locales"
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Done!
+echo             Done!
 ping -n 3 127.0.0.1>nul
 echo.
 goto menu
@@ -2627,9 +3119,9 @@ goto menu
 :LoadFR
 set cur_loc=fr
 echo.
-echo    Installing French Locale...
-for %%i in ("%mainfolder%\sql\%expansion%\locales\French\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\French\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\French\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\French\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-echo %expansion% > "%mainfolder%\%expansion%_fr.spp"
+echo             Installing French Locale...
+for %%i in ("%mainfolder%\Server\sql\%expansion%\locales\French\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\French\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\French\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\French\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+echo %expansion% > "%versions%\%expansion%_fr.spp"
 ping -n 2 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_2
 goto WorldDB1:
@@ -2637,9 +3129,9 @@ goto WorldDB1:
 :LoadDE
 set cur_loc=de
 echo.
-echo    Installing German Locale...
-for %%i in ("%mainfolder%\sql\%expansion%\locales\German\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\German\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\German\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\German\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-echo %expansion% > "%mainfolder%\%expansion%_de.spp"
+echo             Installing German Locale...
+for %%i in ("%mainfolder%\Server\sql\%expansion%\locales\German\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\German\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\German\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\German\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+echo %expansion% > "%versions%\%expansion%_de.spp"
 ping -n 2 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_2
 goto WorldDB2:
@@ -2647,9 +3139,9 @@ goto WorldDB2:
 :LoadKO
 set cur_loc=ko
 echo.
-echo    Installing Korean Locale...
-for %%i in ("%mainfolder%\sql\%expansion%\locales\Korean\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Korean\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Korean\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Korean\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-echo %expansion% > "%mainfolder%\%expansion%_ko.spp"
+echo             Installing Korean Locale...
+for %%i in ("%mainfolder%\Server\sql\%expansion%\locales\Korean\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Korean\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Korean\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Korean\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+echo %expansion% > "%versions%\%expansion%_ko.spp"
 ping -n 2 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_2
 goto WorldDB3:
@@ -2657,9 +3149,9 @@ goto WorldDB3:
 :LoadCH
 set cur_loc=ch
 echo.
-echo    Installing Chinese Locale...
-for %%i in ("%mainfolder%\sql\%expansion%\locales\Chinese\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Chinese\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Chinese\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Chinese\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-echo %expansion% > "%mainfolder%\%expansion%_ch.spp"
+echo             Installing Chinese Locale...
+for %%i in ("%mainfolder%\Server\sql\%expansion%\locales\Chinese\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Chinese\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Chinese\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Chinese\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+echo %expansion% > "%versions%\%expansion%_ch.spp"
 ping -n 2 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_2
 goto WorldDB4:
@@ -2667,9 +3159,9 @@ goto WorldDB4:
 :LoadTW
 set cur_loc=tw
 echo.
-echo    Installing Taiwanese Locale...
-for %%i in ("%mainfolder%\sql\%expansion%\locales\Taiwanese\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Taiwanese\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Taiwanese\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Taiwanese\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-echo %expansion% > "%mainfolder%\%expansion%_tw.spp"
+echo             Installing Taiwanese Locale...
+for %%i in ("%mainfolder%\Server\sql\%expansion%\locales\Taiwanese\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Taiwanese\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Taiwanese\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Taiwanese\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+echo %expansion% > "%versions%\%expansion%_tw.spp"
 ping -n 2 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_2
 goto WorldDB5:
@@ -2677,9 +3169,9 @@ goto WorldDB5:
 :LoadES
 set cur_loc=es
 echo.
-echo    Installing Spanish Locale...
-for %%i in ("%mainfolder%\sql\%expansion%\locales\Spanish\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-echo %expansion% > "%mainfolder%\%expansion%_es.spp"
+echo             Installing Spanish Locale...
+for %%i in ("%mainfolder%\Server\sql\%expansion%\locales\Spanish\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Spanish\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Spanish\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Spanish\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+echo %expansion% > "%versions%\%expansion%_es.spp"
 ping -n 2 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_2
 goto WorldDB6:
@@ -2687,9 +3179,9 @@ goto WorldDB6:
 :LoadMX
 set cur_loc=mx
 echo.
-echo    Installing Spanish (SA) Locale...
-for %%i in ("%mainfolder%\sql\%expansion%\locales\Spanish_South_American\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish_South_American\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish_South_American\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Spanish_South_American\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-echo %expansion% > "%mainfolder%\%expansion%_mx.spp"
+echo             Installing Spanish (SA) Locale...
+for %%i in ("%mainfolder%\Server\sql\%expansion%\locales\Spanish_South_American\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Spanish_South_American\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Spanish_South_American\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Spanish_South_American\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+echo %expansion% > "%versions%\%expansion%_mx.spp"
 ping -n 2 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_2
 goto WorldDB7:
@@ -2697,9 +3189,9 @@ goto WorldDB7:
 :LoadRU
 set cur_loc=ru
 echo.
-echo    Installing Russian Locale...
-for %%i in ("%mainfolder%\sql\%expansion%\locales\Russian\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\locales\Russian\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Russian\*sql" if %%i neq "%mainfolder%\sql\%expansion%\locales\Russian\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
-echo %expansion% > "%mainfolder%\%expansion%_ru.spp"
+echo             Installing Russian Locale...
+for %%i in ("%mainfolder%\Server\sql\%expansion%\locales\Russian\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Russian\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Russian\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\locales\Russian\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < %%i
+echo %expansion% > "%versions%\%expansion%_ru.spp"
 ping -n 2 127.0.0.1>nul
 if %loc_replace% == YES goto locales_replace_2
 goto locales_end
@@ -2708,32 +3200,32 @@ goto locales_end
 echo.
 if %loc_already_replaced% == NO echo    Backing up English locale...
 if %loc_already_replaced% == NO ping -n 3 127.0.0.1>nul
-if %lo_fields% == NO ("%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\add_fields.sql")
-if %lo_fields% == NO (echo %expansion% > "%mainfolder%\%expansion%_locale_fields.spp")
+if %lo_fields% == NO ("%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\locales\add_fields.sql")
+if %lo_fields% == NO (echo %expansion% > "%versions%\%expansion%_locale_fields.spp")
 set lo_fields = YES
 if %loc_already_replaced% == NO ping -n 3 127.0.0.1>nul
-if %loc_already_replaced% == NO "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\save_english.sql"
-if exist "%mainfolder%\%expansion%_fr_re.spp" del "%mainfolder%\%expansion%_fr_re.spp"
-if exist "%mainfolder%\%expansion%_de_re.spp" del "%mainfolder%\%expansion%_de_re.spp"
-if exist "%mainfolder%\%expansion%_ko_re.spp" del "%mainfolder%\%expansion%_ko_re.spp"
-if exist "%mainfolder%\%expansion%_ch_re.spp" del "%mainfolder%\%expansion%_ch_re.spp"
-if exist "%mainfolder%\%expansion%_mx_re.spp" del "%mainfolder%\%expansion%_mx_re.spp"
-if exist "%mainfolder%\%expansion%_ru_re.spp" del "%mainfolder%\%expansion%_ru_re.spp"
-if exist "%mainfolder%\%expansion%_tw_re.spp" del "%mainfolder%\%expansion%_tw_re.spp"
-if exist "%mainfolder%\%expansion%_es_re.spp" del "%mainfolder%\%expansion%_es_re.spp"
+if %loc_already_replaced% == NO "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\locales\save_english.sql"
+if exist "%versions%\%expansion%_fr_re.spp" del "%mainfolder%\%expansion%_fr_re.spp"
+if exist "%versions%\%expansion%_de_re.spp" del "%mainfolder%\%expansion%_de_re.spp"
+if exist "%versions%\%expansion%_ko_re.spp" del "%mainfolder%\%expansion%_ko_re.spp"
+if exist "%versions%\%expansion%_ch_re.spp" del "%mainfolder%\%expansion%_ch_re.spp"
+if exist "%versions%\%expansion%_mx_re.spp" del "%mainfolder%\%expansion%_mx_re.spp"
+if exist "%versions%\%expansion%_ru_re.spp" del "%mainfolder%\%expansion%_ru_re.spp"
+if exist "%versions%\%expansion%_tw_re.spp" del "%mainfolder%\%expansion%_tw_re.spp"
+if exist "%versions%\%expansion%_es_re.spp" del "%mainfolder%\%expansion%_es_re.spp"
 REM cls
-REM more < "%mainfolder%\header_locale.txt"
+REM more < "%mainfolder%\Server\Tools\header_locale.txt"
 goto locales_continue
 
 :locales_replace_2
 echo.
 echo    Replacing English locale...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\replace_%cur_loc%.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\locales\replace_%cur_loc%.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
-echo %expansion% > "%mainfolder%\%expansion%_%cur_loc%_re.spp"
+echo %expansion% > "%versions%\%expansion%_%cur_loc%_re.spp"
 if %cur_loc% == fr goto WorldDB1:
 if %cur_loc% == de goto WorldDB2:
 if %cur_loc% == ko goto WorldDB3:
@@ -2746,31 +3238,31 @@ goto install_locales
 
 :restore_locale
 cls
-more < "%mainfolder%\header_locale.txt"
+more < "%mainfolder%\Server\Tools\header_locale.txt"
 echo.
 echo    Extracting locales...
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Please wait...
-cd "%mainfolder%\sql\%expansion%"
-"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\sql\%expansion%\locales.7z" > nul
+cd "%mainfolder%\Server\sql\%expansion%"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Server\sql\%expansion%\locales.7z" > nul
 cd "%mainfolder%"
 ping -n 3 127.0.0.1>nul
 echo.
 echo    Restoring English locale...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\sql\%expansion%\locales\load_english.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%world% < "%mainfolder%\Server\sql\%expansion%\locales\load_english.sql"
 echo.
 echo    Done!
 ping -n 3 127.0.0.1>nul
-del "%mainfolder%\%expansion%_fr_re.spp"
-del "%mainfolder%\%expansion%_de_re.spp"
-del "%mainfolder%\%expansion%_ko_re.spp"
-del "%mainfolder%\%expansion%_ch_re.spp"
-del "%mainfolder%\%expansion%_mx_re.spp"
-del "%mainfolder%\%expansion%_ru_re.spp"
-del "%mainfolder%\%expansion%_tw_re.spp"
-del "%mainfolder%\%expansion%_es_re.spp"
+del "%versions%\%expansion%_fr_re.spp"
+del "%versions%\%expansion%_de_re.spp"
+del "%versions%\%expansion%_ko_re.spp"
+del "%versions%\%expansion%_ch_re.spp"
+del "%versions%\%expansion%_mx_re.spp"
+del "%versions%\%expansion%_ru_re.spp"
+del "%versions%\%expansion%_tw_re.spp"
+del "%versions%\%expansion%_es_re.spp"
 goto locales_end
 
 :quick_start_servers_x86
@@ -2787,56 +3279,183 @@ echo  Starting the first realm...
 echo.
 echo  %realmname1%
 echo.
-ping -n 5 127.0.0.1>nul
+ping -n 2 127.0.0.1>nul
 goto check_autosave_start
+
+:quick_stop_servers_x64
+set RETURNTOMENU=0
+goto check_autosave_menu
 
 :quick_start_servers_x64
+setlocal enabledelayedexpansion
 taskkill /f /im cmdmp3win.exe
 cls
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if "%ERRORLEVEL%"=="0" (
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
+echo             Server is already running!
+ping -n 2 127.0.0.1>nul
+goto menu
+)
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if NOT "%ERRORLEVEL%"=="0" (
+if "!SERVER_RUNNING!"=="1" (
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
+echo             Server is not running, returning to menu!
+set SERVER_RUNNING=0
+ping -n 2 127.0.0.1>nul
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /f 2>nul
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /im cmd.exe /f 2>nul
+taskkill /f /im !realmserver!>nul
+goto menu
+)
+)
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
 set serverstartoption=2
 set /p realmname1=<"%mainfolder%\Settings\%expansion%\name.txt"
-more < "%mainfolder%\header_spp.txt"
 echo.
-echo    Starting %expansion% realm...
+echo             Starting %expansion% realm...
 echo.
-echo    %realmname1%
+echo             %realmname1%
 echo.
-ping -n 5 127.0.0.1>nul
+ping -n 2 127.0.0.1>nul
 goto check_autosave_start
 
+:check_autosave_menu
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if NOT "%ERRORLEVEL%"=="0" (
+goto shutdown_wait_running_end
+) 
+set serverranonce=1
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
+call :ColorText RED "                                      ########################################" \n
+call :ColorText RED "                                      #           Server is running          #" \n
+call :ColorText RED "                                      # Server shutdown command will be used #" \n
+call :ColorText RED "                                      #           Wait for menu to appear    #" \n
+call :ColorText RED "                                      ########################################" \n
+echo.
+echo.
+call :ColorBlink %expansion_color% "                                                 Are you sure (Y/[N]: "
+set /P AREYOUSURE=
+IF /I "%AREYOUSURE%" NEQ "Y" GOTO menu
+
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /f 2>nul
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /im cmd.exe /f 2>nul
+start "" "%mainfolder%\Server\Tools\shutdown.vbs"
+set shutdown_attempts=0
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+echo.
+echo             Waiting for the server to shut down...
+:shutdown_wait_running
+if %shutdown_attempts% LSS 30 (
+if %shutdown_attempts% LSS 5 (
+start "" "%mainfolder%\Server\Tools\shutdown.vbs"
+)
+ping -n 3 127.0.0.1>nul
+rem check if still running
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if "%ERRORLEVEL%"=="0" (
+set /a shutdown_attempts+=1
+goto shutdown_wait_running
+)
+)
+:shutdown_wait_running_end
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /f 2>nul
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /im cmd.exe /f 2>nul
+tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
+if "%ERRORLEVEL%"=="0" taskkill /f /im %realmserver%
+tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
+if "%ERRORLEVEL%"=="0" taskkill /f /im %worldserver%
+tasklist /FI "IMAGENAME eq cmdmp3win.exe" 2>NUL | find /I /N "cmdmp3win.exe">NUL
+if "%ERRORLEVEL%"=="0" taskkill /f /im cmdmp3win.exe
+tasklist /FI "IMAGENAME eq spp-httpd.exe" 2>NUL | find /I /N "spp-httpd.exe">NUL
+if "%ERRORLEVEL%"=="0" if NOT "%RETURNTOMENU%"=="0" taskkill /f /im spp-httpd.exe
+set SERVER_RUNNING=0
+cls
+if exist "%versions%\autosave.on" goto autosave_shutdown
+if "%RETURNTOMENU%"=="0" goto menu
+goto select_expansion
+
 :check_autosave_start
-if exist "%mainfolder%\autosave.on" goto autosave_start
+rem if exist "%mainfolder%\Server\server_running.spp" del "%mainfolder%\Server\server_running.spp"
+if exist "%versions%\autosave_running.on" (
+rem echo %expansion%>"%mainfolder%\Server\Tools\server_running.spp"
+start "" /min "%mainfolder%\Server\Tools\autosave_daemon.bat" %expansion%
+)
+if exist "%versions%\autosave.on" goto autosave_start
 if "%serverstartoption%"=="1" (goto server_x86)
 if "%serverstartoption%"=="2" (goto server_x64)
 goto menu
 
 :autosave_start
+setlocal EnableDelayedExpansion
 cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 set saveslot=autosave
-more < "%mainfolder%\header_spp.txt"
+set "MAX_SAVES=100"
+set "SAVES_DIR=autosaves"
+set "hour=%time:~0,2%"
+set "hour=!hour: =0!"
+set "minute=%time:~3,2%"
+set "minute=!minute: =0!"
+set "TIMESTAMP=%date:~6,4%%date:~3,2%%date:~0,2%_!hour!!minute!"
+set "SAVE_PATH=%mainfolder%\Saves\%expansion%\%SAVES_DIR%"
+set "SAVE_FOLDER=autosave_%TIMESTAMP%"
+set "FULL_SAVE_PATH=%SAVE_PATH%\%SAVE_FOLDER%"
+
+if exist "%FULL_SAVE_PATH%.7z" (
+echo             Autosave from this time already exists!
+ping -n 2 127.0.0.1>nul
+if "%serverstartoption%"=="1" (goto server_x86)
+if "%serverstartoption%"=="2" (goto server_x64)
+)
+
+mkdir "%SAVE_PATH%" 2>nul
+mkdir "%FULL_SAVE_PATH%" 2>nul
+echo             Autosave is ENABLED!
+ping -n 2 127.0.0.1>nul
 echo.
-echo           Autosave is on!
-echo.
-echo    Exporting accounts...
+echo             Saving databases...
 ping -n 1 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %login% > "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
+"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %login% > "%FULL_SAVE_PATH%\realmd.sql"
+"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %characters% > "%FULL_SAVE_PATH%\characters.sql"
+echo autosave_%TIMESTAMP%>"%FULL_SAVE_PATH%\name.txt"
+xcopy /y "%versions%\%expansion%_chars_version.spp" "%FULL_SAVE_PATH%">nul
+xcopy /y "%versions%\%expansion%_realm_version.spp" "%FULL_SAVE_PATH%">nul
+if not "%logs_version%"=="0" (
+xcopy /y "%versions%\%expansion%_logs_version.spp" "%FULL_SAVE_PATH%">nul
+)
+xcopy /y "%versions%\%expansion%_bots_version.spp" "%FULL_SAVE_PATH%">nul
+xcopy /y "%versions%\%expansion%_website_version.spp" "%FULL_SAVE_PATH%">nul
 echo.
-echo    Done!
-echo.
+echo             Archiving save...
 ping -n 1 127.0.0.1>nul
-echo    Exporting characters...
+cd %SAVE_PATH%
+"%mainfolder%\Server\Tools\7za.exe" a -t7z -mx=3 "%SAVE_PATH%\%SAVE_FOLDER%.7z" "%FULL_SAVE_PATH%">nul
+cd %mainfolder%
+rmdir /s /q "%FULL_SAVE_PATH%" 2>nul
+echo.
+echo             Removing old saves...
 ping -n 1 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %characters% > "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
+set /a count=0
+for /f "delims=" %%f in ('dir "%SAVE_PATH%\autosave_*" /a-d /b /o-d 2^>nul') do (
+    set /a count+=1
+    if !count! gtr %MAX_SAVES% (
+        echo.
+        echo             Removing: %%f
+        del "%SAVE_PATH%\%%f" 2>nul
+        rmdir /s /q "%SAVE_PATH%\%%f" 2>nul
+        ping -n 1 127.0.0.1>nul
+    )
+)
 echo.
-echo    Done!
-echo.
-ping -n 1 127.0.0.1>nul
-echo    Exporting playerbots...
-ping -n 1 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %playerbot% > "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
-echo.
-echo    Done!
-echo.
+echo             Done!
 ping -n 1 127.0.0.1>nul
 if "%serverstartoption%"=="1" (goto server_x86)
 if "%serverstartoption%"=="2" (goto server_x64)
@@ -2855,8 +3474,11 @@ set /P serverstartoption=Select your option:
 goto check_autosave_start
 
 :server_x86
+setlocal EnableDelayedExpansion
+set serverranonce=1
+set SERVER_RUNNING=1
 cd "%mainfolder%\Settings\%expansion%"
-if "%serverstartoption%"=="1" (Start ..\..\Server\Binaries\%expansion%\Bin\%worldserver%)
+if "%serverstartoption%"=="1" (start /min "MaNGOS" ..\..\Server\Binaries\%expansion%\Bin\%worldserver%)
 tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
 if "%ERRORLEVEL%"=="0" goto menu
 start /min ..\..\Server\Binaries\%expansion%\Bin\%realmserver%
@@ -2864,8 +3486,11 @@ REM start Server\Tools\server_check.bat"
 goto menu
 
 :server_x64
+setlocal EnableDelayedExpansion
+set serverranonce=1
+set SERVER_RUNNING=1
 cd "%mainfolder%\Settings\%expansion%"
-if "%serverstartoption%"=="2" (Start ..\..\Server\Binaries\%expansion%\Bin64\%worldserver%)
+if "%serverstartoption%"=="2" (start /min ..\..\Server\Binaries\%expansion%\Bin64\%worldserver%)
 tasklist /FI "IMAGENAME eq %realmserver%" 2>NUL | find /I /N "%realmserver%">NUL
 if "%ERRORLEVEL%"=="0" goto menu
 start /min ..\..\Server\Binaries\%expansion%\Bin64\%realmserver%
@@ -2875,28 +3500,24 @@ goto menu
 :server_restart_x64
 mode con: cols=40 lines=23
 cls
-echo ########################################
-echo # %NAME%
-echo # https://www.singleplayerproject.com/
-echo ########################################
-more < "%mainfolder%\logo_%expansion%.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                         -------- Server Restarter --------" \n
 echo.
-echo    -------- Server Restarter --------
+echo.             Automatically restart
+echo.             if crashed / closed.
 echo.
-echo.       Automatically restart
-echo.       if crashed / closed.
-echo.
-echo.       Checking every 10 seconds...
+echo.             Checking every 10 seconds...
 echo.
 echo.
-echo        Press 0 to go back to menu
+echo              Press 0 to go back to menu
 echo.
 CHOICE /C 01 /T 10 /D 1 /N /M ""
 IF %ERRORLEVEL% EQU 1 goto menu
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if "%ERRORLEVEL%"=="0" goto server_restart_x64
 cd "%mainfolder%\Settings\%expansion%"
-Start ..\..\Server\Binaries\%expansion%\Bin64\%worldserver%
+Start /min ..\..\Server\Binaries\%expansion%\Bin64\%worldserver%
+set SERVER_RUNNING=1
 goto server_restart_x64
 
 :save_menu
@@ -2925,40 +3546,67 @@ if exist "%mainfolder%\Saves\%expansion%\9\name.txt" set /p customname9=<"%mainf
 if exist "%mainfolder%\Saves\%expansion%\old\name.txt" set /p customnameold=<"%mainfolder%\Saves\%expansion%\old\name.txt"
 if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" set /p customnametransfer=<"%mainfolder%\Saves\%expansion%\transfer\name.txt"
 
-more < "%mainfolder%\header_save.txt"
-echo.
-echo   Save 1  -  [%customname1%]
-echo   Save 2  -  [%customname2%]
-echo   Save 3  -  [%customname3%]
-echo   Save 4  -  [%customname4%]
-echo   Save 5  -  [%customname5%]
-echo   Save 6  -  [%customname6%]
-echo   Save 7  -  [%customname7%]
-echo   Save 8  -  [%customname8%]
-echo   Save 9  -  [%customname9%]
-echo   Save 10 -  [Autosave]
+cls
+setlocal enabledelayedexpansion
+if exist "%versions%\autosave.on" set autosave=ON
+if exist "%versions%\autosave.off" set autosave=OFF
+if exist "%versions%\autosave_running.on" set autosave_running=ON
+if exist "%versions%\autosave_running.off" set autosave_running=OFF
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
+if not exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo.
+for /l %%i in (1,1,9) do (
+    call :ColorText %expansion_color% "                 Save %%i  -  "
+    
+    if not "!customname%%i!"=="Empty slot" (
+        call :ColorText %expansion_color% "[!customname%%i!]" \n
+    )
+    
+    if "!customname%%i!"=="Empty slot" (
+        call :ColorText GRAY "[!customname%%i!]" \n
+    )
+)
 if exist "%mainfolder%\Saves\%expansion%\old\name.txt" echo.
-if exist "%mainfolder%\Saves\%expansion%\old\name.txt" echo  -------Old Save-------
-if exist "%mainfolder%\Saves\%expansion%\old\name.txt" echo   Save 11 -  [%customnameold%]
+if exist "%mainfolder%\Saves\%expansion%\old\name.txt" echo                 -------Old Save-------
+if exist "%mainfolder%\Saves\%expansion%\old\name.txt" echo                     Save 11 - [%customnameold%]
 if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo.
-if "%choose_exp%"=="2" if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo  -------Vanilla Save-------
-if "%choose_exp%"=="3" if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo  ---------TBC Save---------
-if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo   Save 12 -  [%customnametransfer%]
-echo  -----------------------
+if "%choose_exp%"=="2" if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" call :ColorText YELLOW "                 ----- Vanilla Save ----" \n
+if "%choose_exp%"=="3" if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" call :ColorText GREEN "                 -------- TBC Save --------" \n
+if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" if "%choose_exp%"=="2" call :ColorText YELLOW "                 Save 12 - [%customnametransfer%]" \n
+if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" if "%choose_exp%"=="3" call :ColorText GREEN "                 Save 12 - [%customnametransfer%]" \n
+if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" if "%choose_exp%"=="2" call :ColorText YELLOW "                 -----------------------" \n
+if exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" if "%choose_exp%"=="3" call :ColorText GREEN "                 -----------------------" \n
+if not exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" echo                  -----------------------
 echo.
-echo   1 - Save     2 - Load     3 - Delete
+echo                    10 - Load Autosaves
 echo.
-echo   4 - Turn autosave on/off [%autosave%]
-echo   5 - Open the Saves folder
+echo             1 - Save     2 - Load     3 - Delete
 echo.
-echo   0 - Back to main menu
+call :ColorText %expansion_color% "            4 - Toggle AutoSave on Start/Shutdown "
+if exist "%versions%\autosave.on" call :ColorText GREEN "[%autosave%]"
+if not exist "%versions%\autosave.on" call :ColorText RED "[%autosave%]"
+call :ColorText %expansion_color% "    5 - Toggle AutoSave every 15 minutes "
+if exist "%versions%\autosave_running.on" call :ColorText GREEN "[%autosave_running%]" \n
+if not exist "%versions%\autosave_running.on" call :ColorText RED "[%autosave_running%]" \n
 echo.
-set /P savemenu=Select your option: 
+echo             6 - Open the Saves folder
+echo.
+echo             0 - Back to main menu
+if not exist "%mainfolder%\Saves\%expansion%\transfer\name.txt" (
+  echo.
+  echo.
+)
+call :ColorBlink WHITE "Enter your choice: "
+set /P savemenu=
 if "%savemenu%"=="1" (goto saveslot_choose)
 if "%savemenu%"=="2" (goto saveslot_choose)
 if "%savemenu%"=="3" (goto saveslot_choose)
 if "%savemenu%"=="4" (goto autosave_switch)
-if "%savemenu%"=="5" (explorer.exe "%mainfolder%\Saves\%expansion%")
+if "%savemenu%"=="5" (goto autosave_running_switch)
+if "%savemenu%"=="6" (explorer.exe "%mainfolder%\Saves\%expansion%")
+if "%savemenu%"=="10" (
+goto import_autosave
+)
 if "%savemenu%"=="0" (goto menu)
 if "%savemenu%"=="" (goto save_menu)
 goto save_menu
@@ -2974,7 +3622,6 @@ if "%saveslot%"=="6" (set saveslot=6)
 if "%saveslot%"=="7" (set saveslot=7)
 if "%saveslot%"=="8" (set saveslot=8)
 if "%saveslot%"=="9" (set saveslot=9)
-if "%saveslot%"=="10" (set saveslot=autosave)
 if "%saveslot%"=="11" (set saveslot=old)
 if "%saveslot%"=="12" (set saveslot=transfer)
 if "%saveslot%"=="" (goto save_menu)
@@ -2986,16 +3633,17 @@ if "%savemenu%"=="3" (goto delete_saveslot_check)
 :delete_saveslot_check
 cls
 if exist "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql" goto delete_saveslot
-more < "%mainfolder%\header_save.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
 echo.
-echo    You can not delete an empty slot...
+echo             You can not delete an empty slot...
 echo.
 ping -n 3 127.0.0.1>nul
 goto save_menu
 
 :delete_saveslot
 cls
-more < "%mainfolder%\header_save.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 echo.
 SET /P AREYOUSURE=Delete #%saveslot% save? (Y/[N])?
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO save_menu
@@ -3003,9 +3651,10 @@ goto delete_saveslot_1
 
 :delete_saveslot_1
 cls
-more < "%mainfolder%\header_save.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
 echo.
-echo    Removing save #%saveslot%...
+echo             Removing save #%saveslot%...
 ping -n 3 127.0.0.1>nul
 rem remove whole folder to wipe version files
 rd /s /q "%mainfolder%\Saves\%expansion%\%saveslot%"
@@ -3015,17 +3664,19 @@ rem del "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
 rem del "%mainfolder%\Saves\%expansion%\%saveslot%\name.txt"
 mkdir "%mainfolder%\Saves\%expansion%\%saveslot%"
 echo.
-echo    Save #%saveslot% is empty now.
+echo             Save #%saveslot% is empty now.
 echo.
 ping -n 3 127.0.0.1>nul
 goto save_menu
 
 :export_notransfer
 cls
-more < "%mainfolder%\header_save.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
 echo.
-if "%saveslot%"=="transfer" echo    Transfer slot is for import only...
-if "%saveslot%"=="old" echo    Old SPP slot is for import only...
+if "%saveslot%"=="transfer" echo             Transfer slot is for import only...
+if "%saveslot%"=="old" echo             Old SPP slot is for import only...
+if "%saveslot%"=="autosave" echo             Autosave slot is for import only...
 echo.
 ping -n 3 127.0.0.1>nul
 goto save_menu
@@ -3034,14 +3685,16 @@ goto save_menu
 cls
 if "%saveslot%"=="transfer" goto export_notransfer
 if "%saveslot%"=="old" goto export_notransfer
+if "%saveslot%"=="autosave" goto export_notransfer
 if exist "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql" goto export_char
 goto export_char_1
 
 :export_char
 cls
-more < "%mainfolder%\header_save.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
 echo.
-echo    This will overwrite previous save!
+echo             This will overwrite previous save!
 echo.
 SET /P AREYOUSURE=Overwrite save in this slot? (Y/[N])?
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO save_menu
@@ -3049,43 +3702,42 @@ goto export_char_1
 
 :export_char_1
 cls
-more < "%mainfolder%\header_save.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
 echo.
 set /P slotname=Enter a name for the save:
 echo %slotname%>"%mainfolder%\Saves\%expansion%\%saveslot%\name.txt"
 cls
-more < "%mainfolder%\header_save.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
+echo.
 ping -n 2 127.0.0.1>nul
 echo.
-echo    Creating save #%saveslot% "%slotname%"
+echo             Creating save #%saveslot% "%slotname%"
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Exporting accounts...
+echo             Exporting accounts...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %login% > "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
 echo.
-echo    Exporting characters...
+echo             Exporting characters...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %characters% > "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
 echo.
-echo    Exporting playerbots...
+echo             Saving version info...
 ping -n 2 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %playerbot% > "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
-echo.
-echo    Saving version info...
-ping -n 2 127.0.0.1>nul
-xcopy /y "%mainfolder%\%expansion%_chars_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
-xcopy /y "%mainfolder%\%expansion%_realm_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
+xcopy /y "%versions%\%expansion%_chars_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
+xcopy /y "%versions%\%expansion%_realm_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
 if not "%logs_version%"=="0" (
-xcopy /y "%mainfolder%\%expansion%_logs_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
+xcopy /y "%versions%\%expansion%_logs_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
 )
-xcopy /y "%mainfolder%\%expansion%_bots_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
-xcopy /y "%mainfolder%\%expansion%_website_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
+xcopy /y "%versions%\%expansion%_bots_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
+xcopy /y "%versions%\%expansion%_website_version.spp" "%mainfolder%\Saves\%expansion%\%saveslot%">nul
 echo.
-echo    Done!
+echo             Done!
 ping -n 2 127.0.0.1>nul
 echo.
-echo    Save #%saveslot% "%slotname%" created.
+echo             Save #%saveslot% "%slotname%" created.
 ping -n 4 127.0.0.1>nul
 rem echo.
 rem echo    Saves are stored here:
@@ -3096,31 +3748,99 @@ goto menu
 
 :import_char_check
 cls
+if "%saveslot%"=="autosave" goto import_autosave
 if exist "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql" goto import_char
-more < "%mainfolder%\header_save.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
 echo.
-echo    This slot is empty
+echo             This slot is empty
 ping -n 2 127.0.0.1>nul
-echo    Please select another one
+echo             Please select another one
 echo.
 ping -n 3 127.0.0.1>nul
 goto save_menu
 
+:import_autosave
+setlocal enabledelayedexpansion
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Auto Saves Menu --------" \n
+echo.
+echo             Available autosaves in %expansion%:
+echo.
+
+set "AUTOSAVES_PATH=%mainfolder%\Saves\%expansion%\autosaves"
+set /a idx=0
+
+REM List available saves
+for /f "delims=" %%f in ('dir "%AUTOSAVES_PATH%\autosave_*.7z" /a-d /b /o-d 2^>nul') do (
+    set /a idx+=1
+    echo             [!idx!] %%~nf
+    set "save_!idx!=%%~nf"
+)
+
+if !idx! equ 0 (
+    echo.
+    echo             No autosaves found!
+    pause
+    goto save_menu
+)
+
+echo.
+echo             0 - Go back
+echo.
+set /p "selected=Select save to restore (1-!idx!): "
+
+echo !selected!|findstr /r "^[0-9][0-9]*$" >nul
+if errorlevel 1 (
+    echo             Invalid input. Please enter a number.
+    goto save_menu
+)
+
+if !selected! LSS 1 (
+    echo             Number too small. Minimum is 1.
+    goto save_menu
+)
+
+if !selected! GTR !idx! (
+    echo             Number too large. Maximum is !idx!.
+    goto save_menu
+)
+
+if defined save_!selected! (
+    call set "restore_path=%%save_!selected!%%"
+    cls
+    more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+    call :ColorText GRAY "                                            -------- Auto Saves Menu --------" \n
+    echo.
+    echo             Restoring from: !restore_path!
+    ping -n 3 127.0.0.1>nul
+    set "saveslot=autosaves\!restore_path!"
+    goto import_char
+) else (
+    echo             Error: Save !selected! not found!
+    pause
+    goto save_menu
+)
+
+goto save_menu
+
 :import_char
 cls
-more < "%mainfolder%\header_save.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
 echo.
-echo    Please stop all your servers
-echo    before continuing!
+echo             Please stop all your servers
+echo             before continuing!
 echo.
-echo    This will overwrite your characters!
+echo             This will overwrite your characters!
 echo.
-if "%saveslot%"=="transfer" echo    IMPORTANT!
-if "%saveslot%"=="transfer" echo    After vanilla - tbc transfer
-if "%saveslot%"=="transfer" echo    all random bots are deleted
-if "%saveslot%"=="transfer" echo    Except for bots who are:
-if "%saveslot%"=="transfer" echo    - in someone's Friends list
-if "%saveslot%"=="transfer" echo    - in real player's guild
+if "%saveslot%"=="transfer" echo             IMPORTANT!
+if "%saveslot%"=="transfer" echo             After vanilla - tbc transfer
+if "%saveslot%"=="transfer" echo             all random bots are deleted
+if "%saveslot%"=="transfer" echo             Except for bots who are:
+if "%saveslot%"=="transfer" echo             - in someone's Friends list
+if "%saveslot%"=="transfer" echo             - in real player's guild
 if "%saveslot%"=="transfer" echo.
 SET /P AREYOUSURE=Are you sure want to do this? (Y/[N])?
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO save_menu
@@ -3128,56 +3848,73 @@ goto import_char_1
 
 :convert_old_data
 echo.
-echo    Converting accounts...
+echo             Converting accounts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\convert_realmd.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\convert_realmd.sql"
 echo.
-echo    Converting characters...
+echo             Converting characters...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\convert_characters.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\convert_characters.sql"
 echo.
-echo    Updating realmlist...
+echo             Updating realmlist...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\realmlist.sql"
 echo.
-echo    Installing website tables...
+echo             Installing website tables...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\website.sql"
 if "%saveslot%"=="old" goto import_playerbots
 
 :convert_transfer_data
 echo.
-echo    Upgrading accounts...
+echo             Upgrading accounts...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\transfer_realmd.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\transfer_realmd.sql"
 echo.
-echo    Upgrading characters...
+echo             Upgrading characters...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\sql\%expansion%\transfer_characters.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Server\sql\%expansion%\transfer_characters.sql"
 echo.
-echo    Updating realmlist...
+echo             Updating realmlist...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\realmlist.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\realmlist.sql"
 echo.
-echo    Installing website tables...
+echo             Installing website tables...
 ping -n 3 127.0.0.1>nul
-"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\sql\%expansion%\website.sql"
+"%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Server\sql\%expansion%\website.sql"
 if "%saveslot%"=="transfer" goto import_playerbots
 
 :import_char_1
+setlocal enabledelayedexpansion
 cls
-if exist "%mainfolder%\Saves\%expansion%\%saveslot%\name.txt" set /p tempname=<"%mainfolder%\Saves\%expansion%\%saveslot%\name.txt"
-more < "%mainfolder%\header_save.txt"
-ping -n 2 127.0.0.1>nul
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                            -------- Saves Menu --------" \n
 echo.
-echo    Loading save #%saveslot% "%tempname%"
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%.7z" (
+echo             Extracting Auto Save %tempname%...
+ping -n 3 127.0.0.1>nul
+cd "%mainfolder%\Saves\%expansion%\autosaves"
+"%mainfolder%\Server\Tools\7za.exe" e -y -spf "%mainfolder%\Saves\%expansion%\!saveslot!.7z" >nul
+cd "%mainfolder%"
+)
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\name.txt" set /p tempname=<"%mainfolder%\Saves\%expansion%\%saveslot%\name.txt"
+ping -n 2 127.0.0.1>nul
+if not exist "%mainfolder%\Saves\%expansion%\%saveslot%\name.txt" (
+echo.
+echo             Loading save failed, no files to load!
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%.7z" rmdir /s /q "%mainfolder%\Saves\%expansion%\%saveslot%" 2>nul
+ping -n 3 127.0.0.1>nul
+goto save_menu
+)
+echo.
+echo             Loading save #%saveslot% "%tempname%"
 ping -n 3 127.0.0.1>nul
 echo.
-echo    Importing accounts...
+echo             Importing accounts...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
 echo.
-echo    Importing characters...
+echo             Importing characters...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
 if "%saveslot%"=="old" goto convert_old_data
@@ -3186,95 +3923,105 @@ if "%saveslot%"=="transfer" goto convert_transfer_data
 rem no more separate bots db
 goto import_continue
 echo.
-echo    Importing playerbots...
+echo             Importing playerbots...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
 if "%saveslot%"=="old" ping -n 2 127.0.0.1>nul
 if "%saveslot%"=="old" echo.
 if "%saveslot%"=="old" echo    Converting playerbots...
-if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
-if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
-if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
-if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
-if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
-if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\delete_randombots.sql"
+if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
+if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
+if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
+if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
+if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\reset_randombots.sql"
+if "%saveslot%"=="old" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\delete_randombots.sql"
 if "%saveslot%"=="transfer" ping -n 2 127.0.0.1>nul
 if "%saveslot%"=="transfer" echo.
 if "%saveslot%"=="transfer" echo    Upgrading playerbots...
-if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
-if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
-if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
-if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
-if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\reset_randombots.sql"
-if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\sql\%expansion%\delete_randombots.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_equip_cache.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rarity_cache.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_rnditem_cache.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\playerbot\characters_ai_playerbot_tele_cache.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\reset_randombots.sql"
+if "%saveslot%"=="transfer" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < "%mainfolder%\Server\sql\%expansion%\delete_randombots.sql"
 REM if "%choose_exp%"=="1" echo  Done!
 REM if "%choose_exp%"=="2" echo  Done!
 REM if "%choose_exp%"=="3" echo  Done!
 :import_continue
 echo.
-echo    Loading version info...
+echo             Loading version info...
 ping -n 2 127.0.0.1>nul
 rem set cur version to 0
 set /a "current_chars_version=0"
 set /a "current_bots_version=0"
 set /a "current_realm_version=0"
 set /a "current_logs_version=0"
-if exist "%mainfolder%\%expansion%_chars_version.spp" del "%mainfolder%\%expansion%_chars_version.spp">nul
-if exist "%mainfolder%\%expansion%_realm_version.spp" del "%mainfolder%\%expansion%_realm_version.spp">nul
+if exist "%versions%\%expansion%_chars_version.spp" del "%versions%\%expansion%_chars_version.spp">nul
+if exist "%versions%\%expansion%_realm_version.spp" del "%versions%\%expansion%_realm_version.spp">nul
 if not "%logs_version%"=="0" (
-if exist "%mainfolder%\%expansion%_logs_version.spp" del "%mainfolder%\%expansion%_logs_version.spp">nul
+if exist "%versions%\%expansion%_logs_version.spp" del "%versions%\%expansion%_logs_version.spp">nul
 )
-if exist "%mainfolder%\%expansion%_bots_version.spp" del "%mainfolder%\%expansion%_bots_version.spp">nul
-if exist "%mainfolder%\%expansion%_website_version.spp" del "%mainfolder%\%expansion%_website_version.spp">nul
+if exist "%versions%\%expansion%_bots_version.spp" del "%versions%\%expansion%_bots_version.spp">nul
+if exist "%versions%\%expansion%_website_version.spp" del "%versions%\%expansion%_website_version.spp">nul
 if not "%saveslot%"=="transfer" (
 if not "%saveslot%"=="old" (
-if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_chars_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_chars_version.spp" "%mainfolder%">nul
-if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_realm_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_realm_version.spp" "%mainfolder%">nul
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_chars_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_chars_version.spp" "%versions%">nul
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_realm_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_realm_version.spp" "%versions%">nul
 if not "%logs_version%"=="0" (
-if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_logs_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_logs_version.spp" "%mainfolder%">nul
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_logs_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_logs_version.spp" "%versions%">nul
 )
-if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_bots_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_bots_version.spp" "%mainfolder%">nul
-if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_website_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_website_version.spp" "%mainfolder%">nul
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_bots_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_bots_version.spp" "%versions%">nul
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_website_version.spp" xcopy /y "%mainfolder%\Saves\%expansion%\%saveslot%\%expansion%_website_version.spp" "%versions%">nul
 )
 )
+rem remove autosave folder
+if exist "%mainfolder%\Saves\%expansion%\%saveslot%.7z" rmdir /s /q "%mainfolder%\Saves\%expansion%\%saveslot%" 2>nul
 rem echo.
 rem echo    Applying characters db updates...
 rem ping -n 2 127.0.0.1>nul
-rem for %%i in ("%mainfolder%\sql\%expansion%\characters_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\characters_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
+rem for %%i in ("%mainfolder%\Server\sql\%expansion%\characters_updates\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\characters_updates\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\characters_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%characters% < %%i
 rem echo.
 rem echo    Applying accounts db updates...
 rem ping -n 2 127.0.0.1>nul
-rem for %%i in ("%mainfolder%\sql\%expansion%\realmd_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\realmd_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
+rem for %%i in ("%mainfolder%\Server\sql\%expansion%\realmd_updates\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\realmd_updates\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\realmd_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%login% < %%i
 rem echo.
 rem echo    Applying playerbot db updates...
 rem ping -n 2 127.0.0.1>nul
-rem for %%i in ("%mainfolder%\sql\%expansion%\playerbot_updates\*sql") do if %%i neq "%mainfolder%\sql\%expansion%\playerbot_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot_updates\*sql" if %%i neq "%mainfolder%\sql\%expansion%\playerbot_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
+rem for %%i in ("%mainfolder%\Server\sql\%expansion%\playerbot_updates\*sql") do if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot_updates\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot_updates\*sql" if %%i neq "%mainfolder%\Server\sql\%expansion%\playerbot_updates\*sql" "%mainfolder%\Server\Database\bin\mysql.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --database=%playerbot% < %%i
 echo.
-echo    Done!
+echo             Done!
 ping -n 2 127.0.0.1>nul
 echo.
-echo    Save #%saveslot% "%tempname%" loaded.
+echo             Save #%saveslot% "%tempname%" loaded.
 ping -n 4 127.0.0.1>nul
 goto start_database
 
-:account_tool
+:help_menu
 cls
-more < "%mainfolder%\header_spp.txt"
-more < "%mainfolder%\logo_%expansion%.txt"
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
+call :ColorText GRAY "                                           -------- Help Menu --------" \n
 echo.
-echo    1) Start the server
-echo    2) Open "mangosd.exe" window
-echo    3) Use the following command:
 echo.
-if "%choose_exp%"=="1" echo     account create NAME PASSWORD
-if "%choose_exp%"=="2" echo     account create NAME PASSWORD
-if "%choose_exp%"=="3" echo     account create NAME PASSWORD
+call :ColorText WHITE_BRIGHT "          NOTE: text appearing in console does not interrupt your command" \n
+call :ColorText WHITE_BRIGHT "                just type it and press Enter" \n
 echo.
-echo    To give GM rights use:
 echo.
-echo     account set gm NAME 3
+call :ColorText CYAN_BRIGHT "          Creating Account:" \n
 echo.
-echo    Change the NAME and PASSWORD to yours
+call :ColorText WHITE "            a) Use website (option M in menu) to create a normal account" \n
+call :ColorText GRAY "            OR" \n
+call :ColorText WHITE "            1) Start server, wait for it to fully load" \n
+call :ColorText WHITE "            2) Select server console in task bar" \n
+call :ColorText WHITE "               it should have lines of text appearing all the time" \n
+call :ColorText WHITE "            3) Type the following command in server console: "
+call :ColorItalic WHITE_BRIGHT "account create LOGIN PASSWORD" \n
+echo.
+echo.
+call :ColorText CYAN_BRIGHT "          Set Admin Account:" \n
+echo.
+call :ColorText WHITE "            Type the following command in server console: "
+call :ColorItalic WHITE_BRIGHT "account set gm LOGIN 3" \n
+echo.
 echo.
 pause
 goto menu
@@ -3282,16 +4029,22 @@ goto menu
 :shutdown_servers
 setlocal EnableDelayedExpansion
 :shutdown_start
+
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /f 2>nul
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /im cmd.exe /f 2>nul
+
 tasklist /FI "IMAGENAME eq %worldserver%" 2>NUL | find /I /N "%worldserver%">NUL
 if NOT "%ERRORLEVEL%"=="0" (
+set SERVER_RUNNING=0
 goto shutdown_end
 )
+
+set serverranonce=1
 start "" "%mainfolder%\Server\Tools\shutdown.vbs"
 set /a shutdown_attempts=0
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
-echo    Waiting for the server to shutdown...
+echo    Waiting for the server to shut down...
 :shutdown_wait
 if %shutdown_attempts% LSS 30 (
 ping -n 3 127.0.0.1>nul
@@ -3311,41 +4064,102 @@ tasklist /FI "IMAGENAME eq cmdmp3win.exe" 2>NUL | find /I /N "cmdmp3win.exe">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im cmdmp3win.exe
 tasklist /FI "IMAGENAME eq spp-httpd.exe" 2>NUL | find /I /N "spp-httpd.exe">NUL
 if "%ERRORLEVEL%"=="0" taskkill /f /im spp-httpd.exe
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /f 2>nul
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /im cmd.exe /f 2>nul
+set SERVER_RUNNING=0
 cls
-if exist "%mainfolder%\autosave.on" goto autosave_shutdown
+if exist "%versions%\autosave.on" goto autosave_shutdown
 "%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown
 
 goto exit
 
 :autosave_shutdown
+setlocal EnableDelayedExpansion
+cls
+more < "%mainfolder%\Server\Tools\logo_%expansion%.txt"
 set saveslot=autosave
-more < "%mainfolder%\header_spp.txt"
+set "MAX_SAVES=100"
+set "SAVES_DIR=autosaves"
+set "hour=%time:~0,2%"
+set "hour=!hour: =0!"
+set "minute=%time:~3,2%"
+set "minute=!minute: =0!"
+set "TIMESTAMP=%date:~6,4%%date:~3,2%%date:~0,2%_!hour!!minute!"
+set "SAVE_PATH=%mainfolder%\Saves\%expansion%\%SAVES_DIR%"
+set "SAVE_FOLDER=autosave_%TIMESTAMP%"
+set "FULL_SAVE_PATH=%SAVE_PATH%\%SAVE_FOLDER%"
+
+if "!serverranonce!"=="0" (
+echo             Autosave skipped, server did not run!
+ping -n 2 127.0.0.1>nul
+if "%menu_option%"=="9" if "%RETURNTOMENU%"=="0" goto menu
+if "%menu_option%"=="2" if "%RETURNTOMENU%"=="0" goto menu
+if "%menu_option%"=="9" goto select_expansion
 echo.
-echo           Autosave is on!
+echo             Shutting down...
+ping -n 2 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown
+goto exit
+)
+if exist "%FULL_SAVE_PATH%.7z" (
+echo             Autosave from this time already exists!
+ping -n 2 127.0.0.1>nul
+if "%menu_option%"=="9" if "%RETURNTOMENU%"=="0" goto menu
+if "%menu_option%"=="2" if "%RETURNTOMENU%"=="0" goto menu
+if "%menu_option%"=="9" goto select_expansion
+echo.
+echo             Shutting down...
+ping -n 2 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown
+goto exit
+)
+
+mkdir "%SAVE_PATH%" 2>nul
+mkdir "%FULL_SAVE_PATH%" 2>nul
+echo             Autosave is ENABLED!
+ping -n 2 127.0.0.1>nul
+echo.
+echo             Saving databases...
+ping -n 1 127.0.0.1>nul
+"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %login% > "%FULL_SAVE_PATH%\realmd.sql"
+"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %characters% > "%FULL_SAVE_PATH%\characters.sql"
+echo autosave_%TIMESTAMP%>"%FULL_SAVE_PATH%\name.txt"
+xcopy /y "%versions%\%expansion%_chars_version.spp" "%FULL_SAVE_PATH%">nul
+xcopy /y "%versions%\%expansion%_realm_version.spp" "%FULL_SAVE_PATH%">nul
+if not "%logs_version%"=="0" (
+xcopy /y "%versions%\%expansion%_logs_version.spp" "%FULL_SAVE_PATH%">nul
+)
+xcopy /y "%versions%\%expansion%_bots_version.spp" "%FULL_SAVE_PATH%">nul
+xcopy /y "%versions%\%expansion%_website_version.spp" "%FULL_SAVE_PATH%">nul
+echo.
+echo             Archiving save...
+ping -n 1 127.0.0.1>nul
+cd %SAVE_PATH%
+"%mainfolder%\Server\Tools\7za.exe" a -t7z -mx=3 "%SAVE_PATH%\%SAVE_FOLDER%.7z" "%FULL_SAVE_PATH%">nul
+cd %mainfolder%
+rmdir /s /q "%FULL_SAVE_PATH%" 2>nul
+echo.
+echo             Removing old saves...
+ping -n 1 127.0.0.1>nul
+set /a count=0
+for /f "delims=" %%f in ('dir "%SAVE_PATH%\autosave_*" /a-d /b /o-d 2^>nul') do (
+    set /a count+=1
+    if !count! gtr %MAX_SAVES% (
+        echo.
+        echo             Removing: %%f
+        del "%SAVE_PATH%\%%f" 2>nul
+        rmdir /s /q "%SAVE_PATH%\%%f" 2>nul
+        ping -n 1 127.0.0.1>nul
+    )
+)
+echo.
+echo             Done!
 ping -n 1 127.0.0.1>nul
 echo.
-echo    Exporting accounts...
-"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %login% > "%mainfolder%\Saves\%expansion%\%saveslot%\realmd.sql"
-ping -n 1 127.0.0.1>nul
-echo.
-echo    Done!
-ping -n 1 127.0.0.1>nul
-echo.
-echo    Exporting characters...
-"%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %characters% > "%mainfolder%\Saves\%expansion%\%saveslot%\characters.sql"
-ping -n 1 127.0.0.1>nul
-echo.
-echo    Done!
-ping -n 1 127.0.0.1>nul
-echo.
-rem echo    Exporting playerbots...
-rem "%mainfolder%\Server\Database\bin\mysqldump.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 %playerbot% > "%mainfolder%\Saves\%expansion%\%saveslot%\playerbot.sql"
-rem ping -n 1 127.0.0.1>nul
-rem echo.
-rem echo    Done!
-rem echo.
-rem ping -n 1 127.0.0.1>nul
-echo    Shutting down...
+if "%menu_option%"=="9" if "%RETURNTOMENU%"=="0" goto menu
+if "%menu_option%"=="2" if "%RETURNTOMENU%"=="0" goto menu
+if "%menu_option%"=="9" goto select_expansion
+echo             Shutting down...
 ping -n 2 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown
 
@@ -3353,15 +4167,9 @@ goto exit
 
 :changelog
 cls
+call :PlaySound "bookopen"
 setlocal EnableDelayedExpansion
-mode con: cols=60 lines=55
-rem more < "%mainfolder%\header_spp.txt"
-echo ############################################################
-echo # SPP - Classics Collection V2                             #
-echo # https://www.singleplayerproject.com/                     #
-echo ############################################################
-echo.
-set /a count=0
+rem set /a count=0
 set /a newcount=0
 for %%f in ("%mainfolder%\Changelog\*.txt") do (
 set /a newcount+=1
@@ -3372,10 +4180,13 @@ set manylogs=0
 set choose_log=0
 rem echo Selected Log:%selected_log%
 if %selected_log% GTR 0 (
-echo          -------- Changelog v%selected_log% --------
+echo.
+call :ColorText 03 "                                         -------- Changelog v%selected_log% --------"
+echo.
 more < "%mainfolder%\Changelog\%selected_log%.txt"
 echo.
 )
+set /a count=0
 for /f "tokens=*" %%f in ('dir /b /o-n "%mainfolder%\Changelog\*.txt"') do (
 set /a count+=1
 set logname[!count!]=%%~nf
@@ -3387,7 +4198,9 @@ rem echo "fullname: %%f"
 rem echo "name: %%~nf"
 rem echo "contents: !val!"
 if !count! EQU 1 (if %selected_log% EQU 0 (
-echo          -------- Changelog v%%~nf --------
+echo.
+call :ColorText CYAN "                                         -------- Changelog v%%~nf --------"
+echo.
 more < "%mainfolder%\Changelog\%%~nf.txt"
 )
 if %selected_log% EQU 0 echo.
@@ -3407,7 +4220,8 @@ echo    6 - More logs...)
 echo.
 echo    Press Enter to continue
 echo.
-set /P choose_log=Enter your choice: 
+call :ColorBlink WHITE "Enter your choice: "
+set /P choose_log=""
 if %choose_log% NEQ 0 (
 if "%choose_log%"=="6" (
 explorer.exe Changelog
@@ -3419,31 +4233,35 @@ set selected_log=!logname[%choose_log%]!
 rem set lognametemp=testingstuffultra
 goto changelog
 )
-if "%choose_log%"=="0" (goto select_expansion)
-if "%choose_log%"=="" (goto select_expansion)
+call :PlaySound "bookclose"
 goto select_expansion
 
 :service_menu
 cls
-COLOR 09
-more < "%mainfolder%\header_spp.txt"
 echo.
-echo      -------- Service Menu --------
+call :ColorText BLUE_BRIGHT "                                             -------- Service Menu --------" \n
 echo.
-echo    1 - Fix Database after crash
+echo    1 - Fix Database errors
+call :ColorText GRAY "          Can help after sudden server shutdown"
+echo.
 echo.
 echo    2 - Install Visual C++ Redist
+call :ColorText GRAY "          C++ redist is needed for server to run"
+echo.
 echo.
 echo    3 - Report bug
+call :ColorText GRAY "          Open GitHub issues page"
+echo.
 echo.
 echo    0 - Go back
 echo.
-set /P choose_service=Enter your choice: 
+call :ColorBlink WHITE "Enter your choice: "
+set /P choose_service=""
 if "%choose_service%"=="1" (goto fix_database)
 if "%choose_service%"=="2" (goto vcredist_install_all)
 if "%choose_service%"=="3" (goto report_issue)
 if "%choose_service%"=="0" (goto select_expansion)
-goto service_menu
+goto select_expansion
 
 :vcredist_install_all
 cls
@@ -3455,7 +4273,6 @@ goto service_menu
 
 :report_issue
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    ike3 is the developer of
 echo    playerbots system
@@ -3471,7 +4288,7 @@ goto service_menu
 
 :fix_database
 cls
-more < "%mainfolder%\header_spp.txt"
+call :PlaySound "repair"
 echo.
 ping -n 2 127.0.0.1>nul
 echo    Starting database...
@@ -3486,7 +4303,6 @@ ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqlcheck.exe" --defaults-extra-file="%mainfolder%\Server\Database\connection.cnf" --default-character-set=utf8 --auto-repair --check --all-databases
 ping -n 3 127.0.0.1>nul
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Check complete!
 ping -n 3 127.0.0.1>nul
@@ -3495,7 +4311,6 @@ echo    Shutting down the database...
 ping -n 3 127.0.0.1>nul
 "%mainfolder%\Server\Database\bin\mysqladmin.exe" -u root -p123456 --port=3310 shutdown
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Check complete!
 echo.
@@ -3511,7 +4326,6 @@ goto select_expansion
 
 :vcredist_install_x86
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Complete VCredist installation
 "%mainfolder%\Addons\vcredist\2005 Updated\vcredist_x86.exe" /Q
@@ -3525,7 +4339,6 @@ goto service_menu
 
 :vcredist_install_x64
 cls
-more < "%mainfolder%\header_spp.txt"
 echo.
 echo    Complete VCredist installation
 "%mainfolder%\Addons\vcredist\2005 Updated\vcredist_x64.exe" /Q
@@ -3542,18 +4355,35 @@ notepad "%mainfolder%\Server\Logs\server.log"
 goto service_menu
 
 :autosave_switch
-if exist "%mainfolder%\autosave.on" goto autosave_off
-if exist "%mainfolder%\autosave.off" goto autosave_on
+if exist "%versions%\autosave.on" goto autosave_off
+if exist "%versions%\autosave.off" goto autosave_on
 
 :autosave_off
 cls
-del "%mainfolder%\autosave.on"
-echo autosave > "%mainfolder%\autosave.off"
+del "%versions%\autosave.on"
+echo autosave > "%versions%\autosave.off"
 goto save_menu
 
 :autosave_on
-del "%mainfolder%\autosave.off"
-echo autosave > "%mainfolder%\autosave.on"
+del "%versions%\autosave.off"
+echo autosave > "%versions%\autosave.on"
+goto save_menu
+
+:autosave_running_switch
+if exist "%versions%\autosave_running.on" goto autosave_running_off
+if exist "%versions%\autosave_running.off" goto autosave_running_on
+
+:autosave_running_off
+cls
+del "%versions%\autosave_running.on"
+echo autosave_running > "%versions%\autosave_running.off"
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /f 2>nul
+taskkill /fi "WINDOWTITLE eq SPP Classics V2 - AutoSave*" /im cmd.exe /f 2>nul
+goto save_menu
+
+:autosave_running_on
+del "%versions%\autosave_running.off"
+echo autosave_running > "%versions%\autosave_running.on"
 goto save_menu
 
 

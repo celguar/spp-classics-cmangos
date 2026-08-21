@@ -20,7 +20,6 @@ Server/Binaries/wotlk/Bin64/*
 *.spp
 *.on
 *.off
-*.txt
 *.log
 *.wget-hsts
 sql/vanilla/world.sql
