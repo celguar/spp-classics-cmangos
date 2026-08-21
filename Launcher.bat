@@ -29,6 +29,7 @@ set repack_version=2.4.0
 set "maps_date=06.06.2021"
 set "maps_date2=06/06/2021" 
 set /a website_version=15
+for /f "tokens=4-7 delims=[.] " %%i in ('ver') do (if %%i==Version (set windows_version=%%j.%%k) else (set windows_version=%%i.%%j))
 
 set COLOR[BLACK]=00>nul
 set COLOR[GRAY]=08>nul
