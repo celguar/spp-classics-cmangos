@@ -132,7 +132,7 @@ taskkill /f /im node.exe
 :repack
 set name=SPP Classics V2
 set installpath=SPP_Server
-set branch=launcher_update
+set branch=master
 goto install
 
 :install
@@ -163,8 +163,8 @@ echo    Starting %name%...
 ping -n 5 127.0.0.1>nul
 cd "%mainfolder%"
 rem copy "%mainfolder%\%installpath%\Server\Tools\Server_Fix.bat" . /Y
-rem copy "%mainfolder%\%installpath%\Server\Tools\Server_Update.bat" . /Y
-rem copy "%mainfolder%\%installpath%\Server\Tools\Server_Start.bat" . /Y
+copy "%mainfolder%\%installpath%\Server\Tools\Server_Update.bat" . /Y
+copy "%mainfolder%\%installpath%\Server\Tools\Server_Start.bat" . /Y
 echo.
 goto start_server
 
