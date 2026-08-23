@@ -1,22 +1,43 @@
 # SPP Classics v2.0
  - Vanilla (1.12), The Burning Crusade (2.4.3) and WotLK (3.3.5) versions are supported
+
+# Prerequisites
+- Windows OS
+- Git installed and available in PATH
+- At least 10 GB free space
+- Everything else, including MySQL, database files, and website to create accounts is bundled in the repack.
+
 # Installation
 -  **DO NOT** install this repack over old one. This update is not a "copy and replace old files" kind. 
 -  Download the installer (if you haven't done this before) - **[SPP_Classics_V2.exe](https://github.com/celguar/spp-classics-cmangos/releases/download/v2.0/SPP_Classics_V2.exe)**.
  - Installer is a 7z self exctacting archive, it will extract "SPP_Classics V2" folder where you put it.
  - It is recommended to use SSD if you have one
  - Run it and click Extract
- - Open the unpacked SPP_Classics_V2 folder and run **Server_Update.bat** and *wait* for it to download all necessary files. (~300 MB).
+ - Open the unpacked SPP_Classics_V2 folder and run **Server_Update.bat** as administrator from command-line and *wait* for it to download all necessary files. (~300 MB).
  - After it is ready you will see Expansion selection menu.
  - Expansions are downloaded "per request", e.g. TBC files (maps/mmaps...) are only downloaded if you select TBC expansion.
  - Select desired expansion by typing expansion menu number and hit Enter. Expansion files will be downloaded and installed automatically.
  - **DO NOT** close the launcher during the process! I'm serious!
  - When its ready you will see Expansion menu, with "Start Servers (Win64)" and other options.
+
+# Troubleshooting
+
+ - Make sure you don't launch the server from Powershell or Bash as that causes errors.
+ - Make sure a separate MySQL CMD tab has opened both during installation and launch of the server. Last lines of MySQL server launch should be:
+ ```
+[Note] Server\Database\bin\mysqld: ready for connections.
+Version: '5.7.26'  socket: ''  port: 3310  MySQL Community Server (GPL)
+```
+
+ - If website has been enabled, make sure it has launched in the separate CMD tab during server launch.
+
 # Bot Addon
  - You can find latest Mangosbot Addon for WoW in SPP_Server/Addons folder. Copy Mangosbot folder in WoW/Interface/AddOns/
 - When you start the game make sure "Load out-of-date Addons" is enabled in Addons list.
+
 # Settings
  - Before you start, you can edit the Settings in SPP_Classics_V2/SPP_Server/Settings/%expansion%/ folder
+
 # _**aiplayerbot.conf**_:
   ## Find these settings:
   AiPlayerbot.MinRandomBots = 1000
