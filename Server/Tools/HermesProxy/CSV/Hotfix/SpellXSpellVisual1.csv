@@ -1,0 +1,4 @@
+Id,DifficultyId,SpellVisualId,Probability,Flags,Priority,SpellIconFileId,ActiveIconFileId,ViewerUnitConditionId,ViewerPlayerConditionId,CasterUnitConditionId,CasterPlayerConditionId,SpellId
+316112,0,7434,1,0,1,0,0,0,0,0,0,32950
+316810,0,107,1,0,1,0,0,0,0,0,0,33389
+316812,0,107,1,0,1,0,0,0,0,0,0,33392

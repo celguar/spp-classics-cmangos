@@ -28,3 +28,21 @@ sql/wotlk/world.sql
 sql/cata/world.sql
 Saves
 !Changelog/*.txt
+
+# Web launcher
+WebLauncher/runtime
+WebLauncher/config.json
+Server/Tools/node
+Server/website.7z
+Server/Sql/*/custom
+Settings/*/mangosd.pdb
+Server/Sql/*/playerbot/characters_ai_playerbot_equip_cache.sql
+Settings/etc
+
+# Linux binaries: only the archive built by the Linux Binaries workflow is tracked
+Server/Binaries/*/Linux64/*
+!Server/Binaries/*/Linux64/Linux64.7z
+
+# HermesProxy runtime data
+Server/Tools/HermesProxy/AccountData
+Server/Tools/HermesProxy/PacketsLog

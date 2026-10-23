@@ -1,0 +1,2 @@
+Id,ModelId,SoundId,SizeClass,CreatureModelScale,CreatureModelAlpha,BloodId,ExtendedDisplayInfoId,NPCSoundId,ParticleColorId,PortraitCreatureDisplayInfoId,PortraitTextureFileDataId,ObjectEffectPackageId,AnimReplacementSetId,Flags,StateSpellVisualKitId,PlayerOverrideScale,PetInstanceScale,UnarmedWeaponType,MountPoofSpellVisualKitId,DissolveEffectId,Gender,DissolveOutEffectId,CreatureModelMinLod,TextureVariationFileDataId1,TextureVariationFileDataId2,TextureVariationFileDataId3
+14733,49,0,1,1.1,255,0,10105,48,0,0,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0,0

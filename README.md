@@ -12,6 +12,10 @@
  - Select desired expansion by typing expansion menu number and hit Enter. Expansion files will be downloaded and installed automatically.
  - **DO NOT** close the launcher during the process! I'm serious!
  - When its ready you will see Expansion menu, with "Start Servers (Win64)" and other options.
+# Web Launcher (Windows & Linux)
+ - Instead of Launcher.bat you can use the web based admin panel: run **Launcher-Web.bat** (Windows) or **launcher-web.sh** (Linux) and open http://127.0.0.1:8090 (first login: admin / admin, you will be asked to change it)
+ - Includes scheduled maintenance: daily/weekly/monthly server restarts, optionally with updates
+ - It has the same features as Launcher.bat plus a live server console, in-browser config editing and account management. See [WebLauncher/README.md](WebLauncher/README.md)
 # Bot Addon
  - You can find latest Mangosbot Addon for WoW in SPP_Server/Addons folder. Copy Mangosbot folder in WoW/Interface/AddOns/
 - When you start the game make sure "Load out-of-date Addons" is enabled in Addons list.

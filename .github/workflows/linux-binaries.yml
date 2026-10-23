@@ -1,0 +1,192 @@
+name: Linux Binaries
+
+# Builds mangosd/realmd for Linux and stores them as Server/Binaries/<exp>/Linux64/Linux64.7z,
+# which the web launcher extracts on Linux just like Bin64.7z on Windows.
+# Run it after updating the Windows binaries and core_version in Launcher.bat, so both
+# platforms are built from the same core and carry the same core_version.
+on:
+  workflow_dispatch:
+    inputs:
+      expansions:
+        description: "Expansions to build (comma separated)"
+        default: "vanilla,tbc,wotlk"
+        required: true
+      core_ref:
+        description: "CMaNGOS branch, tag or commit to build"
+        default: "ike3-bots"
+        required: true
+      commit:
+        description: "Commit the archives to this branch"
+        type: boolean
+        default: true
+
+env:
+  BUILD_TYPE: RelWithDebInfo
+  BUILD_OPTIONS: >-
+    -DBUILD_EXTRACTORS=OFF -DBUILD_PLAYERBOTS=ON -DBUILD_AHBOT=ON -DBUILD_GIT_ID=ON
+    -DBUILD_MODULES=ON -DBUILD_MODULE_ACHIEVEMENTS=ON -DBUILD_MODULE_DUALSPEC=ON -DBUILD_MODULE_HARDCORE=ON
+    -DBUILD_MODULE_IMMERSIVE=ON -DBUILD_MODULE_TRANSMOG=ON -DBUILD_MODULE_BOOST=ON -DBUILD_MODULE_BARBER=ON
+    -DBUILD_MODULE_TRAININGDUMMIES=ON
+
+jobs:
+  setup:
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - id: matrix
+        env:
+          EXPANSIONS: ${{ inputs.expansions }}
+        run: |
+          json="["
+          for exp in $(echo "$EXPANSIONS" | tr ',' ' '); do
+            case "$exp" in
+              vanilla) core=classic ;;
+              tbc) core=tbc ;;
+              wotlk) core=wotlk ;;
+              *) echo "::error::Unknown expansion '$exp' (use vanilla, tbc, wotlk)"; exit 1 ;;
+            esac
+            json="$json{\"exp\":\"$exp\",\"core\":\"$core\"},"
+          done
+          echo "matrix=${json%,}]" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: setup
+    # oldest supported runner: the binaries then also run on newer Ubuntu/Debian releases
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.setup.outputs.matrix) }}
+    name: build (${{ matrix.exp }})
+    steps:
+      - name: Checkout repack (Launcher.bat only)
+        uses: actions/checkout@v4
+        with:
+          path: repack
+          sparse-checkout: Launcher.bat
+          sparse-checkout-cone-mode: false
+
+      - name: Checkout CMaNGOS ${{ matrix.core }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/mangos-${{ matrix.core }}
+          ref: ${{ inputs.core_ref }}
+          path: core
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential cmake p7zip-full patchelf \
+            libboost-dev libboost-program-options-dev libboost-thread-dev libboost-regex-dev \
+            libboost-serialization-dev libboost-filesystem-dev libboost-system-dev \
+            libmariadb-dev libmariadb-dev-compat libssl-dev zlib1g-dev libbz2-dev
+
+      - name: Patch for newer Boost
+        # Boost 1.87+ removed io_service; io_context exists since 1.66
+        run: sed -i 's/io_service svc;/io_context svc;/' core/src/mangosd/Master.cpp
+
+      - name: Configure
+        run: cmake -S core -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=$PWD/install ${{ env.BUILD_OPTIONS }}
+
+      - name: Build
+        run: cmake --build build -j$(nproc)
+
+      - name: Install
+        run: cmake --install build
+
+      - name: Package
+        run: |
+          core_version=$(tr -d '\r' < repack/Launcher.bat | awk -v want="${{ matrix.exp }}" '
+            $0 == ":setup_" want { inside = 1 }
+            inside && /^goto settings/ { exit }
+            inside && /^set \/a core_version=/ { split($0, a, "="); print a[2]; exit }')
+          if [ -z "$core_version" ]; then echo "::error::core_version for ${{ matrix.exp }} not found in Launcher.bat"; exit 1; fi
+
+          mkdir -p pkg/lib
+          cp install/bin/mangosd install/bin/realmd pkg/
+          # bundle the MariaDB client library; everything else (OpenSSL 3, zlib, libstdc++)
+          # is part of any current distribution, Boost is linked statically
+          cp -L "$(ldd pkg/mangosd | awk '/libmariadb/ {print $3}')" pkg/lib/
+          patchelf --set-rpath '$ORIGIN/lib' pkg/mangosd pkg/realmd
+
+          # keep debug symbols as a separate download (like mangosd.pdb on Windows)
+          mkdir -p debug
+          for f in mangosd realmd; do
+            objcopy --only-keep-debug pkg/$f debug/$f.debug
+            strip --strip-debug pkg/$f
+            objcopy --add-gnu-debuglink=debug/$f.debug pkg/$f
+          done
+
+          cat > pkg/build_info.txt <<EOF
+          expansion=${{ matrix.exp }}
+          core_version=$core_version
+          repository=${{ github.repository_owner }}/mangos-${{ matrix.core }}
+          ref=${{ inputs.core_ref }}
+          commit=$(git -C core rev-parse HEAD)
+          date=$(date -u +%Y-%m-%dT%H:%MZ)
+          built_on=ubuntu-22.04
+          EOF
+          sed -i 's/^ *//' pkg/build_info.txt
+          cat pkg/build_info.txt
+          ldd pkg/mangosd
+
+          (cd pkg && 7z a -t7z -mx=9 ../Linux64.7z .)
+          (cd debug && 7z a -t7z -mx=9 ../Linux64-debug.7z .)
+
+      - name: Smoke test
+        # the unpacked binaries must find every library (bundled lib/ included) and run
+        run: |
+          mkdir -p smoke && cd smoke && 7z x -bso0 ../Linux64.7z
+          for f in mangosd realmd; do
+            if ldd ./$f | grep "not found"; then echo "::error::$f has missing libraries"; exit 1; fi
+          done
+          ./mangosd --version
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.exp }}
+          path: Linux64.7z
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.exp }}-debug
+          path: Linux64-debug.7z
+
+  commit:
+    needs: build
+    if: ${{ inputs.commit }}
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repack (binaries folder only)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            Server/Binaries
+            .gitignore
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: linux-*
+          path: artifacts
+
+      - name: Commit archives
+        run: |
+          built=""
+          for dir in artifacts/linux-*; do
+            exp=${dir#artifacts/linux-}
+            case "$exp" in *-debug) continue ;; esac
+            mkdir -p Server/Binaries/$exp/Linux64
+            cp "$dir/Linux64.7z" Server/Binaries/$exp/Linux64/Linux64.7z
+            git add -f Server/Binaries/$exp/Linux64/Linux64.7z
+            built="$built $exp"
+          done
+          if git diff --cached --quiet; then echo "Nothing changed"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update Linux binaries:$built (${{ inputs.core_ref }})"
+          git push

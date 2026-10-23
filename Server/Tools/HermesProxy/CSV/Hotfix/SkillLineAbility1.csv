@@ -1,0 +1,3 @@
+RaceMask,Id,SkillLine,Spell,MinSkillLineRank,ClassMask,SupercedesSpell,AcquireMethod,TrivialSkillLineRankHigh,TrivialSkillLineRankLow,Flags,NumSkillUps,UniqueBit,TradeSkillCategoryID,SkillupSkillLineID,CharacterPoints1,CharacterPoints2
+0,15029,762,33388,1,0,0,0,0,0,0,1,0,0,0,0,0
+0,15030,762,33391,1,0,0,0,0,0,0,1,0,0,0,0,0
