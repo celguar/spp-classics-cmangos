@@ -424,7 +424,10 @@
         try { await api('/api/file', { kind, name, db, text: area.value }); toast(`${name} saved`); d.close(); if (S.view && S.view.reload) S.view.reload(); }
         catch (e) { toast(e.message, true); }
       });
-      area.focus();
+      // start at the top: browsers leave the caret (and the scroll) at the end after setting value
+      area.setSelectionRange(0, 0);
+      area.focus({ preventScroll: true });
+      area.scrollTop = 0;
     }
   }
 
@@ -478,7 +481,7 @@
       playSound('launcher_intro', true);
       root.addEventListener('click', async (e) => {
         const s = e.target.closest('[data-select]');
-        if (s) act('/api/expansion/select', { exp: s.dataset.select }, { onDone: j => { if (j.status === 'done') location.hash = '#/'; } });
+        if (s) act('/api/expansion/select', { exp: s.dataset.select }, { onDone: async (j) => { if (j.status === 'done') { await refreshStatus(); navigate('#/'); } } });
         if (e.target.closest('[data-shutdown]')) shutdownRepack();
       });
       root.addEventListener('change', (e) => {
@@ -1396,6 +1399,12 @@
     window.scrollTo(0, y);
   }
   window.addEventListener('hashchange', render);
+  // Go to a page; also re-renders when already there ('' and '#/' are the same route,
+  // so setting the hash alone may not fire hashchange, e.g. on the first page load).
+  function navigate(hash) {
+    if (currentRoute() === hash.replace(/^#\/?/, '')) render();
+    else location.hash = hash;
+  }
 
   async function start() {
     try { S.session = await api('/api/session'); } catch { /* server down */ }
