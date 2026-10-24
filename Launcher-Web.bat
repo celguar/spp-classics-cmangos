@@ -43,11 +43,13 @@ if not errorlevel 1 (
   "%~dp0Server\Tools\wget.exe" -q --show-progress --no-check-certificate "%NODE_URL%" -O "%NODE_ZIP%"
 )
 if not exist "%NODE_ZIP%" goto download_failed
-"%~dp0Server\Tools\7za.exe" x -y -o"%~dp0Server\Tools" "%NODE_ZIP%" >nul
-del "%NODE_ZIP%"
+rem Only node.exe is needed (the web launcher has no npm packages). Extracting it
+rem straight into place avoids moving the unpacked folder, which fails when an
+rem antivirus is still scanning the new files.
 if exist "%NODE_DIR%" rd /s /q "%NODE_DIR%"
-move "%~dp0Server\Tools\node-%NODE_VERSION%-win-x64" "%NODE_DIR%" >nul
-if not exist "%NODE_DIR%\node.exe" goto download_failed
+"%~dp0Server\Tools\7za.exe" e -y -o"%NODE_DIR%" "%NODE_ZIP%" "node-%NODE_VERSION%-win-x64\node.exe" >nul
+del "%NODE_ZIP%"
+if not exist "%NODE_DIR%\node.exe" goto extract_failed
 set "NODE=%NODE_DIR%\node.exe"
 
 :run
@@ -59,6 +61,15 @@ exit /b
 echo.
 echo    Could not download Node.js. Install it from https://nodejs.org
 echo    or use Launcher.bat instead.
+echo.
+pause
+exit /b 1
+
+:extract_failed
+echo.
+echo    Node.js was downloaded but could not be unpacked into Server\Tools\node.
+echo    Your antivirus may have blocked node.exe. Install Node.js from
+echo    https://nodejs.org or use Launcher.bat instead.
 echo.
 pause
 exit /b 1
