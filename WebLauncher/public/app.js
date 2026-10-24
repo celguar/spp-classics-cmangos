@@ -1345,10 +1345,64 @@
           <button class="btn" type="submit" style="margin-bottom:9px">Save login</button>
         </form>
         <p class="small muted">Other browsers that are logged in will be logged out. Forgot the password? Stop the launcher and delete <code>WebLauncher/runtime/auth.json</code> to reset it to admin / admin.</p>
+        ${s.isDefault ? '' : '<p><button class="btn" type="button" data-auth-reset>Reset login to admin / admin</button></p>'}
         <div class="subheader">Remote access</div>
-        <p>By default the panel only listens on this computer. To manage the server from another device set <code>"host": "0.0.0.0"</code> in <code>WebLauncher/config.json</code> and restart the launcher.</p>`;
+        <div id="remote-box"><p class="muted">Loading...</p></div>`;
+    },
+    renderRemote(r) {
+      const box = $('#remote-box');
+      if (!box) return;
+      const blocked = r.envLocked || (!r.enabled && r.defaultLogin);
+      box.innerHTML = `
+        <label class="check"><input type="checkbox" data-remote ${r.enabled ? 'checked' : ''} ${blocked ? 'disabled' : ''}> Allow access from other devices on the network</label>
+        ${r.envLocked ? `<p class="small muted">Set by the <code>SPP_HOST</code> environment variable (<code>${esc(r.host)}</code>).</p>` : ''}
+        ${!r.enabled && r.defaultLogin && !r.envLocked ? '<p class="small muted">Change the default password above first: the admin / admin login only works on this computer.</p>' : ''}
+        ${r.enabled ? `<p>Open the panel from another device with ${r.urls.length ? r.urls.map(u => `<code>${esc(u)}</code>`).join(' or ') : 'this computer\'s IP address'}.
+            If it does not load, allow Node.js (port ${r.port}) through this computer's firewall.</p>`
+          : '<p class="small muted">The panel only answers on this computer. Changes apply right away; no restart needed.</p>'}`;
+    },
+    async loadRemote() {
+      try { this.renderRemote(await api('/api/remote')); } catch (e) { const box = $('#remote-box'); if (box) box.innerHTML = `<p class="muted">${esc(e.message)}</p>`; }
+    },
+    resetLogin() {
+      const d = dialog({
+        title: 'Reset login',
+        body: `<form id="reset-form">
+          <p>The login goes back to <strong>admin / admin</strong> and other browsers are logged out.
+            Until you choose a new password, logging in only works on this computer${S.session.loopback ? '' : ' (not from the device you are using now)'}.</p>
+          <label class="field" style="width:100%">Current password<input type="password" name="currentPassword" required autocomplete="current-password"></label>
+        </form>`,
+        foot: '<button class="btn" data-close>Cancel</button><button class="btn danger" data-ok>Reset login</button>',
+      });
+      const form = $('#reset-form', d.el);
+      form.currentPassword.focus();
+      const submit = async () => {
+        if (!form.currentPassword.value) { form.currentPassword.focus(); return; }
+        try {
+          await api('/api/auth/reset', { currentPassword: form.currentPassword.value });
+          d.close();
+          toast('Login reset to admin / admin');
+          S.session = await api('/api/session');
+          rerender();
+        } catch (err) { toast(err.message, true); form.currentPassword.select(); }
+      };
+      form.addEventListener('submit', (e) => { e.preventDefault(); submit(); });
+      $('[data-ok]', d.el).addEventListener('click', submit);
     },
     mount(root) {
+      this.loadRemote();
+      $('[data-auth-reset]', root)?.addEventListener('click', () => this.resetLogin());
+      root.addEventListener('change', async (e) => {
+        const t = e.target.closest('[data-remote]');
+        if (!t) return;
+        if (!t.checked && !S.session.loopback && !await confirmDialog({ title: 'Turn off remote access',
+          text: 'You are using the panel from another device. After this it only works on the server computer itself.', ok: 'Turn off' })) {
+          t.checked = true; return;
+        }
+        t.disabled = true;
+        try { this.renderRemote(await api('/api/remote', { enabled: t.checked })); toast(t.checked ? 'Remote access enabled' : 'Remote access disabled'); }
+        catch (err) { toast(err.message, true); this.loadRemote(); }
+      });
       $('#admin-form', root).addEventListener('submit', async (e) => {
         e.preventDefault();
         const f = Object.fromEntries(new FormData(e.target).entries());

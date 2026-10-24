@@ -204,11 +204,16 @@ Pass `--no-browser` to skip opening a browser.
 ### Login and remote access
 
 The panel always asks for a login. Credentials are stored hashed in
-`WebLauncher/runtime/auth.json`; delete that file (with the launcher stopped) to reset to
-admin / admin. While the default password is in use, logins are only accepted from the
+`WebLauncher/runtime/auth.json`. *Launcher Settings > Reset login to admin / admin* puts the
+default back (it asks for the current password); if the password is forgotten, delete that
+file (with the launcher stopped) instead. While the default password is in use, logins are only accepted from the
 server computer itself.
 
-To manage the server from another device set `"host": "0.0.0.0"` and restart the launcher.
+To manage the server from another device, tick **Allow access from other devices on the
+network** in *Launcher Settings* (after changing the default password). It applies right
+away and is saved as `"host": "0.0.0.0"` in `config.json`; unticking sets it back to
+`127.0.0.1`. The page lists the addresses to open. If another device cannot connect, allow
+Node.js / port 8090 through the firewall of the server computer.
 
 ## How it works
 

@@ -17,6 +17,7 @@ const manage = require('./lib/ops/manage');
 const { Auth } = require('./lib/auth');
 const { Scheduler } = require('./lib/scheduler');
 const { gitAvailable } = require('./lib/ops/maintenance');
+const { saveUserConfig } = require('./lib/config');
 
 const L = new Launcher();
 const cfg = L.cfg;
@@ -222,6 +223,21 @@ const routes = {
     throw httpError(400, 'Unknown action');
   },
 
+  // remote access (Launcher Settings)
+  'GET /api/remote': () => remoteInfo(),
+  'POST /api/remote': async (b) => {
+    if (process.env.SPP_HOST) throw httpError(409, 'The address is set by the SPP_HOST environment variable; change it there.');
+    const enable = !!b.enabled;
+    if (enable && auth.isDefault) throw httpError(409, 'Change the default admin password first. It only works on this computer.');
+    const host = enable ? '0.0.0.0' : '127.0.0.1';
+    if (host !== cfg.host) {
+      await relisten(host);
+      cfg.host = host;
+      saveUserConfig({ host });
+    }
+    return remoteInfo();
+  },
+
   // service menu
   'POST /api/service/fixdb': () => job('Fix database errors', ctx => manage.fixDatabase(L, ctx)),
   'POST /api/service/vcredist': () => { manage.runVcredist(L); return {}; },
@@ -289,6 +305,12 @@ const server = http.createServer(async (req, res) => {
       send(res, 200, { username: auth.username });
       return;
     }
+    if (pathname === '/api/auth/reset' && req.method === 'POST') {
+      try { auth.reset(token(req), await readBody(req)); }
+      catch (e) { if (e.status === 403) await new Promise(r => setTimeout(r, 800)); throw e; } // slow down guessing
+      send(res, 200, { username: auth.username });
+      return;
+    }
 
     if (pathname === '/api/events') {
       res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive' });
@@ -315,19 +337,62 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.on('error', (e) => {
-  console.error(e.code === 'EADDRINUSE' ? `Port ${cfg.port} is already in use. Is the launcher already running? Change "port" in WebLauncher/config.json.` : e.message);
-  process.exit(1);
-});
+// ---- listening / remote access -----------------------------------------------------------------
+const isAnyHost = h => h === '0.0.0.0' || h === '::';
+// IPv4 addresses other devices on the network can use to reach this computer
+function lanAddresses() {
+  const out = [];
+  for (const list of Object.values(os.networkInterfaces())) {
+    for (const a of list || []) if ((a.family === 'IPv4' || a.family === 4) && !a.internal) out.push(a.address);
+  }
+  return out;
+}
+function remoteInfo() {
+  const urls = isAnyHost(cfg.host) ? lanAddresses().map(a => `http://${a}:${cfg.port}/`)
+    : LOOPBACK.includes(cfg.host) ? [] : [`http://${cfg.host}:${cfg.port}/`];
+  return { enabled: !LOOPBACK.includes(cfg.host), host: cfg.host, port: cfg.port, urls, envLocked: !!process.env.SPP_HOST, defaultLogin: auth.isDefault };
+}
 
-server.listen(cfg.port, cfg.host, () => {
-  const shown = LOOPBACK.includes(cfg.host) ? '127.0.0.1' : cfg.host === '0.0.0.0' ? '<this-machine-ip>' : cfg.host;
-  const url = `http://${shown === '<this-machine-ip>' ? '127.0.0.1' : shown}:${cfg.port}/`;
+function listenOn(host) {
+  return new Promise((resolve, reject) => {
+    const onError = (e) => { server.off('listening', onListening); reject(e); };
+    const onListening = () => { server.off('error', onError); resolve(); };
+    server.once('error', onError);
+    server.once('listening', onListening);
+    server.listen(cfg.port, host);
+  });
+}
+
+// Switch the listening address while running. Open connections (this page, its event
+// stream) stay up; if the new address cannot be used, go back to the old one.
+async function relisten(host) {
+  const old = cfg.host;
+  server.close();
+  for (let i = 0; ; i++) {
+    await new Promise(r => setTimeout(r, 150)); // let the old socket close
+    try { await listenOn(host); break; } catch (e) {
+      if (e.code === 'EADDRINUSE' && i < 10) continue;
+      await listenOn(old).catch(() => {});
+      throw httpError(500, `Could not listen on ${host}:${cfg.port}: ${e.message}`);
+    }
+  }
+  console.log(`  Admin panel now ${isAnyHost(host) ? `reachable from the network: ${lanAddresses().map(a => `http://${a}:${cfg.port}/`).join(', ')}` : `only on this computer: http://127.0.0.1:${cfg.port}/`}`);
+}
+
+server.on('error', (e) => { if (server.listening) console.error(e.message); }); // listen errors are handled above
+
+listenOn(cfg.host).then(() => {
+  const local = LOOPBACK.includes(cfg.host) || isAnyHost(cfg.host) ? '127.0.0.1' : cfg.host;
+  const url = `http://${local}:${cfg.port}/`;
   console.log(`\n  SPP Classics ${cfg.repackVersion} - Web Launcher`);
-  console.log(`  Admin panel: http://${shown}:${cfg.port}/`);
+  console.log(`  Admin panel: ${url}`);
+  if (isAnyHost(cfg.host)) console.log(`  From other devices: ${lanAddresses().map(a => `http://${a}:${cfg.port}/`).join(', ') || '(no network address found)'}`);
   console.log(`  Platform: ${process.platform}, database ${cfg.database.managed ? 'managed by launcher' : 'external'} at ${cfg.database.host}:${cfg.database.port}`);
   console.log('  Keep this window open while you play. Use "Shutdown Repack" in the panel to stop everything.\n');
   if (cfg.openBrowser && !process.argv.includes('--no-browser')) openBrowser(url);
+}, (e) => {
+  console.error(e.code === 'EADDRINUSE' ? `Port ${cfg.port} is already in use. Is the launcher already running? Change "port" in WebLauncher/config.json.` : e.message);
+  process.exit(1);
 });
 
 function openBrowser(url) {

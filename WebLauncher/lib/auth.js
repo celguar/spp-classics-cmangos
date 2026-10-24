@@ -73,6 +73,15 @@ class Auth {
     const s = this.sessions.get(token);
     if (s) s.user = user;
   }
+
+  // Back to admin / admin (needs the current password); other browsers are logged out.
+  reset(token, { currentPassword }) {
+    if (!this.verify(this.data.username, currentPassword)) throw httpError(403, 'Current password is wrong');
+    this.set(DEFAULT_USER, DEFAULT_PASS, true);
+    for (const t of [...this.sessions.keys()]) if (t !== token) this.sessions.delete(t);
+    const s = this.sessions.get(token);
+    if (s) s.user = DEFAULT_USER;
+  }
 }
 
 module.exports = { Auth };

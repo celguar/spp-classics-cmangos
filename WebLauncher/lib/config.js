@@ -99,6 +99,14 @@ function merge(base, over) {
   return out;
 }
 
+// Change top-level keys of config.json, keeping everything else the user wrote there.
+function saveUserConfig(changes) {
+  let user = {};
+  if (exists(CONFIG_FILE)) user = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+  Object.assign(user, changes);
+  fs.writeFileSync(CONFIG_FILE, `${JSON.stringify(user, null, 2)}\n`);
+}
+
 function loadConfig() {
   let user = {};
   if (exists(CONFIG_FILE)) {
@@ -152,4 +160,4 @@ function makePaths(cfg) {
   return P;
 }
 
-module.exports = { loadConfig, makePaths, CONFIG_FILE, RUNTIME_DIR, DEFAULTS };
+module.exports = { loadConfig, saveUserConfig, makePaths, CONFIG_FILE, RUNTIME_DIR, DEFAULTS };
