@@ -126,7 +126,7 @@
       groups.push({ id: 'chars', title: 'Characters', icon: 'account', items: [['saves', 'Saves'], ['bots', 'Random Bots']] });
       groups.push({ id: 'db', title: 'Database', icon: 'interactive', items: [['database', 'Wipe & Modify DB'], ['locales', 'Translations'], ['beta', 'Beta Build']] });
     }
-    groups.push({ id: 'launcher', title: 'Launcher', icon: 'support', items: [['realms', 'Choose Expansion'], ['admin', 'Launcher Settings'], ['service', 'Service'], ['changelog', 'Changelog']] });
+    groups.push({ id: 'launcher', title: 'Launcher', icon: 'support', items: [['realms', 'Choose Expansion'], ['performance', 'Performance'], ['admin', 'Launcher Settings'], ['service', 'Service'], ['changelog', 'Changelog']] });
     return groups;
   }
 
@@ -1205,6 +1205,178 @@
     },
   };
 
+  // -- performance (CPU, RAM and disk of the machine and the server processes)
+  const fmtUptime = (sec) => {
+    sec = Math.max(0, Math.floor(sec));
+    const d = Math.floor(sec / 86400); const h = Math.floor(sec / 3600) % 24; const m = Math.floor(sec / 60) % 60;
+    return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : m ? `${m}m` : `${sec}s`;
+  };
+  const PERF_RANGES = [['10m', '10 min', 10 * 60000], ['1h', '1 hour', 3600000], ['6h', '6 hours', 6 * 3600000], ['24h', '24 hours', 24 * 3600000]];
+  const PERF_LINES = { mangosd: ['#05374a', 'World server'], db: ['#1d7a1d', 'Database'], realmd: ['#9a5b00', 'Realm server'], hermes: ['#7a2c88', 'HermesProxy'] };
+  const fmtAgo = ms => (ms >= 2 * 3600000 ? `${Math.round(ms / 3600000)} h ago` : ms >= 120000 ? `${Math.round(ms / 60000)} min ago` : `${Math.round(ms / 1000)} s ago`);
+  const viewPerformance = {
+    render() {
+      this.range = (() => { try { return localStorage.getItem('spp.perfRange') || '10m'; } catch { return '10m'; } })();
+      if (!PERF_RANGES.some(r => r[0] === this.range)) this.range = '10m';
+      return `${banner('Performance')}
+        <div class="versions" id="perf-host">&nbsp;</div>
+        <div id="perf-tiles"><p class="empty">Measuring...</p></div>
+        <div class="row perf-toolbar">
+          <div class="seg" role="group" aria-label="Chart range">${PERF_RANGES.map(([k, l]) => `<button data-range="${k}" class="${k === this.range ? 'on' : ''}">${l}</button>`).join('')}</div>
+          <span class="spacer"></span>
+          <label class="check" title="Samples every 10 seconds even when nobody has this page open, and keeps 24 hours of history (also across launcher restarts)"><input type="checkbox" data-perf-bg disabled> Record in the background</label>
+        </div>
+        <div id="perf-range-note"></div>
+        <div class="perf-charts">
+          <div><div class="subheader">CPU usage</div><div id="perf-cpu" class="perf-chart"></div></div>
+          <div><div class="subheader">Memory usage</div><div id="perf-mem" class="perf-chart"></div></div>
+        </div>
+        <div class="subheader">Server processes</div>
+        <div id="perf-procs" class="scroll-x"></div>
+        <p class="small muted" id="perf-note"></p>`;
+    },
+    mount(root) {
+      this.history = [];
+      this.last = 0;
+      this.long = [];
+      this.lastLong = 0;
+      this.live = null;
+      this.data = null;
+      root.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-range]');
+        if (!b || b.dataset.range === this.range) return;
+        this.range = b.dataset.range;
+        try { localStorage.setItem('spp.perfRange', this.range); } catch { /* private mode */ }
+        $$('[data-range]', root).forEach(x => x.classList.toggle('on', x === b));
+        if (this.data) this.draw();
+        this.poll();
+      });
+      root.addEventListener('change', async (e) => {
+        const t = e.target.closest('[data-perf-bg]');
+        if (!t) return;
+        t.disabled = true;
+        try {
+          const r = await api('/api/perf/settings', { background: t.checked });
+          this.data.background = r.background;
+          toast(r.background ? 'Background recording on: 24 hours of history are kept' : 'Background recording off');
+          this.draw();
+        } catch (err) { toast(err.message, true); t.checked = !t.checked; } finally { t.disabled = false; }
+      });
+      this.poll();
+      this.timer = setInterval(() => this.poll(), 2000);
+    },
+    unmount() { clearInterval(this.timer); this.timer = null; },
+    isLong() { return this.range !== '10m'; },
+    async poll() {
+      if (this.busy) return;
+      this.busy = true;
+      try {
+        const d = await api(`/api/perf?since=${this.last}${this.isLong() ? `&lsince=${this.lastLong}` : ''}`);
+        if (!this.timer) return; // left the page meanwhile
+        this.data = d;
+        this.history.push(...d.history);
+        if (this.history.length) this.last = this.history[this.history.length - 1].t;
+        const from = Date.now() - PERF_RANGES[0][2] - 5000;
+        this.history = this.history.filter(h => h.t >= from);
+        if (d.long) {
+          this.long.push(...d.long);
+          if (this.long.length) this.lastLong = this.long[this.long.length - 1].t;
+          this.long = this.long.filter(h => h.t >= Date.now() - PERF_RANGES[3][2] - 60000);
+          this.live = d.longLive;
+        }
+        this.draw();
+      } catch { /* launcher busy or restarting */ } finally { this.busy = false; }
+    },
+    draw() {
+      const d = this.data;
+      if (!$('#perf-tiles')) return;
+      const h = d.host;
+      $('#perf-host').innerHTML = `<b>${esc(h.name)}</b> &middot; ${esc(h.os)} &middot; ${esc(h.cpuModel)} (<b>${h.cores}</b> threads) &middot; up <b>${fmtUptime(d.uptime)}</b>`;
+      const pct = (a, b) => (b ? a / b * 100 : 0);
+      const bar = p => `<div class="meter"><i style="width:${Math.min(100, p).toFixed(1)}%" class="${p >= 90 ? 'hot' : p >= 75 ? 'warm' : ''}"></i></div>`;
+      const tile = (k, v, p, s) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div>${p == null ? '' : bar(p)}<div class="s">${s || '&nbsp;'}</div></div>`;
+      const m = d.mem;
+      const tiles = [
+        tile('CPU', d.cpu == null ? '...' : `${d.cpu.toFixed(0)}%`, d.cpu, d.load ? `load ${d.load.map(x => x.toFixed(2)).join(' ')}` : `${h.cores} threads`),
+        tile('Memory', `${fmtSize(m.used)} <small class="muted">/ ${fmtSize(m.total)}</small>`, pct(m.used, m.total), `${pct(m.used, m.total).toFixed(0)}% used, ${fmtSize(m.total - m.used)} available`),
+      ];
+      if (m.swapTotal) tiles.push(tile('Swap', `${fmtSize(m.swapUsed)} <small class="muted">/ ${fmtSize(m.swapTotal)}</small>`, pct(m.swapUsed, m.swapTotal), m.swapUsed > m.swapTotal * 0.5 ? '<span class="warnc">RAM is running short</span>' : ''));
+      if (d.disk) tiles.push(tile('Disk (repack)', `${fmtSize(d.disk.free)} <small class="muted">free</small>`, pct(d.disk.total - d.disk.free, d.disk.total),
+        d.disk.free < 1073741824 ? '<span class="bad">Almost full: autosaves are skipped</span>' : `of ${fmtSize(d.disk.total)}`));
+      $('#perf-tiles').innerHTML = `<div class="tiles">${tiles.join('')}</div>`;
+      const bg = $('[data-perf-bg]');
+      if (bg && document.activeElement !== bg) { bg.checked = !!d.background; bg.disabled = false; }
+
+      // 10 minutes: every sample; longer: one point per minute (average, plus the CPU peak)
+      const long = this.isLong();
+      const range = PERF_RANGES.find(r => r[0] === this.range);
+      let pts = this.history;
+      if (long) {
+        pts = this.long.slice();
+        if (this.live && (!pts.length || this.live.t > pts[pts.length - 1].t)) pts.push(this.live);
+      }
+      const opts = { pts, range: range[2], minSpan: long ? 10 * 60000 : 60000, gap: long ? 3 * 60000 : Math.max(25000, d.interval * 3) };
+      const shown = Object.keys(PERF_LINES).filter(k => pts.some(x => x.p[k]));
+      $('#perf-cpu').innerHTML = this.chart(opts, x => x.cpu, shown.map(k => [k, x => x.p[k] && x.p[k][0]]), v => `${v}%`, 100, long ? x => x.max : null);
+      $('#perf-mem').innerHTML = this.chart(opts, x => x.mem, shown.map(k => [k, x => x.p[k] && x.p[k][1]]), v => fmtSize(v), m.total);
+      $('#perf-range-note').innerHTML = long && !d.background
+        ? '<div class="notice">Longer ranges only have data for the times this page was open. Turn on <b>Record in the background</b> to keep 24 hours of history.</div>'
+        : '';
+
+      const rows = d.procs.map(p => `<tr><td><b>${esc(p.label)}</b> <span class="muted small">${esc(p.names.join(', '))}</span></td>
+        <td class="mono">${p.pids.slice(0, 3).join(', ')}${p.pids.length > 3 ? ` +${p.pids.length - 3}` : ''}</td>
+        <td class="num">${p.cpu == null ? '...' : `${p.cpu.toFixed(1)}%`}</td>
+        <td class="num">${fmtSize(p.mem)}</td>
+        <td class="num">${p.threads == null ? '' : p.threads}</td>
+        <td>${p.since ? fmtUptime((d.at - p.since) / 1000) : ''}</td></tr>`).join('');
+      $('#perf-procs').innerHTML = `<table class="list perf-procs"><tr><th>Process</th><th>PID</th><th class="num">CPU</th><th class="num">RAM</th><th class="num">Threads</th><th>Running for</th></tr>${rows}</table>
+        ${d.procs.some(p => p.key === 'mangosd') ? '' : '<p class="empty">The world server is not running.</p>'}`;
+      $('#perf-note').textContent = `CPU is a share of the whole computer (all ${h.cores} threads = 100%). Updated every ${d.interval / 1000} seconds while this page is open`
+        + (d.background ? `, every ${d.backgroundInterval / 1000} seconds in the background. Ranges over 10 minutes show per-minute averages; the dotted line is the CPU peak of each minute.` : '.');
+    },
+    // SVG line chart: the machine total as a filled area, the server processes as lines.
+    // Gaps (nothing recorded) break the lines. The time axis grows with the data up to the range.
+    chart({ pts: all, range, minSpan, gap }, total, lines, fmt, max, peak) {
+      const W = 600; const H = 150;
+      const now = this.data.at;
+      const first = all.find(p => p.t >= now - range);
+      const span = Math.min(range, Math.max(minSpan, first ? now - first.t : 0));
+      const from = now - span;
+      const x = t => ((t - from) / span * W).toFixed(1);
+      const y = v => (H - Math.min(1, v / max) * H).toFixed(1);
+      const pts = all.filter(p => p.t >= from);
+      const segments = (get) => {
+        const out = [];
+        let cur = [];
+        let prevT = 0;
+        for (const p of pts) {
+          const v = get(p);
+          if (v == null || (prevT && p.t - prevT > gap)) { if (cur.length) out.push(cur); cur = []; }
+          if (v != null) cur.push([p.t, v]);
+          prevT = p.t;
+        }
+        if (cur.length) out.push(cur);
+        return out;
+      };
+      const path = seg => seg.map(([t, v], i) => `${i ? 'L' : 'M'}${x(t)},${y(v)}`).join('');
+      const area = segments(total).map(s => `<path class="area" d="${path(s)}L${x(s[s.length - 1][0])},${H}L${x(s[0][0])},${H}Z"/><path class="total" d="${path(s)}"/>`).join('');
+      const peakSvg = peak ? segments(peak).map(s => `<path class="peak" d="${path(s)}"/>`).join('') : '';
+      const lineSvg = lines.map(([k, get]) => segments(get).map(s => `<path class="line" stroke="${PERF_LINES[k][0]}" d="${path(s)}"/>`).join('')).join('');
+      const grid = [0.25, 0.5, 0.75].map(f => `<line x1="0" x2="${W}" y1="${H * f}" y2="${H * f}"/>`).join('');
+      const legend = [`<span><i class="sw total"></i>Whole computer</span>`, ...(peak ? ['<span><i class="sw peak"></i>Peak</span>'] : []),
+        ...lines.map(([k]) => `<span><i class="sw" style="background:${PERF_LINES[k][0]}"></i>${PERF_LINES[k][1]}</span>`)];
+      return `<div class="perf-plot">
+          <span class="ax top">${fmt(max)}</span><span class="ax mid">${fmt(max / 2)}</span>
+          ${pts.length ? '' : '<span class="ax none">No data recorded for this range yet</span>'}
+          <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Usage over time">
+            <g class="grid">${grid}</g>${area}${peakSvg}${lineSvg}
+          </svg>
+        </div>
+        <div class="perf-axis"><span>${fmtAgo(span)}</span><span>now</span></div>
+        <div class="perf-legend">${legend.join('')}</div>`;
+    },
+  };
+
   const viewLogin = {
     render() {
       const s = S.session;
@@ -1572,7 +1744,7 @@
     realms: () => viewRealms, accounts: () => viewAccounts, settings: () => viewSettings, logs: () => viewLogs,
     saves: () => viewSaves, bots: () => viewBots, database: () => viewDatabase, locales: () => viewLocales,
     beta: () => viewBeta, service: () => viewService, changelog: () => viewChangelog,
-    maintenance: () => viewMaintenance, admin: () => viewAdmin,
+    maintenance: () => viewMaintenance, admin: () => viewAdmin, performance: () => viewPerformance,
   };
   const NEEDS_EXP = new Set(['maintenance', 'accounts', 'settings', 'logs', 'saves', 'bots', 'database', 'locales', 'beta']);
   const currentRoute = () => location.hash.replace(/^#\/?/, '').split('?')[0];

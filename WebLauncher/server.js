@@ -20,6 +20,7 @@ const autostart = require('./lib/autostart');
 const AUTOSTART = process.argv.includes('--autostart');
 const { gitAvailable } = require('./lib/ops/maintenance');
 const { saveUserConfig } = require('./lib/config');
+const { Perf } = require('./lib/perf');
 
 const L = new Launcher();
 const cfg = L.cfg;
@@ -28,6 +29,8 @@ const LOOPBACK = ['127.0.0.1', 'localhost', '::1'];
 
 const auth = new Auth(L.P.runtime, cfg.password);
 L.scheduler = new Scheduler(L);
+const perf = new Perf({ background: !!cfg.perfHistory, file: path.join(L.P.runtime, 'perf-history.json') });
+process.on('exit', () => perf.close());
 
 // ---- auth ------------------------------------------------------------------------------
 // Only answer to IP addresses, localhost and this machine's name, so a web page
@@ -263,6 +266,15 @@ const routes = {
     }
     const info = b.enabled !== undefined ? await autostart.setEnabled(!!b.enabled) : await autostart.info();
     return { ...info, server: L.state.autostartServer || '', openBrowser: cfg.openBrowser !== false };
+  },
+
+  // resource usage (Performance page)
+  'GET /api/perf': (b, q) => perf.snapshot(+q.get('since') || 0, q.has('lsince') ? +q.get('lsince') || 0 : null),
+  'POST /api/perf/settings': (b) => {
+    cfg.perfHistory = !!b.background;
+    saveUserConfig({ perfHistory: cfg.perfHistory });
+    perf.setBackground(cfg.perfHistory);
+    return { background: cfg.perfHistory };
   },
 
   // service menu

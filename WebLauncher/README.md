@@ -38,6 +38,7 @@ it owns the server processes. Use **Shutdown Repack** in the panel to stop every
 | Beta Build (8) | **Beta Build** (Windows) |
 | Service Menu, Changelog, SPP Extras (E) | **Service**, **Changelog** |
 | - | **Maintenance**: scheduled restarts and updates (see below) |
+| - | **Performance**: CPU, RAM, swap and disk of the computer, charts of the last 10 minutes to 24 hours, and CPU/RAM/threads/uptime per server process (world, realm, database, website, HermesProxy, launcher). Measured only while the page is open, unless **Record in the background** is on |
 | - | **Launcher Settings**: admin username and password |
 | - | **Server Settings > HermesProxy**: start HermesProxy with the server for modern Classic clients |
 
@@ -198,6 +199,7 @@ Copy `config.example.json` to `config.json` and change what you need. Every key 
 | `shutdownTimeoutSec` | `0` | Seconds to wait for a clean server shutdown before killing it. `0` waits until mangosd exits by itself (saving a long-running world can take many minutes); a stuck server can still be ended with **Force close** on the Overview page |
 | `autosaveIntervalMin` | `15` | Minutes between autosaves while running (10 to 1440). Set on the *Saves* page |
 | `maxAutosaves` | `100` | Autosaves kept per expansion; the oldest are deleted (1 to 1000). Set on the *Saves* page. Autosaves are skipped while less than 1 GB of disk space is free |
+| `perfHistory` | `false` | *Performance > Record in the background*: sample CPU and RAM every 10 seconds even when the page is closed and keep 24 hours of per-minute history (average and peak) in `runtime/perf-history.json`, also across launcher restarts. On Windows a small hidden PowerShell process stays running for the per-process numbers |
 
 Environment variables `SPP_HOST` and `SPP_PORT` override the file.
 Pass `--no-browser` to skip opening a browser.

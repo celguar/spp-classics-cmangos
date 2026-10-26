@@ -38,6 +38,7 @@ const DEFAULTS = {
   autosaveIntervalMin: 15,
   maxAutosaves: 100,
   restartDelaySec: 10,
+  perfHistory: false, // Performance page: record in the background, keep 24 hours
 };
 
 // Fallbacks for when Launcher.bat cannot be parsed. Launcher.bat stays the single

@@ -463,3 +463,32 @@ pre.viewer { margin: 0; height: 100%; overflow: auto; background: #0b0a08; color
 fieldset.opts { border: 0; margin: 6px 0 0 22px; padding: 0; min-width: 0; }
 fieldset.opts:disabled { opacity: .45; }
 fieldset.opts:disabled .check { cursor: not-allowed; }
+
+/* ---------- performance ---------- */
+.meter { height: 6px; margin: 4px 0 2px; background: rgba(60, 40, 10, .18); border-radius: 1px; overflow: hidden; }
+.meter > i { display: block; height: 100%; background: var(--ok); transition: width .4s; }
+.meter > i.warm { background: var(--warn); }
+.meter > i.hot { background: var(--bad); }
+.perf-charts { display: grid; gap: 0 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-bottom: 4px; }
+.perf-plot { position: relative; height: 150px; border: 1px solid var(--parch-line); background: rgba(255, 250, 230, .45); }
+.perf-plot svg { display: block; width: 100%; height: 100%; }
+.perf-plot .grid line { stroke: var(--parch-line); stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+.perf-plot .area { fill: rgba(100, 9, 9, .14); stroke: none; }
+.perf-plot path.total { fill: none; stroke: var(--heading); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.perf-plot path.line { fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.perf-plot .ax { position: absolute; left: 4px; font-size: 10px; color: var(--ink-soft); pointer-events: none; }
+.perf-plot .ax.top { top: 1px; }
+.perf-plot .ax.mid { top: calc(50% - 7px); }
+.perf-axis { display: flex; justify-content: space-between; font-size: 10px; color: var(--ink-soft); margin: 1px 0 4px; }
+.perf-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11px; margin-bottom: 12px; }
+.perf-legend .sw { display: inline-block; width: 12px; height: 3px; margin-right: 5px; vertical-align: 3px; }
+.perf-legend .sw.total { background: var(--heading); }
+table.perf-procs th.num, table.perf-procs td.num { text-align: right; white-space: nowrap; }
+.perf-toolbar { margin: 0 0 6px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid #3b2f1a; border-radius: 2px; overflow: hidden; }
+.seg button { border: 0; border-right: 1px solid #3b2f1a; background: #2a2116; color: #b8a575; font: bold 11px Arial; padding: 4px 10px; cursor: pointer; }
+.seg button:last-child { border-right: 0; }
+.seg button.on { background: #0b0a08; color: var(--gold); }
+.perf-plot path.peak { fill: none; stroke: var(--heading); stroke-width: 1; stroke-dasharray: 2 3; opacity: .6; vector-effect: non-scaling-stroke; }
+.perf-plot .ax.none { top: calc(50% + 14px); left: 0; right: 0; text-align: center; font-style: italic; }
+.perf-legend .sw.peak { background: repeating-linear-gradient(90deg, var(--heading) 0 2px, transparent 2px 5px); opacity: .7; }
