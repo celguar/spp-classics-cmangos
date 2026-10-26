@@ -7,6 +7,19 @@ const { exists, mkdirp, rmrf, copyFile, readFirstLine, writeText, stamp, fileInf
 
 const SLOTS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'old', 'transfer'];
 const VERSION_KEYS = ['chars', 'realm', 'logs', 'bots', 'website'];
+// Autosave limits (also enforced when read from config.json)
+const MIN_INTERVAL = 10;
+const MAX_INTERVAL = 24 * 60;
+const MAX_KEEP = 1000;
+// An autosave is skipped below this much free disk space, so it cannot fill the disk
+const MIN_FREE_BYTES = 1024 ** 3;
+
+const intervalMin = L => Math.min(MAX_INTERVAL, Math.max(MIN_INTERVAL, Math.round(+L.cfg.autosaveIntervalMin) || 15));
+const keepCount = L => Math.min(MAX_KEEP, Math.max(1, Math.round(+L.cfg.maxAutosaves) || 1));
+
+function freeBytes(dir) {
+  try { const s = fs.statfsSync(dir); return s.bavail * s.bsize; } catch { return null; } // statfs: Node 18.15+
+}
 
 function versionKeys(L, exp) {
   return VERSION_KEYS.filter(k => k !== 'logs' || L.exp(exp).versions.logs !== 0);
@@ -39,7 +52,11 @@ function listSaves(L, exp) {
     autosaves: listAutosaves(L, exp),
     autosave: L.flags.isOn('autosave'),
     autosaveRunning: L.flags.isOn('autosave_running'),
-    intervalMin: L.cfg.autosaveIntervalMin,
+    intervalMin: intervalMin(L),
+    keep: keepCount(L),
+    limits: { minInterval: MIN_INTERVAL, maxInterval: MAX_INTERVAL, maxKeep: MAX_KEEP },
+    freeBytes: freeBytes(exists(base) ? base : L.P.root),
+    minFreeBytes: MIN_FREE_BYTES,
   };
 }
 
@@ -59,9 +76,15 @@ async function dumpInto(L, exp, dir, name) {
   for (const k of versionKeys(L, exp)) copyFile(L.flags.file(L.flags.versionFile(exp, k)), dir);
 }
 
-// Used on server start/stop and by the 15 minute timer
+// Used on server start/stop and by the "every N minutes" timer
 async function makeAutosave(L, ctx, exp) {
   const base = path.join(L.P.saves(exp), 'autosaves');
+  mkdirp(base);
+  const free = freeBytes(base);
+  if (free !== null && free < MIN_FREE_BYTES) {
+    ctx.log(`Autosave skipped: only ${Math.round(free / 1048576)} MB free disk space left (needs ${MIN_FREE_BYTES >= 1024 ** 3 ? `${MIN_FREE_BYTES / 1024 ** 3} GB` : `${MIN_FREE_BYTES / 1048576} MB`}). Delete old autosaves or lower "Keep" on the Saves page.`, 'warn');
+    return;
+  }
   const name = `autosave_${stamp()}`;
   const archive = path.join(base, `${name}.7z`);
   if (exists(archive)) { ctx.log('Autosave from this time already exists!'); return; }
@@ -74,9 +97,39 @@ async function makeAutosave(L, ctx, exp) {
   } finally {
     await rmrf(dir);
   }
-  const old = listAutosaves(L, exp).slice(Math.max(1, L.cfg.maxAutosaves));
-  for (const f of old) { ctx.log(`Removing old autosave ${f.name}`); fs.rmSync(path.join(base, f.name), { force: true }); }
+  pruneAutosaves(L, exp, ctx);
   ctx.log(`Saved ${name}`, 'ok');
+}
+
+// Deletes the oldest autosaves beyond the "keep" count; returns how many were removed.
+function pruneAutosaves(L, exp, ctx) {
+  const base = path.join(L.P.saves(exp), 'autosaves');
+  const old = listAutosaves(L, exp).slice(keepCount(L));
+  for (const f of old) {
+    if (ctx) ctx.log(`Removing old autosave ${f.name}`);
+    fs.rmSync(path.join(base, f.name), { force: true });
+  }
+  return old.length;
+}
+
+// Interval and keep count from the Saves page (stored in config.json, used by every expansion).
+function saveAutosaveSettings(L, { intervalMin: iv, keep }) {
+  const changes = {};
+  if (iv !== undefined) {
+    const n = Math.round(+iv);
+    if (!(n >= MIN_INTERVAL && n <= MAX_INTERVAL)) throw httpError(400, `Autosave interval must be ${MIN_INTERVAL} to ${MAX_INTERVAL} minutes`);
+    changes.autosaveIntervalMin = n;
+  }
+  if (keep !== undefined) {
+    const n = Math.round(+keep);
+    if (!(n >= 1 && n <= MAX_KEEP)) throw httpError(400, `Number of autosaves to keep must be 1 to ${MAX_KEEP}`);
+    changes.maxAutosaves = n;
+  }
+  Object.assign(L.cfg, changes);
+  require('../config').saveUserConfig(changes);
+  let removed = 0;
+  if (changes.maxAutosaves) for (const exp of Object.keys(L.cfg.expansions)) removed += pruneAutosaves(L, exp);
+  return { removed };
 }
 
 async function saveSlot(L, ctx, exp, slot, name) {
@@ -165,4 +218,4 @@ function deleteAutosave(L, exp, file) {
   fs.rmSync(path.join(L.P.saves(exp), 'autosaves', file), { force: true });
 }
 
-module.exports = { listSaves, saveSlot, deleteSlot, loadSlot, loadAutosave, deleteAutosave, makeAutosave };
+module.exports = { listSaves, saveSlot, deleteSlot, loadSlot, loadAutosave, deleteAutosave, makeAutosave, saveAutosaveSettings, intervalMin };

@@ -323,6 +323,8 @@ input[type=text], input[type=password], input[type=number], select, textarea {
 input:focus, select:focus, textarea:focus { outline: 2px solid rgba(160, 100, 0, .45); outline-offset: 0; }
 label.field { display: inline-flex; flex-direction: column; gap: 2px; margin: 0 12px 8px 0; font-weight: bold; color: var(--ink-soft); font-size: 11px; }
 .check { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+input.num { width: 64px; }
+span.check { cursor: default; }
 .row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 4px 6px; }
 .row.center { align-items: center; }
 .spacer { flex: 1; }

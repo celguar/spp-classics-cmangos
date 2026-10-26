@@ -16,6 +16,8 @@ const saves = require('./lib/ops/saves');
 const manage = require('./lib/ops/manage');
 const { Auth } = require('./lib/auth');
 const { Scheduler } = require('./lib/scheduler');
+const autostart = require('./lib/autostart');
+const AUTOSTART = process.argv.includes('--autostart');
 const { gitAvailable } = require('./lib/ops/maintenance');
 const { saveUserConfig } = require('./lib/config');
 
@@ -47,6 +49,8 @@ function cookies(req) {
 }
 const token = req => cookies(req).spp_session;
 const isLoopback = req => /^(::1$|127\.|::ffff:127\.)/.test(req.socket.remoteAddress || '');
+// "Skip the login on this computer": requests from the server computer itself need no session
+const loginFree = req => auth.skipLogin && isLoopback(req);
 
 // ---- server-sent events -----------------------------------------------------------------
 const clients = new Set();
@@ -200,6 +204,11 @@ const routes = {
   'POST /api/saves/delete': async (b) => { await saves.deleteSlot(L, sel(), String(b.slot)); return {}; },
   'POST /api/saves/autosave': () => job('Creating autosave', async (ctx) => { await L.startDatabase(ctx); await saves.makeAutosave(L, ctx, sel()); }),
   'POST /api/saves/autosave/load': b => job(`Loading ${b.file}`, ctx => saves.loadAutosave(L, ctx, sel(), b.file)),
+  'POST /api/saves/autosave/settings': (b) => {
+    const r = saves.saveAutosaveSettings(L, b);
+    if (b.intervalMin !== undefined && L.autosaveTimer) L.startAutosaveTimer(); // new interval right away
+    return r;
+  },
   'POST /api/saves/autosave/delete': (b) => { saves.deleteAutosave(L, sel(), b.file); return {}; },
 
   // bots, database
@@ -237,6 +246,23 @@ const routes = {
       saveUserConfig({ host });
     }
     return remoteInfo();
+  },
+
+  // start with the operating system, optionally starting a server too
+  'GET /api/autostart': async () => ({ ...(await autostart.info()), server: L.state.autostartServer || '', openBrowser: cfg.openBrowser !== false }),
+  'POST /api/open-browser': (b) => {
+    cfg.openBrowser = !!b.enabled;
+    saveUserConfig({ openBrowser: cfg.openBrowser });
+    return { openBrowser: cfg.openBrowser };
+  },
+  'POST /api/autostart': async (b) => {
+    if (b.server !== undefined) {
+      if (b.server) L.exp(b.server); // validates
+      L.state.autostartServer = b.server || null;
+      L.saveState();
+    }
+    const info = b.enabled !== undefined ? await autostart.setEnabled(!!b.enabled) : await autostart.info();
+    return { ...info, server: L.state.autostartServer || '', openBrowser: cfg.openBrowser !== false };
   },
 
   // service menu
@@ -296,14 +322,21 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     if (pathname === '/api/session') {
-      send(res, 200, { authed: auth.check(token(req)), required: true, username: auth.username, isDefault: auth.isDefault, loopback: isLoopback(req) });
+      send(res, 200, { authed: loginFree(req) || auth.check(token(req)), required: !loginFree(req), skipLogin: auth.skipLogin, username: auth.username, isDefault: auth.isDefault, loopback: isLoopback(req) });
       return;
     }
-    if (!auth.check(token(req))) throw httpError(401, 'Login required');
+    if (!loginFree(req) && !auth.check(token(req))) throw httpError(401, 'Login required');
     if (pathname === '/api/logout') { auth.logout(token(req)); send(res, 200, {}); return; }
     if (pathname === '/api/auth/change' && req.method === 'POST') {
       auth.change(token(req), await readBody(req));
       send(res, 200, { username: auth.username });
+      return;
+    }
+    if (pathname === '/api/auth/skip-login' && req.method === 'POST') {
+      const b = await readBody(req);
+      try { auth.setSkipLogin(!!b.enabled, b.currentPassword); }
+      catch (e) { if (e.status === 403) await new Promise(r => setTimeout(r, 800)); throw e; } // slow down guessing
+      send(res, 200, { skipLogin: auth.skipLogin });
       return;
     }
     if (pathname === '/api/auth/reset' && req.method === 'POST') {
@@ -390,11 +423,27 @@ listenOn(cfg.host).then(() => {
   if (isAnyHost(cfg.host)) console.log(`  From other devices: ${lanAddresses().map(a => `http://${a}:${cfg.port}/`).join(', ') || '(no network address found)'}`);
   console.log(`  Platform: ${process.platform}, database ${cfg.database.managed ? 'managed by launcher' : 'external'} at ${cfg.database.host}:${cfg.database.port}`);
   console.log('  Keep this window open while you play. Use "Shutdown Repack" in the panel to stop everything.\n');
-  if (cfg.openBrowser && !process.argv.includes('--no-browser')) openBrowser(url);
+  if (AUTOSTART) startOnBoot();
+  else if (cfg.openBrowser && !process.argv.includes('--no-browser')) openBrowser(url);
 }, (e) => {
   console.error(e.code === 'EADDRINUSE' ? `Port ${cfg.port} is already in use. Is the launcher already running? Change "port" in WebLauncher/config.json.` : e.message);
   process.exit(1);
 });
+
+// Started by the system (--autostart): start the chosen server, as Enter realm + Start would.
+function startOnBoot() {
+  const exp = L.state.autostartServer;
+  if (!exp || !cfg.expansions[exp]) return;
+  const E = cfg.expansions[exp];
+  console.log(`  Autostart: starting ${E.label} server...`);
+  L.jobs.run(`Autostart: starting ${E.label}`, async (ctx) => {
+    const log = ctx.log; // also to the console / journal, nobody may be watching the panel
+    ctx.log = (text, level) => { log(text, level); console.log(`  [autostart] ${text}`); };
+    if (await L.serverRunning(exp)) { ctx.log('Server is already running.'); return; }
+    await install.prepareExpansion(L, ctx, exp);
+    await L.startServer(ctx);
+  });
+}
 
 function openBrowser(url) {
   try {

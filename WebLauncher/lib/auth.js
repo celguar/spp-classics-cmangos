@@ -28,10 +28,13 @@ class Auth {
 
   get username() { return this.data.username; }
   get isDefault() { return !!this.data.isDefault; }
+  // No login on the server computer itself (other devices still log in).
+  get skipLogin() { return !!this.data.skipLogin; }
 
   set(username, password, isDefault = false) {
     const salt = crypto.randomBytes(16).toString('hex');
-    this.data = { username, salt, hash: hash(password, salt), isDefault };
+    const skipLogin = !!(this.data && this.data.skipLogin);
+    this.data = { username, salt, hash: hash(password, salt), isDefault, skipLogin };
     writeText(this.file, JSON.stringify(this.data, null, 2));
   }
 
@@ -72,6 +75,13 @@ class Auth {
     for (const t of [...this.sessions.keys()]) if (t !== token) this.sessions.delete(t);
     const s = this.sessions.get(token);
     if (s) s.user = user;
+  }
+
+  // Turning it on needs the current password; turning it off does not.
+  setSkipLogin(on, currentPassword) {
+    if (on && !this.verify(this.data.username, currentPassword)) throw httpError(403, 'Current password is wrong');
+    this.data.skipLogin = !!on;
+    writeText(this.file, JSON.stringify(this.data, null, 2));
   }
 
   // Back to admin / admin (needs the current password); other browsers are logged out.

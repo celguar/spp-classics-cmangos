@@ -188,6 +188,7 @@ Copy `config.example.json` to `config.json` and change what you need. Every key 
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `host`, `port` | `127.0.0.1`, `8090` | Where the panel listens |
+| `openBrowser` | `true` | Open the panel in the browser when the launcher starts. Set in *Launcher Settings > Startup* |
 | `allowedHosts` | `[]` | Extra host names the panel answers to (IP addresses, `localhost` and this computer's name always work) |
 | `database.*` | bundled MySQL settings | Connection used by the launcher. `manage: "auto"` runs the bundled MySQL on Windows; on Linux set `startCommand`/`stopCommand` (e.g. `systemctl start mariadb`) if you want the launcher to start it |
 | `website.manage` | `auto` | Run the bundled Apache on Windows |
@@ -195,8 +196,8 @@ Copy `config.example.json` to `config.json` and change what you need. Every key 
 | `binaries.<expansion>` | empty | Folder with your own `mangosd`/`realmd` build (default `Server/Binaries/<expansion>/Bin64` on Windows, `Linux64` on Linux) |
 | `sevenZip` | empty | Path to a 7-Zip executable |
 | `shutdownTimeoutSec` | `0` | Seconds to wait for a clean server shutdown before killing it. `0` waits until mangosd exits by itself (saving a long-running world can take many minutes); a stuck server can still be ended with **Force close** on the Overview page |
-| `autosaveIntervalMin` | `15` | Interval for "autosave while running" |
-| `maxAutosaves` | `100` | Older autosaves are deleted |
+| `autosaveIntervalMin` | `15` | Minutes between autosaves while running (10 to 1440). Set on the *Saves* page |
+| `maxAutosaves` | `100` | Autosaves kept per expansion; the oldest are deleted (1 to 1000). Set on the *Saves* page. Autosaves are skipped while less than 1 GB of disk space is free |
 
 Environment variables `SPP_HOST` and `SPP_PORT` override the file.
 Pass `--no-browser` to skip opening a browser.
@@ -209,11 +210,33 @@ default back (it asks for the current password); if the password is forgotten, d
 file (with the launcher stopped) instead. While the default password is in use, logins are only accepted from the
 server computer itself.
 
+**Skip the login on this computer** (*Launcher Settings*) opens the panel without a password on
+the server computer. Turning it on shows a security warning and asks for the current password.
+Other devices on the network still have to log in. Do not use it when the panel is reached
+through a reverse proxy on the same computer, since every visitor would then look local.
+
 To manage the server from another device, tick **Allow access from other devices on the
 network** in *Launcher Settings* (after changing the default password). It applies right
 away and is saved as `"host": "0.0.0.0"` in `config.json`; unticking sets it back to
 `127.0.0.1`. The page lists the addresses to open. If another device cannot connect, allow
 Node.js / port 8090 through the firewall of the server computer.
+
+### Start with the system
+
+*Launcher Settings > Startup > Start the web launcher...* starts the web launcher automatically:
+
+- **Windows**: a minimized shortcut to `Launcher-Web.bat` in your Startup folder, so it starts
+  when you log in to Windows.
+- **Linux**: a systemd user service (`~/.config/systemd/user/spp-weblauncher.service`). The
+  launcher also enables "linger" for your user so it starts at boot without a login; if that
+  needs root, run `sudo loginctl enable-linger $USER`. Without systemd it adds a
+  `@reboot` line to your crontab instead (output goes to `WebLauncher/runtime/autostart.log`).
+
+Once that is on, **Then start the server for** picks an expansion whose server is prepared and
+started right away, like *Enter realm* followed by *Start Server*. This only happens when the
+launcher was started by the system (it gets `--autostart`, which also skips opening the
+browser); starting it by hand never starts a server on its own. The choice is kept in
+`runtime/state.json`. If you move the repack folder, turn the option off and on again.
 
 ## How it works
 

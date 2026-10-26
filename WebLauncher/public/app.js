@@ -5,7 +5,7 @@
   const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmtDate = ms => (ms ? new Date(ms).toLocaleString() : '');
-  const fmtSize = b => (b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : b > 1024 ? Math.round(b / 1024) + ' KB' : b + ' B');
+  const fmtSize = b => (b >= 1073741824 ? +(b / 1073741824).toFixed(1) + ' GB' : b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : b > 1024 ? Math.round(b / 1024) + ' KB' : b + ' B');
 
   const S = {
     status: null,
@@ -177,7 +177,7 @@
     const j = S.lastJob;
     if (j && j.status === 'running') parts.push(`<span class="jobchip" data-showjob><span class="spin"></span>${esc(j.title)}...</span>`);
     if (S.session.isDefault) parts.push('<a href="#/admin" style="color:#ff8a7a">Change the default password!</a>');
-    parts.push(`<button class="link" data-logout title="Logged in as ${esc(S.session.username || '')}">Logout</button>`);
+    if (S.session.required !== false) parts.push(`<button class="link" data-logout title="Logged in as ${esc(S.session.username || '')}">Logout</button>`);
     $('#statusbox').innerHTML = parts.join('<span class="sep"></span>');
   }
 
@@ -889,7 +889,37 @@
       root.addEventListener('change', (e) => {
         const t = e.target.closest('[data-toggle]');
         if (t) act('/api/toggle', { name: t.dataset.toggle, value: t.checked }, { onDone: () => this.reload() });
+        if (e.target.matches('[data-as-interval]')) this.saveInterval(e.target);
+        if (e.target.matches('[data-as-keep]')) this.saveKeep(e.target);
       });
+    },
+    async saveInterval(input) {
+      const d = this.data;
+      const n = Math.round(+input.value);
+      if (!(n >= d.limits.minInterval && n <= d.limits.maxInterval)) {
+        toast(`Autosave interval must be ${d.limits.minInterval} to ${d.limits.maxInterval} minutes`, true);
+        input.value = d.intervalMin; return;
+      }
+      try { await api('/api/saves/autosave/settings', { intervalMin: n }); toast(`Autosave every ${n} minutes`); }
+      catch (err) { toast(err.message, true); }
+      this.reload();
+    },
+    async saveKeep(input) {
+      const d = this.data;
+      const n = Math.round(+input.value);
+      if (!(n >= 1 && n <= d.limits.maxKeep)) { toast(`Keep 1 to ${d.limits.maxKeep} autosaves`, true); input.value = d.keep; return; }
+      const extra = d.autosaves.length - n;
+      if (extra > 0 && !await confirmDialog({
+        title: 'Keep fewer autosaves',
+        warning: [`The ${extra} oldest autosave${extra > 1 ? 's' : ''} of this expansion will be deleted now.`],
+        text: 'Other expansions are trimmed the same way. This cannot be undone.',
+        ok: 'Delete and save',
+      })) { input.value = d.keep; return; }
+      try {
+        const r = await api('/api/saves/autosave/settings', { keep: n });
+        toast(`Keeping ${n} autosaves${r.removed ? `, ${r.removed} old one${r.removed > 1 ? 's' : ''} deleted` : ''}`);
+      } catch (err) { toast(err.message, true); }
+      this.reload();
     },
     async click(e) {
       const b = e.target.closest('[data-save],[data-load],[data-del],[data-aload],[data-adel],[data-now]');
@@ -946,10 +976,14 @@
           <div class="subheader">Autosave</div>
           <div class="row center" style="gap:6px 22px">
             <label class="check"><input type="checkbox" data-toggle="autosave" ${d.autosave ? 'checked' : ''}> Autosave when the server starts and stops</label>
-            <label class="check"><input type="checkbox" data-toggle="autosaveRunning" ${d.autosaveRunning ? 'checked' : ''}> Autosave every ${d.intervalMin} minutes while running</label>
+            <span class="check"><label class="check"><input type="checkbox" data-toggle="autosaveRunning" ${d.autosaveRunning ? 'checked' : ''}> Autosave every</label>
+              <input type="number" class="num" data-as-interval min="${d.limits.minInterval}" max="${d.limits.maxInterval}" step="1" value="${d.intervalMin}" aria-label="Minutes between autosaves"> minutes while running</span>
+            <span class="check">Keep <input type="number" class="num" data-as-keep min="1" max="${d.limits.maxKeep}" step="1" value="${d.keep}" aria-label="Number of autosaves to keep"> autosaves</span>
             <button class="btn" data-now>Autosave now</button>
           </div>
-          <div class="subheader">Autosaves (${d.autosaves.length})</div>
+          <p class="small muted">Minimum interval is ${d.limits.minInterval} minutes. When there are more autosaves than you keep, the oldest are deleted. Applies to every expansion.
+            ${d.freeBytes != null ? `Free disk space: <b>${fmtSize(d.freeBytes)}</b>${d.freeBytes < d.minFreeBytes ? ` <span style="color:#a00"><b>- below ${fmtSize(d.minFreeBytes)}, autosaves are skipped!</b></span>` : ` (autosaves are skipped below ${fmtSize(d.minFreeBytes)})`}.` : ''}</p>
+          <div class="subheader">Autosaves (${d.autosaves.length}${d.autosaves.length ? `, ${fmtSize(d.autosaves.reduce((t, a) => t + a.size, 0))}` : ''})</div>
           ${d.autosaves.length ? `<table class="list"><tr><th>Autosave</th><th>Size</th><th>Created</th><th></th></tr>
             ${d.autosaves.map(a => `<tr><td>${esc(a.name.replace(/\.7z$/, ''))}</td><td>${fmtSize(a.size)}</td><td class="small">${fmtDate(a.mtime)}</td>
               <td class="actions"><button class="btn" data-aload="${esc(a.name)}">Load</button><button class="btn danger" data-adel="${esc(a.name)}">Delete</button></td></tr>`).join('')}</table>`
@@ -1368,8 +1402,45 @@
         </form>
         <p class="small muted">Other browsers that are logged in will be logged out. Forgot the password? Stop the launcher and delete <code>WebLauncher/runtime/auth.json</code> to reset it to admin / admin.</p>
         ${s.isDefault ? '' : '<p><button class="btn" type="button" data-auth-reset>Reset login to admin / admin</button></p>'}
+        <div class="subheader">Login on this computer</div>
+        <label class="check"><input type="checkbox" data-skip-login ${s.skipLogin ? 'checked' : ''}> Skip the login on this computer (open the panel without a password)</label>
+        <p class="small muted">${s.skipLogin
+          ? `The panel opens without a login on the server computer. Other devices on the network still need the password.${s.loopback ? '' : ' (You are on another device now, so you still log in here.)'}`
+          : 'Other devices on the network always need the password, even with this on.'}</p>
         <div class="subheader">Remote access</div>
-        <div id="remote-box"><p class="muted">Loading...</p></div>`;
+        <div id="remote-box"><p class="muted">Loading...</p></div>
+        <div class="subheader">Startup</div>
+        <div id="autostart-box"><p class="muted">Loading...</p></div>`;
+    },
+    renderAutostart(a) {
+      const box = $('#autostart-box');
+      if (!box) return;
+      const browser = `<label class="check"><input type="checkbox" data-open-browser ${a.openBrowser ? 'checked' : ''}> Open the panel in the browser when the launcher starts</label>
+        <p class="small muted" style="margin:2px 0 10px">When it is off, open <code>${esc(location.origin)}/</code> yourself. Launching with <code>--no-browser</code> never opens it.</p>`;
+      if (!a.supported) { box.innerHTML = `${browser}<p class="small muted">Starting with the system is not available here. ${esc(a.reason || '')}</p>`; return; }
+      const exps = (S.status && S.status.expansions) || [];
+      const when = S.status && S.status.isWindows ? 'when you log in to Windows' : a.linger === false && a.enabled ? 'when you log in' : 'when the computer starts';
+      box.innerHTML = `${browser}
+        <label class="check"><input type="checkbox" data-autostart ${a.enabled ? 'checked' : ''}> Start the web launcher ${when}</label>
+        <div class="row" style="margin:6px 0 0 24px;align-items:center">
+          <label class="check"><input type="checkbox" data-autostart-server ${a.server ? 'checked' : ''} ${a.enabled ? '' : 'disabled'}> Then start the server for</label>
+          <select data-autostart-exp aria-label="Expansion to start" ${a.enabled && a.server ? '' : 'disabled'}>
+            ${exps.map(e => `<option value="${e.id}" ${(a.server || S.status.selected || 'vanilla') === e.id ? 'selected' : ''} ${e.installed ? '' : 'disabled'}>${esc(e.label)}${e.installed ? '' : ' (not installed)'}</option>`).join('')}
+          </select>
+        </div>
+        ${a.stale ? '<p class="notice warning small">The startup entry points to another copy of the launcher. Turn the option off and on again to use this one.</p>' : ''}
+        ${a.enabled && a.linger === false ? '<p class="small muted">Linux could not enable "linger" for your user, so it starts when you log in instead of at boot. Run <code>sudo loginctl enable-linger $USER</code> to start it at boot.</p>' : ''}
+        <p class="small muted">${a.enabled ? `Set up as a ${esc(a.method)}: <code>${esc(a.location)}</code>. ` : ''}When started this way the launcher does not open the browser${S.status && S.status.isWindows ? ' and its window starts minimized' : ''}.
+          The chosen server is prepared and started like Enter realm + Start Server; the result is in the panel and the launcher console.</p>`;
+    },
+    async loadAutostart() {
+      try { this.renderAutostart(await api('/api/autostart')); } catch (e) { const box = $('#autostart-box'); if (box) box.innerHTML = `<p class="muted">${esc(e.message)}</p>`; }
+    },
+    async saveAutostart(body, msg) {
+      const box = $('#autostart-box');
+      box.querySelectorAll('input,select').forEach(x => { x.disabled = true; });
+      try { this.renderAutostart(await api('/api/autostart', body)); if (msg) toast(msg); }
+      catch (err) { toast(err.message, true); this.loadAutostart(); }
     },
     renderRemote(r) {
       const box = $('#remote-box');
@@ -1385,6 +1456,36 @@
     },
     async loadRemote() {
       try { this.renderRemote(await api('/api/remote')); } catch (e) { const box = $('#remote-box'); if (box) box.innerHTML = `<p class="muted">${esc(e.message)}</p>`; }
+    },
+    skipLoginDialog(box) {
+      const d = dialog({
+        title: 'Skip the login',
+        body: `<form id="skip-form">
+          <div class="warnbox"><h4>SECURITY WARNING</h4>
+            <div>Anyone who can use this computer gets full control of the launcher: start and stop the server, edit accounts, wipe or restore databases.</div>
+            <div>This includes other user accounts on this computer and programs running on it.</div>
+            <div>Do not use this if the panel is reached through a reverse proxy running on this computer: every visitor would look local.</div></div>
+          <p>Devices on the network still need the password. Enter the current password to turn this on.</p>
+          <label class="field" style="width:100%">Current password<input type="password" name="currentPassword" required autocomplete="current-password"></label>
+        </form>`,
+        foot: '<button class="btn" data-close>Cancel</button><button class="btn danger" data-ok>Skip the login</button>',
+        onClose: () => { if (!d.done) box.checked = false; },
+      });
+      const form = $('#skip-form', d.el);
+      form.currentPassword.focus();
+      const submit = async () => {
+        if (!form.currentPassword.value) { form.currentPassword.focus(); return; }
+        try {
+          await api('/api/auth/skip-login', { enabled: true, currentPassword: form.currentPassword.value });
+          d.done = true;
+          d.close();
+          toast('Login is skipped on this computer');
+          S.session = await api('/api/session');
+          rerender();
+        } catch (err) { toast(err.message, true); form.currentPassword.select(); }
+      };
+      form.addEventListener('submit', (e) => { e.preventDefault(); submit(); });
+      $('[data-ok]', d.el).addEventListener('click', submit);
     },
     resetLogin() {
       const d = dialog({
@@ -1413,7 +1514,33 @@
     },
     mount(root) {
       this.loadRemote();
+      this.loadAutostart();
       $('[data-auth-reset]', root)?.addEventListener('click', () => this.resetLogin());
+      root.addEventListener('change', (e) => {
+        const box = $('#autostart-box');
+        const sel = $('[data-autostart-exp]', box);
+        if (e.target.matches('[data-open-browser]')) {
+          const on = e.target.checked;
+          api('/api/open-browser', { enabled: on }).then(() => toast(on ? 'The browser opens when the launcher starts' : 'The browser no longer opens when the launcher starts'))
+            .catch((err) => { toast(err.message, true); e.target.checked = !on; });
+        } else if (e.target.matches('[data-autostart]')) {
+          this.saveAutostart({ enabled: e.target.checked }, e.target.checked ? 'The launcher now starts with the system' : 'The launcher no longer starts with the system');
+        } else if (e.target.matches('[data-autostart-server]')) {
+          this.saveAutostart({ server: e.target.checked ? sel.value : '' }, e.target.checked ? `${sel.selectedOptions[0].text} starts automatically` : 'No server starts automatically');
+        } else if (e.target.matches('[data-autostart-exp]')) {
+          this.saveAutostart({ server: e.target.value }, `${e.target.selectedOptions[0].text} starts automatically`);
+        }
+      });
+      root.addEventListener('change', async (e) => {
+        if (!e.target.matches('[data-skip-login]')) return;
+        if (e.target.checked) { this.skipLoginDialog(e.target); return; }
+        try {
+          await api('/api/auth/skip-login', { enabled: false });
+          toast('The login is required again');
+          S.session = await api('/api/session');
+          rerender();
+        } catch (err) { toast(err.message, true); e.target.checked = true; }
+      });
       root.addEventListener('change', async (e) => {
         const t = e.target.closest('[data-remote]');
         if (!t) return;

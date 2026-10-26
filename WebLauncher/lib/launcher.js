@@ -434,7 +434,7 @@ class Launcher extends EventEmitter {
   startAutosaveTimer() {
     this.stopAutosaveTimer();
     if (!this.flags.isOn('autosave_running')) return;
-    const minutes = Math.max(1, this.cfg.autosaveIntervalMin);
+    const minutes = require('./ops/saves').intervalMin(this);
     this.mangosd.push(`[autosave] Saving every ${minutes} minutes while the server is running.`);
     this.autosaveTimer = setInterval(async () => {
       const exp = this.serverExp;
