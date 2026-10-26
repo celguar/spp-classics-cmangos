@@ -300,6 +300,7 @@ button { font: inherit; }
 .btn::before { left: -5px; width: 5px; background: url("theme/common/button-left.gif") no-repeat; }
 .btn::after { right: -7px; width: 7px; background: url("theme/common/button-right.gif") no-repeat; }
 .btn { margin-right: 9px; }
+.btn[hidden] { display: none; }
 .btn:hover:not(:disabled) { color: #fff; filter: brightness(1.25); }
 .btn:active:not(:disabled) { filter: brightness(.9); transform: translateY(1px); }
 .btn:disabled { filter: grayscale(1) brightness(.75); color: #bbb; cursor: not-allowed; }

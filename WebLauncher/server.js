@@ -134,6 +134,7 @@ const routes = {
   'POST /api/server/start': () => job('Starting server', ctx => L.startServer(ctx)),
   'POST /api/binaries/accept': () => { L.binaries.accept(sel()); L.emit('changed'); return {}; },
   'POST /api/server/stop': b => job('Stopping server', ctx => L.stopServer(ctx, { autosave: b.autosave !== false })),
+  'POST /api/server/force-stop': () => { L.forceStopWorld(); return {}; },
   'POST /api/server/restart': () => job('Restarting server', async (ctx) => { await L.stopServer(ctx, { autosave: false }); await L.startServer(ctx); }),
   'POST /api/shutdown': () => job('Shutting down repack', async (ctx) => {
     await L.leaveExpansion(ctx);

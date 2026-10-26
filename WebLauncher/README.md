@@ -194,7 +194,7 @@ Copy `config.example.json` to `config.json` and change what you need. Every key 
 | `website.url` | empty | Link shown for the website (default `http://<this host>/`) |
 | `binaries.<expansion>` | empty | Folder with your own `mangosd`/`realmd` build (default `Server/Binaries/<expansion>/Bin64` on Windows, `Linux64` on Linux) |
 | `sevenZip` | empty | Path to a 7-Zip executable |
-| `shutdownTimeoutSec` | `120` | How long to wait for a clean server shutdown before killing it |
+| `shutdownTimeoutSec` | `0` | Seconds to wait for a clean server shutdown before killing it. `0` waits until mangosd exits by itself (saving a long-running world can take many minutes); a stuck server can still be ended with **Force close** on the Overview page |
 | `autosaveIntervalMin` | `15` | Interval for "autosave while running" |
 | `maxAutosaves` | `100` | Older autosaves are deleted |
 

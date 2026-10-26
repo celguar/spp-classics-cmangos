@@ -84,6 +84,11 @@ class ManagedProcess extends EventEmitter {
     this.child.stdin.write(text + '\n');
   }
 
+  // Empty line on stdin, not echoed (an empty console command does nothing).
+  nudge() {
+    try { if (this.child) this.child.stdin.write('\n'); } catch { /* exited */ }
+  }
+
   kill() {
     if (!this.child) return;
     this.stopping = true;

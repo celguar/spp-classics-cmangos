@@ -65,6 +65,7 @@
       S.status = await api('/api/status');
       if (S.status.job) syncJob(S.status.job);
       renderChrome();
+      renderJobForce();
       if (S.view && S.view.onStatus) S.view.onStatus(S.status);
     } catch (e) {
       if (S.session.authed) $('#statusbox').innerHTML = '<span><span class="dot off"></span>Launcher not reachable</span>';
@@ -266,10 +267,12 @@
       title: 'Working...',
       body: `<div class="progress-text" data-ptext></div><div class="progress indet" data-pbar><i style="width:0"></i></div>
              <div class="joblog" data-log></div>`,
-      foot: '<span class="muted small" data-hint style="margin-right:auto">You can close this window, the task keeps running.</span><button class="btn" data-close>Close</button>',
+      foot: '<span class="muted small" data-hint style="margin-right:auto">You can close this window, the task keeps running.</span><button class="btn danger" data-force hidden title="Kill mangosd without waiting for it to finish saving">Force close</button><button class="btn" data-close>Close</button>',
       onClose: () => { S.jobDialog = null; },
     });
     S.jobDialog = { id, d, onDone };
+    $('[data-force]', d.el).addEventListener('click', forceStopWorld);
+    renderJobForce();
     if (S.lastJob && S.lastJob.id === id) {
       renderJobDialog(true);
       // finished before the API call returned
@@ -287,6 +290,21 @@
     if (full) { $('[data-log]', el).innerHTML = ''; job.log.forEach(appendJobLog); }
     renderJobProgress();
     $('[data-hint]', el).style.visibility = job.status === 'running' ? 'visible' : 'hidden';
+  }
+  // Force close is offered while mangosd is shutting down (it can take minutes).
+  function renderJobForce() {
+    const b = S.jobDialog && $('[data-force]', S.jobDialog.d.el);
+    const w = S.status && S.status.server && S.status.server.world;
+    if (b) b.hidden = !(w && w.shuttingDown);
+  }
+  async function forceStopWorld() {
+    const ok = await confirmDialog({
+      title: 'Force close',
+      warning: ['mangosd is still saving the world and characters.', 'Killing it now can lose recent progress or leave data half saved.'],
+      text: 'Only do this if the server is stuck. Kill the world server now?',
+      ok: 'Force close',
+    });
+    if (ok) act('/api/server/force-stop', {});
   }
   function renderJobProgress() {
     const jd = S.jobDialog;
@@ -538,6 +556,7 @@
         if (k === 'start') act('/api/server/start', {});
         if (k === 'stop') this.stop();
         if (k === 'restart') act('/api/server/restart', {});
+        if (k === 'force-stop') forceStopWorld();
         if (k === 'prepare') act('/api/expansion/select', { exp: srv().exp });
         if (k === 'accept-binary') this.acceptBinary();
         if (k === 'website-update') act('/api/website/update', {});
@@ -630,7 +649,10 @@
             !st.flags.website ? 'Disabled' : st.website.running ? 'Online' : st.website.managed ? 'Offline' : st.website.installed ? 'External' : 'Not installed', st.flags.website ? `<a href="${esc(site)}" target="_blank" rel="noopener">${esc(site)}</a>` : '')}
         </div>
         <div class="row center">
-          ${w.running
+          ${w.running && w.shuttingDown
+            ? `<button class="btn big" disabled>Shutting down...</button>
+               <button class="btn danger" data-act="force-stop" title="Kill mangosd without waiting for it to finish saving">Force close</button>`
+            : w.running
             ? `<button class="btn big danger" data-act="stop" ${busy ? 'disabled' : ''}>Stop Server</button>
                <button class="btn" data-act="restart" ${busy || w.external ? 'disabled' : ''}>Restart</button>`
             : `<button class="btn big" data-act="start" ${busy || !s.binariesFound || (s.binary && !s.binary.ok) ? 'disabled' : ''}>Start Server</button>`}

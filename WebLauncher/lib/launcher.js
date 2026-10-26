@@ -14,6 +14,8 @@ const { IS_WIN, exists, isDir, readFirstLine, writeText, rmFile, sleep, httpErro
 
 const SYS_NAMES = IS_WIN ? ['mangosd.exe', 'realmd.exe', 'spp-httpd.exe'] : ['mangosd', 'realmd'];
 
+const fmtWait = sec => (sec < 60 ? `${sec}s` : `${Math.floor(sec / 60)}m ${String(sec % 60).padStart(2, '0')}s`);
+
 class Launcher extends EventEmitter {
   constructor() {
     super();
@@ -280,8 +282,22 @@ class Launcher extends EventEmitter {
         log('Stopping a server that was started outside the web launcher...');
         if (IS_WIN && exists(path.join(this.P.tools, 'shutdown.vbs'))) {
           spawn('wscript', [path.join(this.P.tools, 'shutdown.vbs')], { windowsHide: true, detached: true, stdio: 'ignore' }).unref();
-          for (let i = 0; i < 30 && (await this.externalProcs(exp, 'mangosd')).length; i++) { this.sys.at = 0; await sleep(2000); }
+          this.shuttingDown = true;
+          this.forceStop = false;
+          this.emit('changed');
+          const start = Date.now();
+          try {
+            for (let i = 1; !this.forceStop; i++) {
+              this.sys.at = 0;
+              if (!(await this.externalProcs(exp, 'mangosd')).length) break;
+              if (i % 15 === 0) log(`Still waiting for the world server to finish shutting down (${fmtWait(Math.round((Date.now() - start) / 1000))})...`);
+              await sleep(2000);
+            }
+          } finally { this.shuttingDown = false; }
+          if (this.forceStop) log('World server was force closed.', 'warn');
+          this.forceStop = false;
         }
+        this.sys.at = 0;
         for (const p of await this.externalProcs(exp, 'mangosd')) killPid(p.pid);
       }
     }
@@ -303,22 +319,54 @@ class Launcher extends EventEmitter {
   }
 
   // Graceful stop of our own mangosd with a console command ("server shutdown N" or
-  // "server restart N"); waits for the process to exit, killing it after the timeout.
+  // "server restart N"). Waits until the process has exited: saving a long-running
+  // world can take many minutes. Only forceStopWorld() (Force close button) or a
+  // positive shutdownTimeoutSec ends the wait early by killing it.
   async stopWorld(ctx, command, delaySec = 0) {
     if (!this.mangosd.running) return;
     this.stopAutosaveTimer();
     clearTimeout(this.restartTimer);
     this.mangosd.stopping = true;
+    this.shuttingDown = true;
+    this.forceStop = false;
+    this.emit('changed');
+    // After saving, mangosd prints "Halting process..." and waits for its console thread,
+    // which sits in fgets() on stdin. On Windows it unblocks that with a fake Enter key
+    // (WriteConsoleInput), which only works on a real console, not on our pipe: send the
+    // Enter ourselves, or mangosd never exits.
+    const onLine = (l) => { if (/Halting process/i.test(l)) this.mangosd.nudge(); };
+    this.mangosd.on('line', onLine);
     try { this.mangosd.write(command); } catch { /* exited meanwhile */ }
-    const ok = await this.mangosd.waitExit((delaySec + this.cfg.shutdownTimeoutSec) * 1000);
-    if (!ok) {
-      ctx.log('Server did not stop in time, forcing it to close.', 'warn');
-      this.mangosd.kill();
-      await this.mangosd.waitExit(10000);
+    const limit = this.cfg.shutdownTimeoutSec > 0 ? (delaySec + this.cfg.shutdownTimeoutSec) * 1000 : Infinity;
+    const start = Date.now();
+    try {
+      while (!(await this.mangosd.waitExit(Math.min(30000, limit - (Date.now() - start))))) {
+        const waited = Math.round((Date.now() - start) / 1000);
+        if (Date.now() - start >= limit) {
+          ctx.log(`Server did not stop within ${waited} seconds (shutdownTimeoutSec), forcing it to close.`, 'warn');
+          this.mangosd.kill();
+          await this.mangosd.waitExit(10000);
+          break;
+        }
+        this.mangosd.nudge(); // in case the "Halting process" line was missed
+        if (waited > delaySec) ctx.log(`Still waiting for the world server to finish shutting down (${fmtWait(waited - delaySec)})...`);
+      }
+      if (this.forceStop) ctx.log('World server was force closed.', 'warn');
+    } finally {
+      this.mangosd.off('line', onLine);
+      this.shuttingDown = false;
+      this.forceStop = false;
     }
     this.online = false;
     this.sys.at = 0; // the cached process list still shows the old mangosd
     this.emit('changed');
+  }
+
+  // Ends a stopWorld() wait right away (the server hangs instead of saving).
+  forceStopWorld() {
+    if (!this.shuttingDown) throw httpError(409, 'The world server is not shutting down');
+    this.forceStop = true;
+    this.mangosd.kill(); // an external mangosd is killed by stopServer once the wait ends
   }
 
   // Start world (and realm) server again after a maintenance stop.
@@ -466,7 +514,7 @@ class Launcher extends EventEmitter {
         address: this.realmAddress(sel),
         binariesFound: exists(this.P.mangosd(sel)),
         binDir: this.P.bin(sel),
-        world: { running: (this.mangosd.running && this.serverExp === sel) || extWorld.length > 0, external: !this.mangosd.running && extWorld.length > 0, pid: this.mangosd.pid || (extWorld[0] && extWorld[0].pid) || null, since: this.mangosd.running ? this.mangosd.startedAt : null, online: this.online },
+        world: { running: (this.mangosd.running && this.serverExp === sel) || extWorld.length > 0, external: !this.mangosd.running && extWorld.length > 0, pid: this.mangosd.pid || (extWorld[0] && extWorld[0].pid) || null, since: this.mangosd.running ? this.mangosd.startedAt : null, online: this.online, shuttingDown: !!this.shuttingDown },
         hermes: this.hermes.status(sel),
         binary: this.binaries.info(sel),
         realm: { running: this.realmd.running || extRealm.length > 0, external: !this.realmd.running && extRealm.length > 0, pid: this.realmd.pid || (extRealm[0] && extRealm[0].pid) || null },

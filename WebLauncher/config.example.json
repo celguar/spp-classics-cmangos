@@ -27,7 +27,7 @@
   },
 
   "sevenZip": "",
-  "shutdownTimeoutSec": 120,
+  "shutdownTimeoutSec": 0,
   "autosaveIntervalMin": 15,
   "maxAutosaves": 100,
   "restartDelaySec": 10

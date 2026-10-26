@@ -34,7 +34,7 @@ const DEFAULTS = {
   // HermesProxy folder with HermesProxy.exe (Windows) and HermesProxy (Linux)
   hermes: { dir: '' },
   sevenZip: '',
-  shutdownTimeoutSec: 120,
+  shutdownTimeoutSec: 0, // 0 = wait as long as mangosd needs to save and exit
   autosaveIntervalMin: 15,
   maxAutosaves: 100,
   restartDelaySec: 10,
