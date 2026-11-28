@@ -591,6 +591,7 @@
         if (k === 'website-update') act('/api/website/update', {});
         if (k === 'autosave') act('/api/saves/autosave', {});
         if (k === 'leave') this.leave();
+        if (k === 'shutdown') shutdownRepack();
       });
       root.addEventListener('change', (e) => {
         const t = e.target.closest('[data-toggle]');
@@ -689,6 +690,7 @@
           <label class="check" title="Automatically start the world server and HermesProxy again if they crash"><input type="checkbox" data-toggle="autoRestart" ${st.flags.autoRestart ? 'checked' : ''}> Restarter mode</label>
           <span class="spacer"></span>
           <button class="btn" data-act="leave" ${busy ? 'disabled' : ''}>Change expansion</button>
+          <button class="btn danger" data-act="shutdown" ${busy ? 'disabled' : ''} title="Save and stop the server, then stop the website, the database and this launcher">Shutdown Repack</button>
         </div>
         ${st.maintenance && st.maintenance.next ? `<p class="small" style="margin:8px 0 0">Next scheduled maintenance: <b>${fmtDate(st.maintenance.next.at)}</b> (${st.maintenance.next.action === 'update' ? 'update &amp; restart' : 'restart'}) &middot; <a href="#/maintenance">Maintenance</a></p>` : ''}
         <p class="small muted" style="margin-top:8px">To play, put <code>set realmlist ${esc(s.address)}</code> in your client's realmlist.wtf. Create an account on the <a href="#/accounts">Accounts</a> page${st.flags.website ? ' or on the website' : ''}.</p>`;
