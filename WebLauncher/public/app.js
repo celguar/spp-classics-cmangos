@@ -289,7 +289,36 @@
     $('.banner .grow', el).textContent = job.status === 'running' ? `${job.title}...` : job.status === 'done' ? `${job.title} - complete` : `${job.title} - failed`;
     if (full) { $('[data-log]', el).innerHTML = ''; job.log.forEach(appendJobLog); }
     renderJobProgress();
-    $('[data-hint]', el).style.visibility = job.status === 'running' ? 'visible' : 'hidden';
+    const hint = $('[data-hint]', el);
+    if (job.status === 'running') {
+      hint.style.visibility = 'visible';
+      hint.textContent = 'You can close this window, the task keeps running.';
+    } else if (job.status === 'done') {
+      // The job is over, so the window counts itself down to closed.
+      if (!jd.closing) startJobCloseCountdown();
+      hint.style.visibility = 'visible';
+      hint.textContent = `Closing in ${Math.max(jd.left, 1)} second${jd.left === 1 ? '' : 's'}...`;
+    } else {
+      hint.style.visibility = 'hidden';
+    }
+  }
+  // A window of a job that succeeded needs no attention any more: the panel is already
+  // waiting under it, and its result is in the log and the status box. Count its last
+  // seconds on screen and close it when they run out, so the launcher keeps working
+  // unattended. A failed job keeps its window open, its error is worth reading, and
+  // anything the job still wants from the user (the Force close button) is shown while
+  // it runs, not while it counts down.
+  const JOB_CLOSE_SECONDS = 5;
+  function startJobCloseCountdown() {
+    const jd = S.jobDialog;
+    if (!jd) return;
+    jd.left = JOB_CLOSE_SECONDS;
+    jd.closing = setInterval(() => {
+      // Opening another window, or closing this one by hand, stops the count.
+      if (S.jobDialog !== jd) { clearInterval(jd.closing); jd.closing = null; return; }
+      if (--jd.left > 0) renderJobDialog();
+      else { clearInterval(jd.closing); jd.closing = null; jd.d.close(); }
+    }, 1000);
   }
   // Force close is offered while mangosd is shutting down (it can take minutes).
   function renderJobForce() {
