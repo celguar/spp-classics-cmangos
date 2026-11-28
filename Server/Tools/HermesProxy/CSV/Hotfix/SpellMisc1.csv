@@ -1,7 +1,0 @@
-Id,DifficultyId,CastingTimeIndex,DurationIndex,RangeIndex,SchoolMask,Speed,LaunchDelay,MinDuration,SpellIconFileDataId,ActiveIconFileDataId,Attributes1,Attributes2,Attributes3,Attributes4,Attributes5,Attributes6,Attributes7,Attributes8,Attributes9,Attributes10,Attributes11,Attributes12,Attributes13,Attributes14,SpellId
-320003,0,7,0,1,1,0,0,0,136222,0,276824080,0,0,0,0,0,0,0,0,0,0,0,0,0,7355
-450196,0,5,0,13,8,0,0,0,136014,0,0,136,4,256,0,0,0,0,0,0,0,0,0,0,32950
-450979,0,1,0,1,1,0,0,0,136103,0,16777424,0,0,0,0,0,0,0,0,0,0,0,0,0,33388
-450258,0,1,0,6,1,0,0,0,136103,0,262400,0,0,0,0,0,0,0,0,0,0,0,0,0,33389
-450260,0,1,0,1,1,0,0,0,136103,0,16777424,0,0,0,0,0,0,0,0,0,0,0,0,0,33391
-449137,0,1,0,6,1,0,0,0,136103,0,262400,0,0,0,0,0,0,0,0,0,0,0,0,0,33392

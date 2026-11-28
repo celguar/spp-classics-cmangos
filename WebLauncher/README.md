@@ -72,9 +72,17 @@ to fire; a slot missed by more than 30 minutes is recorded as "missed" instead o
 [HermesProxy](https://github.com/WowLegacyCore/HermesProxy) lets the 1.14.x (Classic Era) and
 2.5.x (TBC Classic) game clients play on the Vanilla and TBC servers. It does not support WotLK.
 
-HermesProxy lives in `Server/Tools/HermesProxy` (or set `hermes.dir` in the config): `HermesProxy.exe`
-for Windows and `HermesProxy` for Linux, sharing one `HermesProxy.config`, the `CSV` folder and the
-`AccountData` folder (per-account client data, not tracked by git). In **Server Settings** you choose, per expansion:
+HermesProxy is not part of the repack, so the folder it lives in is empty at first. When
+`Server/Tools/HermesProxy` (or the folder set in `hermes.dir`) has no proxy, the *Server Settings*
+page offers **Download & install HermesProxy**: the launcher downloads `hermes.url` (a release
+build of the proxy), unpacks only HermesProxy, its `HermesProxy.config` and its `CSV` data into
+that folder, and removes the archive it downloaded once they are in place (the Windows archive
+also carries a game launcher and updater scripts nothing here runs, and they are never unpacked).
+With no `hermes.url`, Windows gets `hermes_launcher_classic.zip` and Linux gets `HermesProxy-linux.zip`,
+both from [celguar/HermesProxy releases](https://github.com/celguar/HermesProxy/releases); set
+`hermes.url` to download another build. `AccountData` (per-account client data HermesProxy writes
+next to its executable) is left as it is. In **Server Settings**
+you choose, per expansion:
 
 - whether HermesProxy starts together with the server (it also stops with it, restarts after maintenance and, with **Restarter mode** on, is started again if it crashes; after 5 crashes in 10 minutes the Restarter gives up),
 - which executable to use,
@@ -195,6 +203,7 @@ Copy `config.example.json` to `config.json` and change what you need. Every key 
 | `website.manage` | `auto` | Run the bundled Apache on Windows |
 | `website.url` | empty | Link shown for the website (default `http://<this host>/`) |
 | `binaries.<expansion>` | empty | Folder with your own `mangosd`/`realmd` build (default `Server/Binaries/<expansion>/Bin64` on Windows, `Linux64` on Linux) |
+| `hermes.dir`, `hermes.url` | empty | HermesProxy folder (default `Server/Tools/HermesProxy`) and the archive downloaded into it when that folder has no proxy |
 | `sevenZip` | empty | Path to a 7-Zip executable |
 | `shutdownTimeoutSec` | `0` | Seconds to wait for a clean server shutdown before killing it. `0` waits until mangosd exits by itself (saving a long-running world can take many minutes); a stuck server can still be ended with **Force close** on the Overview page |
 | `autosaveIntervalMin` | `15` | Minutes between autosaves while running (10 to 1440). Set on the *Saves* page |

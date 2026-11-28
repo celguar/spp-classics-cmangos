@@ -4,7 +4,7 @@
 // together with the realm and keeps HermesProxy.config in line with the expansion.
 const fs = require('fs');
 const path = require('path');
-const { IS_WIN, exists, isDir, readText, httpError } = require('./util');
+const { IS_WIN, exists, isDir, readText, mkdirp, rmrf, rmFile, httpError } = require('./util');
 const { ManagedProcess, portOpen } = require('./procs');
 
 // Legacy server build HermesProxy must talk to, per expansion (VersionChecker.IsSupportedLegacyVersion)
@@ -12,6 +12,12 @@ const SERVER_BUILDS = {
   vanilla: { build: 5875, version: '1.12.1', clientMajor: 1 },
   tbc: { build: 8606, version: '2.4.3', clientMajor: 2 },
 };
+
+// Builds the launcher downloads when HermesProxy is not in its folder: release archives
+// whose HermesProxy (executable, HermesProxy.config, CSV data) is unpacked into that
+// folder. Set hermes.url in the config to download another build.
+const RELEASE_URL = 'https://github.com/celguar/HermesProxy/releases/latest/download/hermes_launcher_classic.zip';
+const LINUX_RELEASE_URL = 'https://github.com/celguar/HermesProxy/releases/latest/download/HermesProxy-linux.zip';
 
 // Used when the HermesProxy source is not available to read the list from.
 const FALLBACK_BUILDS = {
@@ -33,6 +39,7 @@ class Hermes {
 
   supported(exp) { return !!SERVER_BUILDS[exp]; }
   serverBuild(exp) { return SERVER_BUILDS[exp] || null; }
+  downloadUrl() { return (this.L.cfg.hermes && this.L.cfg.hermes.url) || (IS_WIN ? RELEASE_URL : LINUX_RELEASE_URL); }
 
   // ---- executables -----------------------------------------------------------------------
   executables() {
@@ -181,6 +188,79 @@ class Hermes {
     return m ? +m[1] : 3724;
   }
 
+  // ---- download the build -------------------------------------------------------------------------
+  // HermesProxy is not part of the repack, so an empty folder gets a build from GitHub:
+  // the Windows release archive also carries a game launcher and updater scripts, which
+  // nothing here runs, so only the folder holding HermesProxy is unpacked and moved up
+  // into HermesProxy's own folder: the folder ends up with the proxy, its config and its
+  // CSV data, and the archive the launcher fetched is deleted once they are in place.
+  async download(ctx) {
+    const url = this.downloadUrl();
+    const zip = path.join(this.dir, path.basename(url.split('?')[0]) || 'hermes.zip');
+    const stage = path.join(this.dir, 'unpacked');
+    mkdirp(this.dir);
+    await rmrf(stage); // what an interrupted attempt left behind
+    const fetched = !exists(zip); // a zip already in the folder is the user's own, kept as it is
+    let installed = false;
+    try {
+      if (exists(zip)) ctx.log(`Using ${path.basename(zip)}, it is already in ${this.dir}`);
+      else {
+        ctx.log(`Downloading HermesProxy from ${url}`);
+        await this.L.tools.download(ctx, url, zip, 'HermesProxy build');
+      }
+      // find the proxy inside the archive by its executable, wherever it sits
+      const entries = await this.L.tools.list(zip);
+      const exe = entries
+        .filter((e) => !e.dir && /^hermesproxy(\.exe)?$/i.test(e.path.split(/[\\/]/).pop()))
+        .sort((a, b) => a.path.length - b.path.length)[0];
+      if (!exe) {
+        if (fetched) {
+          rmFile(zip);
+          ctx.log(`Deleted ${path.basename(zip)}: it is not a HermesProxy build, so the next attempt downloads a new one`, 'warn');
+        }
+        throw httpError(502, `${path.basename(zip)} has no HermesProxy in it. Put a build in ${this.dir} yourself, or point hermes.url at another archive.`);
+      }
+      // the archive may keep the proxy in a folder of its own or straight in its root
+      const parts = exe.path.split(/[\\/]/);
+      const exeName = parts.pop();
+      const sep = exe.path.includes('/') ? '/' : IS_WIN ? '\\' : '/';
+      const from = path.join(stage, ...parts);
+      ctx.log(`Unpacking HermesProxy from ${parts.join('/') || 'the root of'} the archive...`);
+      await this.L.tools.extract(ctx, zip, stage, 'HermesProxy build', [parts.length ? `${parts.join(sep)}${sep}*` : '*']);
+      if (!exists(path.join(from, exeName))) throw new Error(`Unpacking ${path.basename(zip)} left no ${exeName}`);
+      const moved = fs.readdirSync(from);
+      for (const name of moved) {
+        const to = path.join(this.dir, name);
+        await rmrf(to); // the downloaded build replaces whatever is in its way
+        fs.renameSync(path.join(from, name), to);
+        // an unpacked binary does not always keep its executable bit on Linux
+        const st = fs.statSync(to);
+        if (!IS_WIN && /^HermesProxy$/i.test(name) && !(st.mode & 0o111)) {
+          fs.chmodSync(to, 0o755);
+          ctx.log(`Made ${name} executable`, 'ok');
+        }
+      }
+      this.buildCache = null; // its client builds are read from the folder on demand
+      installed = true;
+      ctx.log(`HermesProxy is installed in ${this.dir}: ${moved.join(', ')}`, 'ok');
+    } finally {
+      if (isDir(stage)) {
+        await rmrf(stage);
+        ctx.log('Removed the folder the archive was unpacked in');
+      }
+      if (exists(zip)) {
+        // only an archive the launcher fetched is a temporary file; one that was already
+        // in the folder belongs to whoever put it there and stays
+        if (fetched) {
+          if (installed) {
+            rmFile(zip);
+            ctx.log(`Deleted ${path.basename(zip)}`);
+          } else ctx.log(`Kept ${path.basename(zip)}: nothing was installed, so trying again does not download it a second time`);
+        }
+      }
+    }
+  }
+
   // ---- process ------------------------------------------------------------------------------------
   enabled(exp) { return this.supported(exp) && this.settings(exp).enabled; }
 
@@ -220,6 +300,7 @@ class Hermes {
     const exe = sb ? this.exePath((this.L.state.hermes || {}).exe) : null;
     return {
       dir: this.dir,
+      download: this.downloadUrl(),
       supported: !!sb,
       serverBuild: sb,
       executables: this.executables(),

@@ -797,6 +797,7 @@
         if (e.target.closest('[data-hermes-conf]')) openFile('hermes', 'HermesProxy.config', null, true);
         const hs = e.target.closest('[data-hermes-run]');
         if (hs) act(`/api/hermes/${hs.dataset.hermesRun}`, {}, { onDone: () => this.reloadHermes() });
+        if (e.target.closest('[data-hermes-download]')) act('/api/hermes/download', {}, { onDone: () => this.reloadHermes() });
       });
       root.addEventListener('submit', async (e) => {
         if (e.target.id !== 'hermes-form') return;
@@ -822,8 +823,9 @@
       const intro = '<p>HermesProxy lets the modern Classic game clients (1.14.x for Vanilla, 2.5.x for TBC) play on this server.</p>';
       if (!h.supported) { box.innerHTML = `${intro}<div class="notice">HermesProxy only supports the Vanilla (1.12.1) and TBC (2.4.3) servers, not WotLK.</div>`; return; }
       if (!h.executables.length) {
-        box.innerHTML = `${intro}<div class="notice warning"><strong>HermesProxy was not found.</strong> Put a HermesProxy build (with its HermesProxy.config) in <code>${esc(h.dir)}</code>.
-          Builds: <a href="https://github.com/WowLegacyCore/HermesProxy/releases" target="_blank" rel="noopener">HermesProxy releases</a>.</div>`;
+        box.innerHTML = `${intro}<div class="notice warning"><strong>HermesProxy was not found.</strong>
+          Press <button class="btn" data-hermes-download>Download &amp; install HermesProxy</button>: the launcher fetches <code>${esc(h.download)}</code>, unpacks only HermesProxy, its config and its CSV data into <code>${esc(h.dir)}</code>, and keeps nothing else from the archive.
+          Or put a build (with its HermesProxy.config) in <code>${esc(h.dir)}</code> yourself, or point <code>hermes.url</code> in WebLauncher/config.json at another archive.</div>`;
         return;
       }
       const s = h.settings;

@@ -168,6 +168,7 @@ const routes = {
     return {};
   },
   'POST /api/hermes/stop': async () => { await L.hermes.stop(); L.emit('changed'); return {}; },
+  'POST /api/hermes/download': () => job('Downloading HermesProxy', ctx => L.hermes.download(ctx)),
 
   // scheduled maintenance
   'GET /api/maintenance': () => ({ ...L.scheduler.list(), gitAvailable: gitAvailable(L), isWindows: IS_WIN }),

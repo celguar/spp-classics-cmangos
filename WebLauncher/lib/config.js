@@ -31,8 +31,10 @@ const DEFAULTS = {
   },
   // Folder holding mangosd/realmd per expansion. Empty = Server/Binaries/<exp>/Bin64
   binaries: { vanilla: '', tbc: '', wotlk: '' },
-  // HermesProxy folder with HermesProxy.exe (Windows) and HermesProxy (Linux)
-  hermes: { dir: '' },
+  // HermesProxy folder with HermesProxy.exe (Windows) and HermesProxy (Linux).
+  // url: archive to download into it when that folder has no proxy; empty = the release build
+  // for this system (hermes_launcher_classic.zip on Windows, HermesProxy-linux.zip on Linux)
+  hermes: { dir: '', url: '' },
   sevenZip: '',
   shutdownTimeoutSec: 0, // 0 = wait as long as mangosd needs to save and exit
   autosaveIntervalMin: 15,

@@ -125,12 +125,14 @@ class Tools {
     return found;
   }
 
-  // Extract with full paths into outDir (equivalent of `cd outDir && 7za e -y -spf archive`).
-  async extract(ctx, archive, outDir, label) {
+  // Extract with full paths into outDir. `include` are paths as the archive stores
+  // them (see list()), and only those are taken out of it: an archive can carry more
+  // than the server needs, and the rest is then never written to disk.
+  async extract(ctx, archive, outDir, label, include = []) {
     if (!exists(archive)) throw new Error(`Archive not found: ${archive}`);
     mkdirp(outDir);
     let last = -1;
-    const r = await run(this.sevenZip(), ['x', '-y', '-bsp1', '-bso0', `-o${outDir}`, archive], {
+    const r = await run(this.sevenZip(), ['x', '-y', '-bsp1', '-bso0', `-o${outDir}`, archive, ...include], {
       // 7-Zip redraws its percentage with backspaces, so look at raw chunks
       onData: (t) => {
         const all = [...t.matchAll(/(\d+)%/g)];
@@ -145,6 +147,24 @@ class Tools {
   async compress(archive, folderName, cwd) {
     const r = await run(this.sevenZip(), ['a', '-t7z', '-mx=3', '-bso0', '-bsp0', archive, folderName], { cwd });
     if (r.code !== 0) throw new Error(`Creating ${path.basename(archive)} failed: ${r.stderr.trim()}`);
+  }
+
+  // What is inside an archive: [{ path, dir }], with the path separators the archive
+  // itself uses, so a path can be handed back to extract() as a filter.
+  async list(archive) {
+    if (!exists(archive)) throw new Error(`Archive not found: ${archive}`);
+    const r = await run(this.sevenZip(), ['l', '-slt', archive]);
+    const out = [];
+    let entries = false;
+    for (const line of r.stdout.split(/\r?\n/)) {
+      // the archive itself is described first, its entries come after a dashed line
+      if (!entries) { if (/^-{10,}$/.test(line)) entries = true; continue; }
+      const m = /^Path = (.+)$/.exec(line);
+      if (m) out.push({ path: m[1], dir: false });
+      else if (out.length && /^\s*(Folder = \+|Type = Dir)/.test(line)) out[out.length - 1].dir = true;
+    }
+    if (!entries) throw new Error(`Cannot list ${path.basename(archive)}: 7-Zip did not read it`);
+    return out;
   }
 
   // ---- Downloads ------------------------------------------------------------------

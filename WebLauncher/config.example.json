@@ -26,6 +26,11 @@
     "wotlk": ""
   },
 
+  "hermes": {
+    "dir": "",
+    "url": ""
+  },
+
   "sevenZip": "",
   "shutdownTimeoutSec": 0,
   "autosaveIntervalMin": 15,
